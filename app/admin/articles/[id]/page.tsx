@@ -1,8 +1,8 @@
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { ArticleForm } from '@/components/admin/ArticleForm'
 import { getAllTags } from '@/lib/queries'
 import { notFound } from 'next/navigation'
-import type { Article, Tag } from '@/types'
+import type { Article, ArticleRow, Tag } from '@/types'
 
 export default async function EditArticlePage({
   params,
@@ -11,13 +11,15 @@ export default async function EditArticlePage({
 }) {
   const supabase = await createAdminClient()
 
-  const { data: articleRow } = await supabase
+  const { data } = await supabase
     .from('articles')
     .select('*')
     .eq('id', params.id)
     .single()
 
-  if (!articleRow) notFound()
+  if (!data) notFound()
+
+  const articleRow = data as ArticleRow
 
   const { data: articleTagRows } = await supabase
     .from('article_tags')

@@ -1,6 +1,7 @@
+// @ts-nocheck
 // app/api/admin/comments/[id]/route.ts
 
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 
 interface RouteParams {

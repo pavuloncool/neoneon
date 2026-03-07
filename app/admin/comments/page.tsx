@@ -21,9 +21,9 @@ export default async function AdminCommentsPage() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-ink">{comment.author_name}</p>
                   <p className="text-xs text-muted mt-0.5">
-                    {comment.author_email} · {formatDate(comment.created_at)}
+                    {comment.author_name} · {formatDate(comment.created_at)}
                   </p>
-                  <p className="text-sm text-ink mt-3 leading-relaxed">{comment.body}</p>
+                  <p className="text-sm text-ink mt-3 leading-relaxed">{comment.content}</p>
                 </div>
                 <ApproveCommentButton commentId={comment.id} />
               </div>

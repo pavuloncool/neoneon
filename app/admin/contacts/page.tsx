@@ -1,6 +1,6 @@
 // app/admin/contacts/page.tsx
 
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { formatDate } from '@/lib/utils'
 import type { Contact } from '@/types'
 

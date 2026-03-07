@@ -1,60 +1,14 @@
-// ============================================================
-// types/index.ts — centralne typy projektu
-// ============================================================
-
-export type Category = 'content-writing' | 'ux-strategies'
-export type ArticleStatus = 'draft' | 'published'
-
 export interface Tag {
   id: string
   name: string
   slug: string
 }
 
-export interface Article {
-  id: string
-  slug: string
-  title: string
-  excerpt: string | null
-  content: TiptapContent | null
-  category: Category
-  cover_image_url: string | null
-  status: ArticleStatus
-  published_at: string | null
-  created_at: string
-  updated_at: string
-  // Pole wirtualne — pochodzi z JOIN, nie z tabeli articles
-  tags?: Tag[]
-}
-
-// Wiersz tabeli articles bez pola tags (relacja, nie kolumna)
-export type ArticleRow = Omit<Article, 'tags'>
-
-// Tiptap JSON content
-export interface TiptapContent {
-  type: 'doc'
-  content: TiptapNode[]
-}
-
-export interface TiptapNode {
-  type: string
-  attrs?: Record<string, unknown>
-  content?: TiptapNode[]
-  marks?: TiptapMark[]
-  text?: string
-}
-
-export interface TiptapMark {
-  type: string
-  attrs?: Record<string, unknown>
-}
-
 export interface Comment {
   id: string
   article_id: string
   author_name: string
-  author_email: string
-  body: string
+  content: string
   approved: boolean
   created_at: string
 }
@@ -67,14 +21,48 @@ export interface Contact {
   created_at: string
 }
 
-// Supabase DB types (uproszczone)
-export type Database = {
+export interface Article {
+  id: string
+  slug: string
+  title: string
+  excerpt?: string | null
+  content: any
+  category: 'content-writing' | 'ux-strategies'
+  cover_image_url?: string | null
+  status: 'draft' | 'published'
+  published_at?: string | null
+  created_at: string
+  updated_at: string
+  tags?: Tag[]
+}
+
+export type ArticleRow = Omit<Article, 'tags'>
+
+export interface TiptapNode {
+  type: string
+  attrs?: Record<string, any>
+  content?: TiptapNode[]
+  marks?: TiptapMark[]
+  text?: string
+}
+
+export interface TiptapMark {
+  type: string
+  attrs?: Record<string, any>
+}
+
+export interface TiptapContent {
+  type: 'doc'
+  content: TiptapNode[]
+}
+
+export interface Database {
   public: {
     Tables: {
       articles: {
         Row: ArticleRow
         Insert: Omit<ArticleRow, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<ArticleRow, 'id' | 'created_at'>>
+        Update: Partial<Omit<ArticleRow, 'id' | 'created_at' | 'updated_at'>>
       }
       tags: {
         Row: Tag
@@ -84,18 +72,21 @@ export type Database = {
       article_tags: {
         Row: { article_id: string; tag_id: string }
         Insert: { article_id: string; tag_id: string }
-        Update: never
+        Update: { article_id?: string; tag_id?: string }
       }
       comments: {
         Row: Comment
-        Insert: Omit<Comment, 'id' | 'created_at' | 'approved'>
-        Update: Partial<Pick<Comment, 'approved'>>
+        Insert: Omit<Comment, 'id' | 'created_at'>
+        Update: Partial<Omit<Comment, 'id' | 'created_at'>>
       }
       contacts: {
         Row: Contact
         Insert: Omit<Contact, 'id' | 'created_at'>
-        Update: never
+        Update: Partial<Omit<Contact, 'id' | 'created_at'>>
       }
     }
   }
 }
+
+export type Category = 'content-writing' | 'ux-strategies'
+export type ArticleStatus = 'draft' | 'published'

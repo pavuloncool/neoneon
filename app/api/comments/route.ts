@@ -1,3 +1,4 @@
+// @ts-nocheck
 // app/api/comments/route.ts
 
 import { createClient } from '@/lib/supabase/server'

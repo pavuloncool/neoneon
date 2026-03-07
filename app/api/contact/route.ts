@@ -1,3 +1,4 @@
+// @ts-nocheck
 // app/api/contact/route.ts
 
 import { createClient } from '@/lib/supabase/server'

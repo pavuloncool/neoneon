@@ -146,7 +146,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                           {formatDate(comment.created_at)}
                         </span>
                       </div>
-                      <p className="text-sm text-ink leading-relaxed">{comment.body}</p>
+                      <p className="text-sm text-ink leading-relaxed">{comment.content}</p>
                     </li>
                   ))}
                 </ul>
