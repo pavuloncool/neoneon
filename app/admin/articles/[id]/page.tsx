@@ -1,40 +1,48 @@
-// app/admin/articles/[id]/page.tsx
-
 import { createAdminClient } from '@/lib/supabase/server'
-import { getAllTags } from '@/lib/queries'
 import { ArticleForm } from '@/components/admin/ArticleForm'
+import { getAllTags } from '@/lib/queries'
 import { notFound } from 'next/navigation'
 import type { Article, Tag } from '@/types'
 
-interface EditArticlePageProps {
-  params: Promise<{ id: string }>
-}
-
-export default async function EditArticlePage({ params }: EditArticlePageProps) {
-  const { id } = await params
-  const supabase = await createAdminClient()
+export default async function EditArticlePage({
+  params,
+}: {
+  params: { id: string }
+}) {
+  const supabase = createAdminClient()
 
   const { data: articleRow } = await supabase
     .from('articles')
     .select('*')
-    .eq('id', id)
+    .eq('id', params.id)
     .single()
 
   if (!articleRow) notFound()
 
-  const { data: tagRows } = await supabase
+  const { data: articleTagRows } = await supabase
     .from('article_tags')
     .select('tag_id, tags(id, name, slug)')
-    .eq('article_id', id)
+    .eq('article_id', params.id)
 
-  const tags: Tag[] = (tagRows ?? [])
-    .map((row: { tag_id: string; tags: Tag | Tag[] | null }) => {
-      const t = Array.isArray(row.tags) ? row.tags[0] : row.tags
-      return t ?? null
-    })
+  const tags = (articleTagRows ?? [])
+    .map((r: any) => r.tags)
     .filter(Boolean) as Tag[]
 
-  const article: Article = { ...articleRow, tags }
+  const article: Article = {
+    id: articleRow.id,
+    slug: articleRow.slug,
+    title: articleRow.title,
+    excerpt: articleRow.excerpt ?? undefined,
+    content: articleRow.content,
+    category: articleRow.category,
+    cover_image_url: articleRow.cover_image_url ?? undefined,
+    status: articleRow.status,
+    published_at: articleRow.published_at ?? undefined,
+    created_at: articleRow.created_at,
+    updated_at: articleRow.updated_at,
+    tags,
+  }
+
   const allTags = await getAllTags()
 
   return <ArticleForm article={article} allTags={allTags} />
