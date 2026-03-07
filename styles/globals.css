@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Zmienne CSS ustawiane przez next/font w layout.tsx ──────
+   --font-cormorant, --font-dm-sans, --font-dm-mono
+   są automatycznie wstrzykiwane przez next/font jako className na <html>.
+   NIE definiujemy ich tutaj ponownie.
+─────────────────────────────────────────────────────────────── */
+@layer base {
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #fafaf8;
+    color: #0f0f0f;
+    font-family: var(--font-dm-sans);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  ::selection {
+    background-color: #c8a96e;
+    color: #fafaf8;
+  }
+}
+
+/* ── Typografia artykułu ───────────────────────────────────── */
+@layer components {
+  .article-body {
+    font-family: var(--font-dm-sans);
+    font-size: 1.0625rem;
+    line-height: 1.8;
+  }
+
+  .article-body h1,
+  .article-body h2,
+  .article-body h3 {
+    font-family: var(--font-cormorant);
+    font-weight: 600;
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .article-body h2 {
+    font-size: 2rem;
+  }
+
+  .article-body h3 {
+    font-size: 1.5rem;
+  }
+
+  .article-body p {
+    margin-bottom: 1.5rem;
+  }
+
+  .article-body img {
+    width: 100%;
+    height: auto;
+    border-radius: 2px;
+    margin: 2rem 0;
+  }
+
+  /* Pełnoekranowy obraz tła w nagłówku artykułu */
+  .cover-full {
+    position: relative;
+    width: 100%;
+    height: 70vh;
+    min-height: 400px;
+    overflow: hidden;
+  }
+
+  .cover-full img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Kontener wideo (aspect-ratio 16:9) */
+  .video-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #0f0f0f;
+    margin: 2rem 0;
+  }
+
+  .video-container iframe,
+  .video-container video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* ── Utility ───────────────────────────────────────────────── */
+@layer utilities {
+  /* UWAGA: text-muted, bg-muted, text-accent, bg-accent, border-border
+     są generowane automatycznie przez Tailwind z kolorów w tailwind.config.ts.
+     NIE definiujemy ich tutaj ponownie. */
+
+  /* border-subtle — alias dla border-border z lżejszym semantycznym znaczeniem */
+  .border-subtle {
+    border-color: theme('colors.border');
+  }
+
+  /* Linia dekoracyjna pod linkiem */
+  .link-underline {
+    position: relative;
+    text-decoration: none;
+  }
+
+  .link-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: #c8a96e;
+    transition: width 0.3s ease;
+  }
+
+  .link-underline:hover::after {
+    width: 100%;
+  }
+}
