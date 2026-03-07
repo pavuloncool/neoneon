@@ -9,7 +9,7 @@ export default async function EditArticlePage({
 }: {
   params: { id: string }
 }) {
-  const supabase = createAdminClient()
+  const supabase = await createAdminClient()
 
   const { data: articleRow } = await supabase
     .from('articles')
