@@ -32,21 +32,12 @@ function ThemeToggle({ className }: { className?: string }) {
         setTheme(isDark ? 'light' : 'dark')
       }}
       aria-label="Toggle theme"
-      className={cn('flex items-center justify-center w-6 h-6 transition-opacity active:opacity-50', className)}
+      className={cn('flex items-center justify-center w-6 h-6 active:opacity-50 transition-opacity', className)}
     >
-      {/* Półkolo: lewa czarna / prawa biała — odwraca się w dark mode */}
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-        <circle cx="9" cy="9" r="8" stroke="#0f0f0f" strokeWidth="1.5" className="dark:stroke-paper" />
-        {/* lewa połowa — wypełniona w light, pusta w dark */}
-        <path
-          d="M9 1 A8 8 0 0 0 9 17 Z"
-          fill={isDark ? '#fafaf8' : '#0f0f0f'}
-        />
-        {/* prawa połowa — pusta w light, wypełniona w dark */}
-        <path
-          d="M9 1 A8 8 0 0 1 9 17 Z"
-          fill={isDark ? '#0f0f0f' : '#fafaf8'}
-        />
+        <circle cx="9" cy="9" r="8" stroke="#0f0f0f" strokeWidth="1.5" className="dark:stroke-[#fafaf8]" />
+        <path d="M9 1 A8 8 0 0 0 9 17 Z" fill={isDark ? '#fafaf8' : '#0f0f0f'} />
+        <path d="M9 1 A8 8 0 0 1 9 17 Z" fill={isDark ? '#0f0f0f' : '#fafaf8'} />
       </svg>
     </button>
   )
@@ -96,8 +87,9 @@ export function Nav() {
           <ThemeToggle />
         </div>
 
-        {/* Mobile: search + hamburger */}
+        {/* Mobile: theme toggle + search + hamburger */}
         <div className="md:hidden flex items-center gap-4">
+          <ThemeToggle />
           <Link href="/search" aria-label="Search" className="text-muted hover:text-ink dark:hover:text-paper transition-colors">
             <Search size={16} strokeWidth={1.5} />
           </Link>
@@ -113,7 +105,7 @@ export function Nav() {
         </div>
       </nav>
 
-      {/* Mobile menu */}
+      {/* Mobile menu — bez theme toggle, bo jest już w navbarze */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -140,11 +132,6 @@ export function Nav() {
                   </Link>
                 </li>
               ))}
-              {/* Theme toggle w menu mobilnym */}
-              <li className="px-3 py-3 flex items-center gap-3 border-t border-border dark:border-white/10 mt-1">
-                <span className="text-xs tracking-widest text-muted uppercase">Theme</span>
-                <ThemeToggle />
-              </li>
             </ul>
           </motion.div>
         )}
