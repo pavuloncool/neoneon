@@ -75,15 +75,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     {article.title}
                   </h1>
                   <div className="flex items-center gap-3 flex-wrap">
-                    <span className="text-xs tracking-widest text-muted uppercase">
+                    <span className="text-xs tracking-widest text-muted dark:text-white/60 uppercase">
                       {categoryLabel}
                     </span>
                     <span className="text-border">·</span>
-                    <span className="text-xs text-muted">
+                    <span className="text-xs text-muted dark:text-white/60">
                       {article.published_at ? formatDate(article.published_at) : ''}
                     </span>
                     <span className="text-border">·</span>
-                    <span className="text-xs text-muted">
+                    <span className="text-xs text-muted dark:text-white/60">
                       {readingTime(article.content)}
                     </span>
                   </div>
@@ -93,13 +93,13 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             ) : (
               <div className="max-w-3xl">
                 <div className="flex items-center gap-3 mb-6 flex-wrap">
-                  <span className="text-xs tracking-widest text-muted uppercase">{categoryLabel}</span>
+                  <span className="text-xs tracking-widest text-muted dark:text-white/60 uppercase">{categoryLabel}</span>
                   <span className="text-border">·</span>
-                  <span className="text-xs text-muted">
+                  <span className="text-xs text-muted dark:text-white/60">
                     {article.published_at ? formatDate(article.published_at) : ''}
                   </span>
                   <span className="text-border">·</span>
-                  <span className="text-xs text-muted">
+                  <span className="text-xs text-muted dark:text-white/60">
                     {readingTime(article.content)}
                   </span>
                 </div>
@@ -113,7 +113,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             {(article.excerpt || (article.tags && article.tags.length > 0)) && (
               <div className="mt-8 md:mt-10 pt-8 border-t border-border max-w-3xl">
                 {article.excerpt && (
-                  <p className="text-muted text-lg leading-relaxed mb-5">
+                  <p className="text-muted dark:text-white/70 text-lg leading-relaxed mb-5">
                     {article.excerpt}
                   </p>
                 )}
@@ -151,11 +151,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     <li key={comment.id} className="py-6">
                       <div className="flex items-baseline justify-between mb-2">
                         <span className="text-sm font-medium">{comment.author_name}</span>
-                        <span className="text-xs text-muted">
+                        <span className="text-xs text-muted dark:text-white/60">
                           {formatDate(comment.created_at)}
                         </span>
                       </div>
-                      <p className="text-sm text-ink leading-relaxed">{comment.body}</p>
+                      <p className="text-sm text-ink dark:text-white/90 leading-relaxed">{comment.body}</p>
                     </li>
                   ))}
                 </ul>
