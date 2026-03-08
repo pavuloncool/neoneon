@@ -40,20 +40,27 @@ function ThemeToggle({ className }: { className?: string }) {
 function useScrollVisibility() {
   const [visible, setVisible] = useState(true)
   const lastY = useRef(0)
-
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY
-      if (y < 20) { setVisible(true) }
-      else if (y < lastY.current) { setVisible(true) }
-      else if (y > lastY.current + 8) { setVisible(false) }
+      if (y < 20) setVisible(true)
+      else if (y < lastY.current) setVisible(true)
+      else if (y > lastY.current + 8) setVisible(false)
       lastY.current = y
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
-
   return visible
+}
+
+// Wspólny glass style — używamy inline aby mieć pewność że Safari to zrozumie
+const glassStyle = {
+  background: 'rgba(20, 20, 20, 0.55)',
+  backdropFilter: 'blur(20px) saturate(180%)',
+  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+  border: '1px solid rgba(255, 255, 255, 0.18)',
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.35)',
 }
 
 export function Nav() {
@@ -69,68 +76,64 @@ export function Nav() {
           <Link href="/" className="font-display text-xl tracking-wide hover:text-muted transition-colors">
             Your Name
           </Link>
-
-          {/* Desktop: pełna nawigacja */}
           <div className="hidden md:flex items-center gap-3">
             <ul className="flex items-center gap-1">
               {links.map(({ href, label }) => (
                 <li key={href}>
-                  <Link
-                    href={href}
+                  <Link href={href}
                     className={cn(
                       'text-sm tracking-wide px-3 py-1.5 transition-colors duration-300',
                       pathname?.startsWith(href)
                         ? 'bg-ink text-paper dark:bg-paper dark:text-ink'
                         : 'text-muted hover:bg-ink hover:text-paper dark:hover:bg-paper dark:hover:text-ink'
                     )}
-                  >
-                    {label}
-                  </Link>
+                  >{label}</Link>
                 </li>
               ))}
             </ul>
             <Link href="/search" aria-label="Search"
               className={cn('transition-colors', pathname === '/search' ? 'text-ink dark:text-paper' : 'text-muted hover:text-ink dark:hover:text-paper')}
-            >
-              <Search size={16} strokeWidth={1.5} />
-            </Link>
+            ><Search size={16} strokeWidth={1.5} /></Link>
             <ThemeToggle />
           </div>
         </nav>
       </header>
 
       {/* ── Floating bottom pill: tylko mobile ───────────── */}
-      <motion.div
-        className="md:hidden fixed bottom-6 left-1/2 z-50"
-        style={{ x: '-50%' }}
-        animate={{ y: bottomVisible ? 0 : 100, opacity: bottomVisible ? 1 : 0 }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
+      <div
+        className="md:hidden fixed z-50"
+        style={{
+          bottom: '24px',
+          left: '50%',
+          transform: `translateX(-50%) translateY(${bottomVisible ? '0px' : '100px'})`,
+          opacity: bottomVisible ? 1 : 0,
+          transition: 'transform 0.3s ease, opacity 0.3s ease',
+        }}
       >
-        {/* Pill */}
-        <div className="flex items-center gap-7 px-9 py-4 rounded-full bg-ink/60 dark:bg-paper/60 backdrop-blur-xl border border-white/20 dark:border-black/20 shadow-xl shadow-black/30">
-          <ThemeToggle className="text-paper dark:text-ink w-6 h-6" />
-
+        <div
+          className="flex items-center gap-7 px-9 py-4 rounded-full"
+          style={glassStyle}
+        >
+          <ThemeToggle className="text-white w-6 h-6" />
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
             className="flex flex-col gap-[5px] items-center justify-center w-6 h-6"
           >
-            <span className={cn('block w-5 h-px bg-paper dark:bg-ink transition-transform duration-300', menuOpen && 'translate-y-[6px] rotate-45')} />
-            <span className={cn('block w-5 h-px bg-paper dark:bg-ink transition-opacity duration-300', menuOpen && 'opacity-0')} />
-            <span className={cn('block w-5 h-px bg-paper dark:bg-ink transition-transform duration-300', menuOpen && '-translate-y-[6px] -rotate-45')} />
+            <span className={cn('block w-5 h-px bg-white transition-transform duration-300', menuOpen && 'translate-y-[6px] rotate-45')} />
+            <span className={cn('block w-5 h-px bg-white transition-opacity duration-300', menuOpen && 'opacity-0')} />
+            <span className={cn('block w-5 h-px bg-white transition-transform duration-300', menuOpen && '-translate-y-[6px] -rotate-45')} />
           </button>
-
-          <Link href="/search" aria-label="Search" className="text-paper dark:text-ink flex items-center justify-center w-6 h-6">
+          <Link href="/search" aria-label="Search" className="text-white flex items-center justify-center w-6 h-6">
             <Search size={18} strokeWidth={1.5} />
           </Link>
         </div>
-      </motion.div>
+      </div>
 
       {/* ── Mobile menu — centralnie nad pillem ─────────── */}
       <AnimatePresence>
         {menuOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -139,19 +142,17 @@ export function Nav() {
               className="md:hidden fixed inset-0 z-40"
               onClick={() => setMenuOpen(false)}
             />
-            {/* Menu card — centralnie nad pillem, ten sam glass co pill */}
             <motion.div
-              initial={{ opacity: 0, y: 16, scale: 0.95 }}
+              initial={{ opacity: 0, y: 12, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 16, scale: 0.95 }}
+              exit={{ opacity: 0, y: 12, scale: 0.96 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="md:hidden fixed bottom-28 left-1/2 z-50 -translate-x-1/2 w-72 rounded-3xl overflow-hidden"
+              className="md:hidden fixed z-50 w-72 rounded-3xl overflow-hidden"
               style={{
-                background: 'rgba(15,15,15,0.6)',
-                backdropFilter: 'blur(24px)',
-                WebkitBackdropFilter: 'blur(24px)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+                bottom: '110px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                ...glassStyle,
               }}
             >
               <ul className="flex flex-col p-3">
@@ -163,8 +164,8 @@ export function Nav() {
                       className={cn(
                         'flex items-center justify-center text-sm tracking-wide px-4 py-3.5 rounded-2xl transition-colors duration-200',
                         pathname?.startsWith(href)
-                          ? 'bg-white/20 text-white'
-                          : 'text-white/80 hover:bg-white/10 hover:text-white'
+                          ? 'bg-white/25 text-white font-medium'
+                          : 'text-white/80 hover:bg-white/15 hover:text-white'
                       )}
                     >
                       {label}
