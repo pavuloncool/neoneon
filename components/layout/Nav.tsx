@@ -37,7 +37,6 @@ function ThemeToggle({ className }: { className?: string }) {
   )
 }
 
-// Hook: ukrywa bar przy scroll w dół, pokazuje przy górze
 function useScrollVisibility() {
   const [visible, setVisible] = useState(true)
   const lastY = useRef(0)
@@ -101,14 +100,16 @@ export function Nav() {
       </header>
 
       {/* ── Floating bottom pill: tylko mobile ───────────── */}
-      <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300"
-        style={{ transform: `translateX(-50%) translateY(${bottomVisible ? '0' : '100px'})`, opacity: bottomVisible ? 1 : 0 }}
+      <motion.div
+        className="md:hidden fixed bottom-6 left-1/2 z-50"
+        style={{ x: '-50%' }}
+        animate={{ y: bottomVisible ? 0 : 100, opacity: bottomVisible ? 1 : 0 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
-        <div className="flex items-center gap-6 px-8 py-3.5 rounded-full bg-ink/85 dark:bg-paper/85 backdrop-blur-md shadow-lg shadow-black/20">
-          {/* Lewo: dark/light toggle */}
+        {/* Pill */}
+        <div className="flex items-center gap-7 px-9 py-4 rounded-full bg-ink/60 dark:bg-paper/60 backdrop-blur-xl border border-white/20 dark:border-black/20 shadow-xl shadow-black/30">
           <ThemeToggle className="text-paper dark:text-ink w-6 h-6" />
 
-          {/* Środek: hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
@@ -119,14 +120,13 @@ export function Nav() {
             <span className={cn('block w-5 h-px bg-paper dark:bg-ink transition-transform duration-300', menuOpen && '-translate-y-[6px] -rotate-45')} />
           </button>
 
-          {/* Prawo: search */}
           <Link href="/search" aria-label="Search" className="text-paper dark:text-ink flex items-center justify-center w-6 h-6">
             <Search size={18} strokeWidth={1.5} />
           </Link>
         </div>
-      </div>
+      </motion.div>
 
-      {/* ── Mobile menu (nad pillem) ──────────────────────── */}
+      {/* ── Mobile menu — centralnie nad pillem ─────────── */}
       <AnimatePresence>
         {menuOpen && (
           <>
@@ -136,28 +136,35 @@ export function Nav() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="md:hidden fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+              className="md:hidden fixed inset-0 z-40"
               onClick={() => setMenuOpen(false)}
             />
-            {/* Menu card */}
+            {/* Menu card — centralnie nad pillem, ten sam glass co pill */}
             <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              initial={{ opacity: 0, y: 16, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-              className="md:hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-50 w-64 rounded-2xl bg-paper dark:bg-ink border border-border dark:border-white/10 shadow-xl overflow-hidden"
+              exit={{ opacity: 0, y: 16, scale: 0.95 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className="md:hidden fixed bottom-28 left-1/2 z-50 -translate-x-1/2 w-72 rounded-3xl overflow-hidden"
+              style={{
+                background: 'rgba(15,15,15,0.6)',
+                backdropFilter: 'blur(24px)',
+                WebkitBackdropFilter: 'blur(24px)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+              }}
             >
-              <ul className="flex flex-col p-2">
+              <ul className="flex flex-col p-3">
                 {links.map(({ href, label }) => (
                   <li key={href}>
                     <Link
                       href={href}
                       onClick={() => setMenuOpen(false)}
                       className={cn(
-                        'block text-sm tracking-wide px-4 py-3 rounded-xl transition-colors duration-200',
+                        'flex items-center justify-center text-sm tracking-wide px-4 py-3.5 rounded-2xl transition-colors duration-200',
                         pathname?.startsWith(href)
-                          ? 'bg-ink text-paper dark:bg-paper dark:text-ink'
-                          : 'text-ink dark:text-paper hover:bg-ink/10 dark:hover:bg-paper/10'
+                          ? 'bg-white/20 text-white'
+                          : 'text-white/80 hover:bg-white/10 hover:text-white'
                       )}
                     >
                       {label}
