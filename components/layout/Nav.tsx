@@ -72,7 +72,7 @@ export function Nav() {
     const onScroll = () => {
       const y = window.scrollY
       if (y < 20 || y < lastY.current) setPillVisible(true)
-      else if (y > lastY.current + 8) setPillVisible(false)
+      else if (y > lastY.current + 8) { setPillVisible(false); setMenuOpen(false) }
       lastY.current = y
     }
     window.addEventListener('scroll', onScroll, { passive: true })
