@@ -1,30 +1,18 @@
 // @ts-nocheck
-// app/api/admin/comments/[id]/route.ts
-
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
-interface RouteParams {
-  params: Promise<{ id: string }>
-}
-
-export async function PATCH(request: Request, { params }: RouteParams) {
+export async function PATCH(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const supabase = await createAdminClient()
-
-    const { data: { user } } = await supabase.auth.getUser()
+    const authClient = await createClient()
+    const { data: { user } } = await authClient.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const { approved } = await request.json()
-
-    const { error } = await supabase
-      .from('comments')
-      .update({ approved })
-      .eq('id', id)
-
+    const supabase = createAdminClient()
+    const { error } = await supabase.from('comments').update({ approved: true }).eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-
     return NextResponse.json({ success: true })
   } catch {
     return NextResponse.json({ error: 'Invalid request.' }, { status: 400 })
