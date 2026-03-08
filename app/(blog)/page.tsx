@@ -1,5 +1,4 @@
 // app/(blog)/page.tsx
-
 import { getArticles } from '@/lib/queries'
 import Link from 'next/link'
 import { formatDate } from '@/lib/utils'
@@ -15,7 +14,6 @@ export default async function HomePage() {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-16">
-
       <section className="mb-20">
         <FadeUp>
           <h1 className="font-display text-6xl md:text-8xl font-light leading-none mb-6">
@@ -32,13 +30,13 @@ export default async function HomePage() {
 
       <FadeUp delay={0.25}>
         <section className="grid md:grid-cols-2 gap-px bg-border mb-20">
-          <Link href="/content-writing" className="bg-paper p-10 group hover:bg-ink transition-colors duration-500">
-            <p className="text-xs tracking-widest text-muted group-hover:text-paper/60 mb-3 uppercase transition-colors">Category</p>
-            <h2 className="font-display text-4xl font-light group-hover:text-paper transition-colors">Content Writing</h2>
+          <Link href="/content-writing" className="bg-paper dark:bg-ink dark:border dark:border-white/10 p-10 group hover:bg-ink dark:hover:bg-paper transition-colors duration-500">
+            <p className="text-xs tracking-widest text-muted group-hover:text-paper/60 dark:group-hover:text-ink/60 mb-3 uppercase transition-colors">Category</p>
+            <h2 className="font-display text-4xl font-light group-hover:text-paper dark:text-paper dark:group-hover:text-ink transition-colors">Content Writing</h2>
           </Link>
-          <Link href="/ux-strategies" className="bg-paper p-10 group hover:bg-ink transition-colors duration-500">
-            <p className="text-xs tracking-widest text-muted group-hover:text-paper/60 mb-3 uppercase transition-colors">Category</p>
-            <h2 className="font-display text-4xl font-light group-hover:text-paper transition-colors">UX Strategies</h2>
+          <Link href="/ux-strategies" className="bg-paper dark:bg-ink dark:border dark:border-white/10 p-10 group hover:bg-ink dark:hover:bg-paper transition-colors duration-500">
+            <p className="text-xs tracking-widest text-muted group-hover:text-paper/60 dark:group-hover:text-ink/60 mb-3 uppercase transition-colors">Category</p>
+            <h2 className="font-display text-4xl font-light group-hover:text-paper dark:text-paper dark:group-hover:text-ink transition-colors">UX Strategies</h2>
           </Link>
         </section>
       </FadeUp>
@@ -53,12 +51,12 @@ export default async function HomePage() {
               <StaggerItem key={article.id}>
                 <Link
                   href={`/${article.category}/${article.slug}`}
-                  className="flex flex-col md:flex-row md:items-baseline justify-between px-4 py-5 gap-2 group border-t border-border hover:bg-ink transition-colors duration-300"
+                  className="flex flex-col md:flex-row md:items-baseline justify-between px-4 py-5 gap-2 group border-t border-border hover:bg-ink dark:hover:bg-paper transition-colors duration-300"
                 >
-                  <span className="font-display text-2xl font-light group-hover:text-paper transition-colors duration-300">
+                  <span className="font-display text-2xl font-light group-hover:text-paper dark:group-hover:text-ink transition-colors duration-300">
                     {article.title}
                   </span>
-                  <span className="text-sm text-muted group-hover:text-paper/60 shrink-0 transition-colors duration-300">
+                  <span className="text-sm text-muted group-hover:text-paper/60 dark:group-hover:text-ink/60 shrink-0 transition-colors duration-300">
                     {article.published_at ? formatDate(article.published_at) : ''}
                   </span>
                 </Link>

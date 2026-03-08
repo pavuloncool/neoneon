@@ -1,5 +1,4 @@
 // app/(blog)/content-writing/page.tsx
-
 import { getArticles } from '@/lib/queries'
 import { ArticleCard } from '@/components/blog/ArticleCard'
 import { FadeUp, StaggerList, StaggerItem } from '@/components/ui/Motion'

@@ -46,66 +46,74 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   const comments = await getCommentsByArticle(article.id)
 
+  const categoryLabel = article.category === 'content-writing' ? 'Content Writing' : 'UX Strategies'
+
   return (
     <article>
-      <div className="max-w-5xl mx-auto px-6 py-16">
-
+      <div className="max-w-5xl mx-auto px-6 py-12 md:py-16">
         <FadeUp>
-          <header className="mb-16">
-            <div className="flex items-center gap-3 mb-8">
-              <span className="text-xs tracking-widest text-muted uppercase">
-                {article.category === 'content-writing' ? 'Content Writing' : 'UX Strategies'}
-              </span>
-              <span className="text-border">·</span>
-              <span className="text-xs text-muted">
-                {article.published_at ? formatDate(article.published_at) : ''}
-              </span>
-              <span className="text-border">·</span>
-              <span className="text-xs text-muted">
-                {readingTime(article.content)}
-              </span>
-            </div>
+          <header className="mb-10 md:mb-14">
 
             {article.cover_image_url ? (
-              <div className="grid grid-cols-[1fr_1.2fr] gap-12 items-start">
-                <div className="relative mt-4">
-                  <div className="absolute -top-3 -left-3 w-full h-full border border-border" />
-                  <div className="relative aspect-[4/5] overflow-hidden">
-                    <Image
-                      src={article.cover_image_url}
-                      alt={article.title}
-                      fill
-                      priority
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 40vw"
-                    />
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_1.1fr] gap-8 md:gap-12 items-start">
+
+                {/* Lewa kolumna: samo zdjęcie */}
+                <div className="relative" style={{ paddingBottom: '125%' }}>
+                  <Image
+                    src={article.cover_image_url}
+                    alt={article.title}
+                    fill
+                    priority
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 45vw"
+                  />
                 </div>
-                <div className="flex flex-col justify-center pt-8">
-                  <h1 className="font-display text-5xl md:text-6xl font-light leading-tight mb-6">
+
+                {/* Prawa kolumna: tytuł + meta w jednej linii */}
+                <div className="flex flex-col justify-center md:pt-4">
+                  <h1 className="font-display text-5xl sm:text-6xl md:text-8xl font-light leading-[1.02] tracking-tight mb-8">
                     {article.title}
                   </h1>
-                  {article.excerpt && (
-                    <p className="text-muted text-lg leading-relaxed mb-6">
-                      {article.excerpt}
-                    </p>
-                  )}
-                  {article.tags && article.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {article.tags.map((tag) => (
-                        <TagBadge key={tag.id} tag={tag} />
-                      ))}
-                    </div>
-                  )}
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="text-xs tracking-widest text-muted uppercase">
+                      {categoryLabel}
+                    </span>
+                    <span className="text-border">·</span>
+                    <span className="text-xs text-muted">
+                      {article.published_at ? formatDate(article.published_at) : ''}
+                    </span>
+                    <span className="text-border">·</span>
+                    <span className="text-xs text-muted">
+                      {readingTime(article.content)}
+                    </span>
+                  </div>
                 </div>
+
               </div>
             ) : (
               <div className="max-w-3xl">
-                <h1 className="font-display text-5xl md:text-7xl font-light leading-tight mb-6">
+                <div className="flex items-center gap-3 mb-6 flex-wrap">
+                  <span className="text-xs tracking-widest text-muted uppercase">{categoryLabel}</span>
+                  <span className="text-border">·</span>
+                  <span className="text-xs text-muted">
+                    {article.published_at ? formatDate(article.published_at) : ''}
+                  </span>
+                  <span className="text-border">·</span>
+                  <span className="text-xs text-muted">
+                    {readingTime(article.content)}
+                  </span>
+                </div>
+                <h1 className="font-display text-5xl md:text-8xl font-light leading-tight mb-6">
                   {article.title}
                 </h1>
+              </div>
+            )}
+
+            {/* Lead + tagi */}
+            {(article.excerpt || (article.tags && article.tags.length > 0)) && (
+              <div className="mt-8 md:mt-10 pt-8 border-t border-border max-w-3xl">
                 {article.excerpt && (
-                  <p className="text-muted text-lg leading-relaxed mb-6">
+                  <p className="text-muted text-lg leading-relaxed mb-5">
                     {article.excerpt}
                   </p>
                 )}
@@ -118,6 +126,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 )}
               </div>
             )}
+
           </header>
         </FadeUp>
 
@@ -129,7 +138,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
             <div className="mt-16 pt-8 border-t border-border" />
 
-            <section className="mt-2">
+            <section className="mt-2 pb-8">
               <h2 className="font-display text-3xl font-light mb-8">
                 {comments.length > 0
                   ? `${comments.length} comment${comments.length === 1 ? '' : 's'}`

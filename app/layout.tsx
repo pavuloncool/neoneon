@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Cormorant_Garamond, DM_Sans, DM_Mono } from 'next/font/google'
+import { ThemeProvider } from '@/components/layout/ThemeProvider'
 import '@/styles/globals.css'
 
 const cormorant = Cormorant_Garamond({
@@ -29,26 +30,24 @@ export const metadata: Metadata = {
     default: 'Your Name — Content Writing & UX Strategies',
     template: '%s | Your Name',
   },
-  description:
-    'Writing about content strategy, UX design, and the craft of digital communication.',
+  description: 'Writing about content strategy, UX design, and the craft of digital communication.',
   openGraph: {
     type: 'website',
     locale: 'en_US',
   },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"
       className={`${cormorant.variable} ${dmSans.variable} ${dmMono.variable}`}
+      suppressHydrationWarning
     >
-      <body className="bg-paper text-ink antialiased">
-        {children}
+      <body className="bg-paper text-ink antialiased transition-colors duration-300">
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )

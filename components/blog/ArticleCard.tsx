@@ -20,7 +20,7 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
   if (variant === 'featured') {
     return (
       <motion.article
-        className="group border-t border-border py-8"
+        className="group py-8"
         whileHover={{ x: 4 }}
         transition={{ duration: 0.2 }}
       >
