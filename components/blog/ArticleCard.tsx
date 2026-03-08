@@ -37,14 +37,14 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
             </div>
           )}
           <div className="flex flex-col justify-center">
-            <p className="text-xs tracking-widest text-muted uppercase mb-3">
+            <p className="text-xs tracking-widest text-muted dark:text-white/60 uppercase mb-3">
               {date} · {time}
             </p>
-            <h2 className="font-display text-4xl font-light leading-tight mb-3 group-hover:text-ink transition-colors duration-200">
+            <h2 className="font-display text-4xl font-light leading-tight mb-3 group-hover:text-ink dark:group-hover:text-white transition-colors duration-200">
               {article.title}
             </h2>
             {article.excerpt && (
-              <p className="text-muted text-sm leading-relaxed line-clamp-3">
+              <p className="text-muted dark:text-white/60 text-sm leading-relaxed line-clamp-3">
                 {article.excerpt}
               </p>
             )}
@@ -81,14 +81,14 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
         )}
         <div className="flex flex-col justify-between">
           <div>
-            <p className="text-xs tracking-widest text-muted uppercase mb-2">
+            <p className="text-xs tracking-widest text-muted dark:text-white/60 uppercase mb-2">
               {date} · {time}
             </p>
-            <h3 className="font-display text-2xl font-light leading-snug mb-2 group-hover:text-ink transition-colors duration-200">
+            <h3 className="font-display text-2xl font-light leading-snug mb-2 group-hover:text-ink dark:group-hover:text-white transition-colors duration-200">
               {article.title}
             </h3>
             {article.excerpt && (
-              <p className="text-muted text-sm leading-relaxed line-clamp-2">
+              <p className="text-muted dark:text-white/60 text-sm leading-relaxed line-clamp-2">
                 {article.excerpt}
               </p>
             )}

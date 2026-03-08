@@ -17,7 +17,7 @@ export default async function UXStrategiesPage() {
     <div className="max-w-5xl mx-auto px-6 py-16">
       <FadeUp>
         <header className="mb-12 pb-12 border-b border-border">
-          <p className="text-xs tracking-widest text-muted uppercase mb-3">Category</p>
+          <p className="text-xs tracking-widest text-muted dark:text-white/60 uppercase mb-3">Category</p>
           <h1 className="font-display text-6xl md:text-7xl font-light leading-none">
             UX Strategies
           </h1>
