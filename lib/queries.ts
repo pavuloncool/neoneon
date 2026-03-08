@@ -87,7 +87,7 @@ export async function getAllTags(): Promise<Tag[]> {
 
   const { data } = await supabase
     .from('tags')
-    .select('*')
+    .select('*, articles(title, category, slug)')
     .order('name')
 
   return data ?? []
@@ -100,7 +100,7 @@ export async function getCommentsByArticle(articleId: string): Promise<Comment[]
 
   const { data } = await supabase
     .from('comments')
-    .select('*')
+    .select('*, articles(title, category, slug)')
     .eq('article_id', articleId)
     .eq('approved', true)
     .order('created_at', { ascending: true })
@@ -126,7 +126,7 @@ export async function getPendingComments(): Promise<Comment[]> {
 
   const { data } = await supabase
     .from('comments')
-    .select('*')
+    .select('*, articles(title, category, slug)')
     .eq('approved', false)
     .order('created_at', { ascending: true })
 

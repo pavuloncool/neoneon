@@ -8,7 +8,7 @@ export interface Comment {
   id: string
   article_id: string
   author_name: string
-  content: string
+  body: string
   approved: boolean
   created_at: string
 }
