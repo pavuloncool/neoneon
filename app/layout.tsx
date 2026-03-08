@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     description: 'Writing about online content strategy, UX design and digital communication that work for AI-powered search engines.',
     images: [
       {
-        url: 'https://neoneon.vercel.app/neoneon-og.webp',
+        url: 'https://neoneon.vercel.app/neoneon-og.jpeg',
         width: 1200,
         height: 630,
         alt: 'neoneon',
