@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
@@ -60,11 +61,30 @@ export function Nav() {
 
   return (
     <>
-      {/* Górny navbar — tylko logo na mobile */}
+      {/* Górny navbar */}
       <header className="fixed top-0 inset-x-0 z-50 bg-paper/90 dark:bg-ink/90 backdrop-blur-sm border-b border-border dark:border-white/10">
         <nav className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-          <Link href="/" className="font-display text-xl tracking-wide hover:text-muted transition-colors">
-            Your Name
+          <Link href="/" className="flex items-center">
+            {/* light mode: multiply usuwa białe tło */}
+            <Image
+              src="/neoneon-logo.webp"
+              alt="neoneon"
+              width={120}
+              height={40}
+              className="h-8 w-auto dark:hidden"
+              style={{ mixBlendMode: 'multiply' }}
+              priority
+            />
+            {/* dark mode: screen usuwa ciemne tło */}
+            <Image
+              src="/neoneon-logo.webp"
+              alt="neoneon"
+              width={120}
+              height={40}
+              className="h-8 w-auto hidden dark:block"
+              style={{ mixBlendMode: 'screen' }}
+              priority
+            />
           </Link>
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-3">
@@ -88,7 +108,7 @@ export function Nav() {
         </nav>
       </header>
 
-      {/* Mobile: floating pill — wrapper flex+center rozwiązuje problem bez transform */}
+      {/* Floating pill — mobile */}
       <div
         className="md:hidden fixed inset-x-0 z-50 flex justify-center transition-all duration-300"
         style={{ bottom: pillVisible ? '24px' : '-80px', opacity: pillVisible ? 1 : 0 }}
@@ -110,7 +130,7 @@ export function Nav() {
         </div>
       </div>
 
-      {/* Mobile: menu nad pillem — ten sam wrapper trick */}
+      {/* Mobile menu nad pillem */}
       <div
         className="md:hidden fixed inset-x-0 z-50 flex justify-center transition-all duration-200"
         style={{
@@ -121,12 +141,8 @@ export function Nav() {
         }}
       >
         <div className="w-72 rounded-3xl overflow-hidden" style={glass}>
-          {/* Backdrop klikalny — zamknij menu */}
           {menuOpen && (
-            <div
-              className="fixed inset-0 z-[-1]"
-              onClick={() => setMenuOpen(false)}
-            />
+            <div className="fixed inset-0 z-[-1]" onClick={() => setMenuOpen(false)}/>
           )}
           <ul className="flex flex-col p-3">
             {links.map(({ href, label }) => (
