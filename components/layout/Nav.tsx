@@ -42,6 +42,26 @@ function ThemeToggle({ className }: { className?: string }) {
   )
 }
 
+function Logo() {
+  const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
+  // Przed hydracją — placeholder żeby nie było skoku layoutu
+  if (!mounted) return <div className="h-8 w-28" />
+
+  return (
+    <Image
+      src={resolvedTheme === 'dark' ? '/neoneon-dark.webp' : '/neoneon-light.webp'}
+      alt="neoneon"
+      width={120}
+      height={40}
+      className="h-8 w-auto"
+      priority
+    />
+  )
+}
+
 export function Nav() {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -65,28 +85,8 @@ export function Nav() {
       <header className="fixed top-0 inset-x-0 z-50 bg-paper/90 dark:bg-ink/90 backdrop-blur-sm border-b border-border dark:border-white/10">
         <nav className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center">
-            {/* light mode: multiply usuwa białe tło */}
-            <Image
-              src="/neoneon-logo.webp"
-              alt="neoneon"
-              width={120}
-              height={40}
-              className="h-8 w-auto dark:hidden"
-              style={{ mixBlendMode: 'multiply' }}
-              priority
-            />
-            {/* dark mode: screen usuwa ciemne tło */}
-            <Image
-              src="/neoneon-logo.webp"
-              alt="neoneon"
-              width={120}
-              height={40}
-              className="h-8 w-auto hidden dark:block"
-              style={{ mixBlendMode: 'screen' }}
-              priority
-            />
+            <Logo />
           </Link>
-          {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-3">
             <ul className="flex items-center gap-1">
               {links.map(({ href, label }) => (
@@ -94,13 +94,13 @@ export function Nav() {
                   <Link href={href} className={cn(
                     'text-sm tracking-wide px-3 py-1.5 transition-colors',
                     pathname?.startsWith(href)
-                      ? 'bg-ink text-paper dark:bg-paper dark:text-ink'
-                      : 'text-muted hover:bg-ink hover:text-paper dark:hover:bg-paper dark:hover:text-ink'
+                      ? 'bg-ink text-paper dark:bg-white dark:text-ink'
+                      : 'text-muted hover:bg-ink hover:text-paper dark:hover:bg-white dark:hover:text-ink'
                   )}>{label}</Link>
                 </li>
               ))}
             </ul>
-            <Link href="/search" className="text-muted hover:text-ink dark:hover:text-paper transition-colors">
+            <Link href="/search" className="text-muted hover:text-ink dark:hover:text-white transition-colors">
               <Search size={16} strokeWidth={1.5}/>
             </Link>
             <ThemeToggle/>
