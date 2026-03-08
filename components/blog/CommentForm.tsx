@@ -16,14 +16,12 @@ export function CommentForm({ articleId }: CommentFormProps) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setStatus('loading')
-
     try {
       const res = await fetch('/api/comments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, article_id: articleId }),
       })
-
       if (!res.ok) throw new Error()
       setStatus('success')
       setForm({ author_name: '', author_email: '', body: '' })
@@ -32,56 +30,43 @@ export function CommentForm({ articleId }: CommentFormProps) {
     }
   }
 
+  const inputClass = "bg-transparent border border-border dark:border-white px-3 py-2 text-sm text-ink dark:text-white placeholder:text-muted dark:placeholder:text-white/50 focus:outline-none focus:border-ink dark:focus:border-white transition-colors"
+  const labelClass = "text-xs tracking-widest text-muted dark:text-white uppercase"
+
   return (
     <div className="mt-12 pt-10 border-t border-border">
       <h3 className="font-display text-2xl font-light mb-6">Leave a comment</h3>
 
       {status === 'success' ? (
-        <p className="text-sm text-muted border border-border px-4 py-3">
+        <p className="text-sm text-muted dark:text-white/70 border border-border dark:border-white px-4 py-3">
           Thank you — your comment is awaiting moderation.
         </p>
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs tracking-widest text-muted uppercase">Name</label>
-              <input
-                type="text"
-                required
-                value={form.author_name}
+              <label className={labelClass}>Name</label>
+              <input type="text" required value={form.author_name}
                 onChange={(e) => setForm({ ...form, author_name: e.target.value })}
-                className="bg-transparent border border-border px-3 py-2 text-sm text-ink placeholder:text-muted/50 focus:outline-none focus:border-ink transition-colors"
-                placeholder="Your name"
-              />
+                placeholder="Your name" className={inputClass} />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs tracking-widest text-muted uppercase">Email</label>
-              <input
-                type="email"
-                required
-                value={form.author_email}
+              <label className={labelClass}>Email</label>
+              <input type="email" required value={form.author_email}
                 onChange={(e) => setForm({ ...form, author_email: e.target.value })}
-                className="bg-transparent border border-border px-3 py-2 text-sm text-ink placeholder:text-muted/50 focus:outline-none focus:border-ink transition-colors"
-                placeholder="your@email.com"
-              />
+                placeholder="your@email.com" className={inputClass} />
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs tracking-widest text-muted uppercase">Comment</label>
-            <textarea
-              required
-              rows={5}
-              value={form.body}
+            <label className={labelClass}>Comment</label>
+            <textarea required rows={5} value={form.body}
               onChange={(e) => setForm({ ...form, body: e.target.value })}
-              className="bg-transparent border border-border px-3 py-2 text-sm text-ink placeholder:text-muted/50 focus:outline-none focus:border-ink transition-colors resize-none"
               placeholder="Your thoughts..."
-            />
+              className={cn(inputClass, "resize-none")} />
           </div>
-
           {status === 'error' && (
             <p className="text-xs text-red-500">Something went wrong. Please try again.</p>
           )}
-
           <button
             type="submit"
             disabled={status === 'loading'}
@@ -89,7 +74,7 @@ export function CommentForm({ articleId }: CommentFormProps) {
               'self-start text-xs tracking-widest uppercase px-6 py-3 border transition-colors duration-200',
               status === 'loading'
                 ? 'border-border text-muted cursor-not-allowed'
-                : 'border-ink text-ink hover:bg-ink hover:text-paper'
+                : 'border-ink text-ink hover:bg-ink hover:text-paper dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-ink'
             )}
           >
             {status === 'loading' ? 'Sending...' : 'Submit'}
