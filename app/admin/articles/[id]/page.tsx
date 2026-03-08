@@ -7,14 +7,15 @@ import type { Article, ArticleRow, Tag } from '@/types'
 export default async function EditArticlePage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  const { id } = await params
   const supabase = await createAdminClient()
 
   const { data } = await supabase
     .from('articles')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
 
   if (!data) notFound()
@@ -24,7 +25,7 @@ export default async function EditArticlePage({
   const { data: articleTagRows } = await supabase
     .from('article_tags')
     .select('tag_id, tags(id, name, slug)')
-    .eq('article_id', params.id)
+    .eq('article_id', id)
 
   const tags = (articleTagRows ?? [])
     .map((r: any) => r.tags)

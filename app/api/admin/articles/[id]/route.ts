@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 interface RouteParams {
@@ -9,10 +10,11 @@ interface RouteParams {
 export async function PUT(request: Request, { params }: RouteParams) {
   try {
     const { id } = await params
-    const supabase = await createAdminClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const authClient = await createClient()
+    const { data: { user } } = await authClient.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+    const supabase = createAdminClient()
     const payload = await request.json()
     const { title, slug, excerpt, category, status, cover_image_url, content, tag_ids } = payload
 
@@ -51,10 +53,11 @@ export async function PUT(request: Request, { params }: RouteParams) {
 export async function DELETE(_request: Request, { params }: RouteParams) {
   try {
     const { id } = await params
-    const supabase = await createAdminClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const authClient = await createClient()
+    const { data: { user } } = await authClient.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+    const supabase = createAdminClient()
     const { error } = await supabase.from('articles').delete().eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
