@@ -27,13 +27,25 @@ const dmMono = DM_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Your Name — Content Writing & UX Strategies',
-    template: '%s | Your Name',
+    default: 'neoneon — Content Writing & UX Strategies',
+    template: '%s | neoneon',
   },
-  description: 'Writing about content strategy, UX design, and the craft of digital communication.',
+  description: 'Writing about online content strategy, UX design and digital communication that work for AI-powered search engines.',
   openGraph: {
     type: 'website',
     locale: 'en_US',
+    url: 'https://neoneon.vercel.app',
+    siteName: 'neoneon',
+    title: 'neoneon — Content Writing & UX Strategies',
+    description: 'Writing about online content strategy, UX design and digital communication that work for AI-powered search engines.',
+    images: [
+      {
+        url: 'https://neoneon.vercel.app/neoneon-og.webp',
+        width: 1200,
+        height: 630,
+        alt: 'neoneon',
+      },
+    ],
   },
 }
 
