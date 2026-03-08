@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Search } from 'lucide-react'
 
 const links = [
@@ -22,7 +22,6 @@ function ThemeToggle({ className }: { className?: string }) {
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
   const isDark = mounted && resolvedTheme === 'dark'
-
   return (
     <button
       onClick={() => { if (!mounted) return; setTheme(isDark ? 'light' : 'dark') }}
@@ -54,8 +53,7 @@ function useScrollVisibility() {
   return visible
 }
 
-// Wspólny glass style — używamy inline aby mieć pewność że Safari to zrozumie
-const glassStyle = {
+const glassStyle: React.CSSProperties = {
   background: 'rgba(20, 20, 20, 0.55)',
   backdropFilter: 'blur(20px) saturate(180%)',
   WebkitBackdropFilter: 'blur(20px) saturate(180%)',
@@ -80,35 +78,34 @@ export function Nav() {
             <ul className="flex items-center gap-1">
               {links.map(({ href, label }) => (
                 <li key={href}>
-                  <Link href={href}
-                    className={cn(
-                      'text-sm tracking-wide px-3 py-1.5 transition-colors duration-300',
-                      pathname?.startsWith(href)
-                        ? 'bg-ink text-paper dark:bg-paper dark:text-ink'
-                        : 'text-muted hover:bg-ink hover:text-paper dark:hover:bg-paper dark:hover:text-ink'
-                    )}
-                  >{label}</Link>
+                  <Link href={href} className={cn(
+                    'text-sm tracking-wide px-3 py-1.5 transition-colors duration-300',
+                    pathname?.startsWith(href)
+                      ? 'bg-ink text-paper dark:bg-paper dark:text-ink'
+                      : 'text-muted hover:bg-ink hover:text-paper dark:hover:bg-paper dark:hover:text-ink'
+                  )}>{label}</Link>
                 </li>
               ))}
             </ul>
-            <Link href="/search" aria-label="Search"
-              className={cn('transition-colors', pathname === '/search' ? 'text-ink dark:text-paper' : 'text-muted hover:text-ink dark:hover:text-paper')}
-            ><Search size={16} strokeWidth={1.5} /></Link>
+            <Link href="/search" aria-label="Search" className={cn('transition-colors', pathname === '/search' ? 'text-ink dark:text-paper' : 'text-muted hover:text-ink dark:hover:text-paper')}>
+              <Search size={16} strokeWidth={1.5} />
+            </Link>
             <ThemeToggle />
           </div>
         </nav>
       </header>
 
-      {/* ── Floating bottom pill: tylko mobile ───────────── */}
+      {/* ── Floating bottom pill ─────────────────────────── */}
+      {/* Wrapper: fixed, full-width, flex center — NIE używamy transform na tym elemencie */}
       <div
-        className="md:hidden fixed z-50"
+        className="md:hidden fixed left-0 right-0 z-50 flex justify-center"
         style={{
           bottom: '24px',
-          left: '50%',
-          transform: `translateX(-50%) translateY(${bottomVisible ? '0px' : '100px'})`,
+          transition: 'opacity 0.3s ease, bottom 0.3s ease',
           opacity: bottomVisible ? 1 : 0,
-          transition: 'transform 0.3s ease, opacity 0.3s ease',
-        }}
+          pointerEvents: bottomVisible ? 'auto' : 'none',
+          bottom: bottomVisible ? '24px' : '-80px',
+        } as React.CSSProperties}
       >
         <div
           className="flex items-center gap-7 px-9 py-4 rounded-full"
@@ -138,42 +135,39 @@ export function Nav() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
               className="md:hidden fixed inset-0 z-40"
               onClick={() => setMenuOpen(false)}
             />
-            <motion.div
-              initial={{ opacity: 0, y: 12, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 12, scale: 0.96 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="md:hidden fixed z-50 w-72 rounded-3xl overflow-hidden"
-              style={{
-                bottom: '110px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                ...glassStyle,
-              }}
-            >
-              <ul className="flex flex-col p-3">
-                {links.map(({ href, label }) => (
-                  <li key={href}>
-                    <Link
-                      href={href}
-                      onClick={() => setMenuOpen(false)}
-                      className={cn(
-                        'flex items-center justify-center text-sm tracking-wide px-4 py-3.5 rounded-2xl transition-colors duration-200',
-                        pathname?.startsWith(href)
-                          ? 'bg-white/25 text-white font-medium'
-                          : 'text-white/80 hover:bg-white/15 hover:text-white'
-                      )}
-                    >
-                      {label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
+            {/* Wrapper: full-width, flex center — transform tylko Y/scale przez Framer */}
+            <div className="md:hidden fixed left-0 right-0 z-50 flex justify-center" style={{ bottom: '110px' }}>
+              <motion.div
+                initial={{ opacity: 0, y: 12, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 12, scale: 0.96 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="w-72 rounded-3xl overflow-hidden"
+                style={glassStyle}
+              >
+                <ul className="flex flex-col p-3">
+                  {links.map(({ href, label }) => (
+                    <li key={href}>
+                      <Link
+                        href={href}
+                        onClick={() => setMenuOpen(false)}
+                        className={cn(
+                          'flex items-center justify-center text-sm tracking-wide px-4 py-3.5 rounded-2xl transition-colors duration-200',
+                          pathname?.startsWith(href)
+                            ? 'bg-white/25 text-white font-medium'
+                            : 'text-white/80 hover:bg-white/15 hover:text-white'
+                        )}
+                      >
+                        {label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>
