@@ -6,7 +6,7 @@ import { FadeUp, StaggerList, StaggerItem } from '@/components/ui/Motion'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Your Name — Content Writing & UX Strategies',
+  title: 'neoneon — Content Writing & UX Strategies',
 }
 
 export default async function HomePage() {

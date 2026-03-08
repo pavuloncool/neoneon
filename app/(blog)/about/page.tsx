@@ -13,7 +13,7 @@ export default function AboutPage() {
       <header className="mb-16">
         <p className="text-xs tracking-widest text-muted uppercase mb-4">About</p>
         <h1 className="font-display text-6xl md:text-7xl font-light leading-none">
-          Your Name
+          Paweł Kuligowski
         </h1>
       </header>
 
