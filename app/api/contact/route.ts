@@ -1,54 +1,39 @@
 // @ts-nocheck
-// app/api/contact/route.ts
-
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { Resend } from 'resend'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(request: Request) {
   try {
-    const payload = await request.json()
-    const { name, email, message } = payload
-
-    // Walidacja
+    const { name, email, message } = await request.json()
     if (!name || !email || !message) {
-      return NextResponse.json(
-        { error: 'All fields are required.' },
-        { status: 400 }
-      )
-    }
-
-    // Podstawowa walidacja email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Invalid email address.' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'All fields required.' }, { status: 400 })
     }
 
     const supabase = await createClient()
+    await supabase.from('contacts').insert({ name, email, message })
 
-    const { error } = await supabase
-      .from('contacts')
-      .insert({
-        name: name.trim(),
-        email: email.trim().toLowerCase(),
-        message: message.trim(),
-      })
+    const { data, error } = await resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: 'pavulon.cool@gmail.com',
+      subject: `Nowa wiadomość od ${name}`,
+      html: `
+        <p><strong>Imię:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Wiadomość:</strong></p>
+        <p>${message}</p>
+      `,
+    })
 
-    if (error) {
-      console.error('Contact insert error:', error)
-      return NextResponse.json(
-        { error: 'Failed to save message.' },
-        { status: 500 }
-      )
-    }
+    console.log('Resend response:', { data, error })
 
-    return NextResponse.json({ success: true }, { status: 201 })
-  } catch {
-    return NextResponse.json(
-      { error: 'Invalid request.' },
-      { status: 400 }
-    )
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    return NextResponse.json({ success: true })
+  } catch (e) {
+    console.error('Contact error:', e)
+    return NextResponse.json({ error: 'Invalid request.' }, { status: 400 })
   }
 }
