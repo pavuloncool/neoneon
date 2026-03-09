@@ -24,7 +24,7 @@ export async function getArticles(options?: {
     const { data: articleIds } = await supabase
       .from('article_tags')
       .select('article_id')
-      .eq('tag_id', tagData.id)
+      .eq('tag_id', (tagData as any).id)
 
     if (!articleIds || articleIds.length === 0) return []
 
