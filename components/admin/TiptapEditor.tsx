@@ -57,8 +57,8 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
       className={cn(
         'px-2.5 py-1.5 text-xs border transition-colors',
         active
-          ? 'border-ink bg-ink text-paper'
-          : 'border-transparent text-muted hover:text-ink hover:border-border'
+          ? 'border-[#0f0f0f] bg-[#0f0f0f] text-[#fafaf8]'
+          : 'border-transparent text-[#0f0f0f] hover:text-[#0f0f0f] hover:border-[#e5e5e0]'
       )}
     >
       {children}
@@ -75,11 +75,9 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
     const supabase = createClient()
     const ext = file.name.split('.').pop()
     const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-
     const { error } = await supabase.storage
       .from('images')
       .upload(filename, file, { cacheControl: '3600', upsert: false })
-
     if (error) {
       alert('Upload failed: ' + error.message)
       return
@@ -100,8 +98,7 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
   }
 
   return (
-    <div className="border border-border">
-      {/* Hidden file input */}
+    <div className="border border-[#e5e5e0]">
       <input
         ref={imageInputRef}
         type="file"
@@ -115,23 +112,15 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
       />
 
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-border bg-paper">
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          active={editor.isActive('bold')}
-          title="Bold"
-        >
-          B
+      <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-[#e5e5e0] bg-[#fafaf8]">
+        <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')} title="Bold">
+          <strong>B</strong>
         </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          active={editor.isActive('italic')}
-          title="Italic"
-        >
-          I
+        <ToolbarButton onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive('italic')} title="Italic">
+          <em>I</em>
         </ToolbarButton>
 
-        <span className="w-px h-4 bg-border mx-1" />
+        <span className="w-px h-4 bg-[#e5e5e0] mx-1" />
 
         {[2, 3, 4].map((level) => (
           <ToolbarButton
@@ -144,64 +133,39 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
           </ToolbarButton>
         ))}
 
-        <span className="w-px h-4 bg-border mx-1" />
+        <span className="w-px h-4 bg-[#e5e5e0] mx-1" />
 
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          active={editor.isActive('bulletList')}
-          title="Bullet list"
-        >
+        <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive('bulletList')} title="Bullet list">
           • List
         </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          active={editor.isActive('orderedList')}
-          title="Ordered list"
-        >
+        <ToolbarButton onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive('orderedList')} title="Ordered list">
           1. List
         </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          active={editor.isActive('blockquote')}
-          title="Blockquote"
-        >
+        <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive('blockquote')} title="Blockquote">
           &ldquo;&rdquo;
         </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-          active={editor.isActive('codeBlock')}
-          title="Code block"
-        >
+        <ToolbarButton onClick={() => editor.chain().focus().toggleCodeBlock().run()} active={editor.isActive('codeBlock')} title="Code block">
           {'</>'}
         </ToolbarButton>
 
-        <span className="w-px h-4 bg-border mx-1" />
+        <span className="w-px h-4 bg-[#e5e5e0] mx-1" />
 
         <ToolbarButton onClick={addLink} active={editor.isActive('link')} title="Add link">
           Link
         </ToolbarButton>
-        <ToolbarButton
-          onClick={() => imageInputRef.current?.click()}
-          title="Upload image"
-        >
+        <ToolbarButton onClick={() => imageInputRef.current?.click()} title="Upload image">
           Image
         </ToolbarButton>
         <ToolbarButton onClick={addYoutube} title="Add YouTube">
           YT
         </ToolbarButton>
 
-        <span className="w-px h-4 bg-border mx-1" />
+        <span className="w-px h-4 bg-[#e5e5e0] mx-1" />
 
-        <ToolbarButton
-          onClick={() => editor.chain().focus().undo().run()}
-          title="Undo"
-        >
+        <ToolbarButton onClick={() => editor.chain().focus().undo().run()} title="Undo">
           ↩
         </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().redo().run()}
-          title="Redo"
-        >
+        <ToolbarButton onClick={() => editor.chain().focus().redo().run()} title="Redo">
           ↪
         </ToolbarButton>
       </div>

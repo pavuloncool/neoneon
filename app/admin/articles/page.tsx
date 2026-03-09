@@ -35,10 +35,10 @@ export default async function AdminArticlesPage() {
                 <span className={`text-xs tracking-widest uppercase ${article.status === 'published' ? 'text-accent' : 'text-muted'}`}>
                   {article.status}
                 </span>
-                <Link href={`/admin/articles/${article.id}`} className="text-xs text-muted hover:text-ink transition-colors">
+                <Link href={`/admin/articles/${article.id}`} className="text-xs text-[#0f0f0f] hover:text-accent transition-colors">
                   Edit →
                 </Link>
-                <Link href={`/${article.category}/${article.slug}`} target="_blank" className="text-xs text-muted hover:text-ink transition-colors">
+                <Link href={`/${article.category}/${article.slug}`} target="_blank" className="text-xs text-[#0f0f0f] hover:text-accent transition-colors">
                   View ↗
                 </Link>
               </div>

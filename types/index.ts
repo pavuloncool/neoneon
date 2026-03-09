@@ -27,7 +27,7 @@ export interface Article {
   title: string
   excerpt?: string | null
   content: any
-  category: 'content-writing' | 'ux-strategies'
+  category: 'content-writing' | 'ux-strategies' | 'data-visualisation'
   cover_image_url?: string | null
   cover_focal_x?: number | null
   cover_focal_y?: number | null
@@ -36,6 +36,8 @@ export interface Article {
   created_at: string
   updated_at: string
   tags?: Tag[]
+  locale: 'pl' | 'en'
+  translation_id?: string | null
 }
 
 export type ArticleRow = Omit<Article, 'tags'>

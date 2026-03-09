@@ -1,0 +1,71 @@
+{
+  "nav": {
+    "contentWriting": "Content Writing",
+    "uxStrategies": "UX Strategies",
+    "dataVisualisation": "Data Visualisation",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "home": {
+    "tagline": "Writing,that works.",
+    "subtitle": "Exploring the intersection of content strategy and user experience design.",
+    "recent": "Recent",
+    "category": "Category"
+  },
+  "article": {
+    "readMore": "Read more",
+    "publishedAt": "Published"
+  },
+  "footer": {
+    "allRightsReserved": "All rights reserved."
+  },
+  "category": {
+    "label": "Category",
+    "filterByTag": "Filter by tag",
+    "noArticles": "No articles in this category."
+  },
+  "about": {
+    "label": "About",
+    "bio1": "I write about the intersection of content strategy and user experience — two disciplines that, when done well, become indistinguishable from each other.",
+    "bio2": "For the past several years I have helped companies find their voice online, structure information that users actually read, and build content systems that scale without losing humanity.",
+    "bio3": "When I am not writing, I am probably reading something about typography, cognitive psychology, or the history of publishing.",
+    "cta": "Get in touch →",
+    "areasLabel": "Areas of focus",
+    "area1Title": "Content Strategy",
+    "area1Desc": "Information architecture, content audits, editorial planning and voice development.",
+    "area2Title": "UX Writing",
+    "area2Desc": "Interface copy, microcopy, onboarding flows and error messaging.",
+    "area3Title": "Content Design",
+    "area3Desc": "Bridging the gap between design systems and the words that live inside them.",
+    "area4Title": "Editorial",
+    "area4Desc": "Long-form articles, case studies, white papers and brand storytelling."
+  },
+  "contact": {
+    "label": "Contact",
+    "heading": "Get in touch",
+    "intro1": "Whether you have a project in mind, a question about my work, or just want to say hello — I would love to hear from you.",
+    "intro2": "I typically respond within two business days.",
+    "fieldName": "Name",
+    "fieldEmail": "Email",
+    "fieldMessage": "Message",
+    "placeholderName": "Your name",
+    "placeholderEmail": "your@email.com",
+    "placeholderMessage": "What's on your mind?",
+    "send": "Send message",
+    "sending": "Sending...",
+    "error": "Something went wrong. Please try again.",
+    "successTitle": "Thank you.",
+    "successBody": "Your message has been received. I will be in touch soon."
+  },
+  "search": {
+    "heading": "Search",
+    "placeholder": "Search articles...",
+    "button": "Search",
+    "filterByTag": "Filter by tag",
+    "noResults": "No results",
+    "result": "result",
+    "results": "results",
+    "tryDifferent": "Try a different search term or browse by tag.",
+    "enterTerm": "Enter a search term or select a tag above."
+  }
+}

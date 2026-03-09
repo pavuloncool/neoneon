@@ -141,3 +141,8 @@
 .dark nav a:hover {
   color: rgba(15, 15, 15, 0.5) !important;
 }
+
+/* Dark mode hover fix: przyciski z białym tłem muszą mieć czarny tekst */
+.dark button[type="submit"]:hover {
+  color: #0f0f0f !important;
+}

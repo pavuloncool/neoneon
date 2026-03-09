@@ -1,0 +1,71 @@
+{
+  "nav": {
+    "contentWriting": "Content Writing",
+    "uxStrategies": "UX Strategies",
+    "dataVisualisation": "Data Visualisation",
+    "about": "O mnie",
+    "contact": "Kontakt"
+  },
+  "home": {
+    "tagline": "Pisanie,które działa.",
+    "subtitle": "Badamy punkt przecięcia strategii treści i projektowania doświadczeń użytkownika.",
+    "recent": "Najnowsze",
+    "category": "Kategoria"
+  },
+  "article": {
+    "readMore": "Czytaj więcej",
+    "publishedAt": "Opublikowano"
+  },
+  "footer": {
+    "allRightsReserved": "Wszelkie prawa zastrzeżone."
+  },
+  "category": {
+    "label": "Kategoria",
+    "filterByTag": "Filtruj po tagu",
+    "noArticles": "Brak artykułów w tej kategorii."
+  },
+  "about": {
+    "label": "O mnie",
+    "bio1": "Piszę o punkcie przecięcia strategii treści i doświadczeń użytkownika — dwóch dyscyplin, które dobrze wykonane stają się od siebie nieodróżnialne.",
+    "bio2": "Od kilku lat pomagam firmom znaleźć swój głos online, porządkować informacje, które użytkownicy faktycznie czytają, i budować systemy treści, które się skalują bez utraty człowieczeństwa.",
+    "bio3": "Gdy nie piszę, prawdopodobnie czytam coś o typografii, psychologii poznawczej lub historii wydawnictw.",
+    "cta": "Skontaktuj się →",
+    "areasLabel": "Obszary działania",
+    "area1Title": "Strategia treści",
+    "area1Desc": "Architektura informacji, audyty treści, planowanie redakcyjne i budowanie głosu marki.",
+    "area2Title": "UX Writing",
+    "area2Desc": "Teksty interfejsu, microcopy, przepływy onboardingowe i komunikaty błędów.",
+    "area3Title": "Content Design",
+    "area3Desc": "Łączenie systemów projektowania ze słowami, które w nich żyją.",
+    "area4Title": "Redakcja",
+    "area4Desc": "Artykuły długoformowe, case studies, white papers i brand storytelling."
+  },
+  "contact": {
+    "label": "Kontakt",
+    "heading": "Napisz do mnie",
+    "intro1": "Czy masz projekt, pytanie o moją pracę, czy po prostu chcesz się przywitać — chętnie usłyszę od Ciebie.",
+    "intro2": "Zazwyczaj odpowiadam w ciągu dwóch dni roboczych.",
+    "fieldName": "Imię",
+    "fieldEmail": "Email",
+    "fieldMessage": "Wiadomość",
+    "placeholderName": "Twoje imię",
+    "placeholderEmail": "twoj@email.com",
+    "placeholderMessage": "O czym chcesz porozmawiać?",
+    "send": "Wyślij wiadomość",
+    "sending": "Wysyłanie...",
+    "error": "Coś poszło nie tak. Spróbuj ponownie.",
+    "successTitle": "Dziękuję.",
+    "successBody": "Twoja wiadomość dotarła. Odezwę się wkrótce."
+  },
+  "search": {
+    "heading": "Szukaj",
+    "placeholder": "Szukaj artykułów...",
+    "button": "Szukaj",
+    "filterByTag": "Filtruj po tagu",
+    "noResults": "Brak wyników",
+    "result": "wynik",
+    "results": "wyniki",
+    "tryDifferent": "Spróbuj innego zapytania lub przeglądaj po tagach.",
+    "enterTerm": "Wpisz zapytanie lub wybierz tag powyżej."
+  }
+}

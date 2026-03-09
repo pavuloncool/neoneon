@@ -1,11 +1,11 @@
 'use client'
 
-// app/(blog)/contact/page.tsx
-
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 export default function ContactPage() {
+  const t = useTranslations('contact')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [form, setForm] = useState({ name: '', email: '', message: '' })
 
@@ -32,58 +32,51 @@ export default function ContactPage() {
   return (
     <div className="max-w-3xl mx-auto px-6 py-16">
       <header className="mb-16">
-        <p className={cn(labelClass, "mb-4")}>Contact</p>
-        <h1 className="font-display text-6xl md:text-7xl font-light leading-none">
-          Get in touch
-        </h1>
+        <p className={cn(labelClass, "mb-4")}>{t('label')}</p>
+        <h1 className="font-display text-6xl md:text-7xl font-light leading-none">{t('heading')}</h1>
       </header>
-
       <div className="grid md:grid-cols-[1fr_2fr] gap-12">
         <div className="flex flex-col gap-6 text-sm text-muted dark:text-white/70 leading-relaxed">
-          <p>Whether you have a project in mind, a question about my work, or just want to say hello — I would love to hear from you.</p>
-          <p>I typically respond within two business days.</p>
+          <p>{t('intro1')}</p>
+          <p>{t('intro2')}</p>
         </div>
-
         {status === 'success' ? (
           <div className="border border-border dark:border-white px-6 py-8">
-            <p className="font-display text-2xl font-light mb-2">Thank you.</p>
-            <p className="text-sm text-muted dark:text-white/70">Your message has been received. I will be in touch soon.</p>
+            <p className="font-display text-2xl font-light mb-2">{t('successTitle')}</p>
+            <p className="text-sm text-muted dark:text-white/70">{t('successBody')}</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>Name</label>
+              <label className={labelClass}>{t('fieldName')}</label>
               <input type="text" required value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Your name" className={inputClass} />
+                placeholder={t('placeholderName')} className={inputClass} />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>Email</label>
+              <label className={labelClass}>{t('fieldEmail')}</label>
               <input type="email" required value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                placeholder="your@email.com" className={inputClass} />
+                placeholder={t('placeholderEmail')} className={inputClass} />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>Message</label>
+              <label className={labelClass}>{t('fieldMessage')}</label>
               <textarea required rows={6} value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
-                placeholder="What's on your mind?"
+                placeholder={t('placeholderMessage')}
                 className={cn(inputClass, "resize-none")} />
             </div>
             {status === 'error' && (
-              <p className="text-xs text-red-500">Something went wrong. Please try again.</p>
+              <p className="text-xs text-red-500">{t('error')}</p>
             )}
-            <button
-              type="submit"
-              disabled={status === 'loading'}
+            <button type="submit" disabled={status === 'loading'}
               className={cn(
                 'self-start text-xs tracking-widest uppercase px-8 py-3 border transition-colors duration-200',
                 status === 'loading'
                   ? 'border-border text-muted cursor-not-allowed'
                   : 'border-ink text-ink hover:bg-ink hover:text-paper dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-ink'
-              )}
-            >
-              {status === 'loading' ? 'Sending...' : 'Send message'}
+              )}>
+              {status === 'loading' ? t('sending') : t('send')}
             </button>
           </form>
         )}

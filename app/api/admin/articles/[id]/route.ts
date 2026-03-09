@@ -16,7 +16,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     const supabase = createAdminClient()
     const payload = await request.json()
-    const { title, slug, excerpt, category, status, cover_image_url, cover_focal_x, cover_focal_y, content, tag_ids } = payload
+    const { title, slug, excerpt, category, status, locale, translation_id, cover_image_url, cover_focal_x, cover_focal_y, content, tag_ids } = payload
 
     const { data: existing } = await supabase
       .from('articles')
@@ -24,8 +24,8 @@ export async function PUT(request: Request, { params }: RouteParams) {
       .eq('id', id)
       .single()
 
-    const prevStatus = existing ? existing.status : null
-    const prevPublishedAt = existing ? existing.published_at : null
+    const prevStatus = existing?.status ?? null
+    const prevPublishedAt = existing?.published_at ?? null
     const published_at = status === 'published' && prevStatus !== 'published'
       ? new Date().toISOString()
       : prevPublishedAt
@@ -38,6 +38,8 @@ export async function PUT(request: Request, { params }: RouteParams) {
         excerpt: excerpt || null,
         category,
         status,
+        locale: locale ?? 'pl',
+        translation_id: translation_id || null,
         cover_image_url: cover_image_url || null,
         cover_focal_x: cover_focal_x ?? 0.5,
         cover_focal_y: cover_focal_y ?? 0.5,

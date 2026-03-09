@@ -4,7 +4,7 @@ import { ThemeProvider } from '@/components/layout/ThemeProvider'
 import '@/styles/globals.css'
 
 const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
+  subsets: ['latin', 'latin-ext'],
   weight: ['300', '400', '500', '600', '700'],
   style: ['normal', 'italic'],
   variable: '--font-cormorant',
@@ -33,11 +33,8 @@ export const metadata: Metadata = {
   description: 'Writing about online content strategy, UX design and digital communication that work for AI-powered search engines.',
   openGraph: {
     type: 'website',
-    locale: 'en_US',
     url: 'https://neoneon.vercel.app',
     siteName: 'neoneon',
-    title: 'neoneon — Content Writing & UX Strategies',
-    description: 'Writing about online content strategy, UX design and digital communication that work for AI-powered search engines.',
     images: [
       {
         url: 'https://neoneon.vercel.app/neoneon-og.jpeg',
@@ -52,9 +49,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
-      lang="en"
-      className={`${cormorant.variable} ${dmSans.variable} ${dmMono.variable}`}
       suppressHydrationWarning
+      className={`${cormorant.variable} ${dmSans.variable} ${dmMono.variable}`}
     >
       <body className="bg-paper text-ink antialiased transition-colors duration-300">
         <ThemeProvider>

@@ -1,20 +1,13 @@
 'use client'
 
-import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
+import { Link, usePathname } from '@/i18n/navigation'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
 import { useState, useEffect, useRef } from 'react'
 import { Search } from 'lucide-react'
-
-const links = [
-  { href: '/content-writing', label: 'Content Writing' },
-  { href: '/ux-strategies', label: 'UX Strategies' },
-  { href: '/data-visualisation', label: 'Data Visualisation' },
-  { href: '/about', label: 'About' },
-  { href: '/contact', label: 'Contact' },
-]
+import { useTranslations } from 'next-intl'
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher'
 
 const glass: React.CSSProperties = {
   background: 'rgba(20,20,20,0.55)',
@@ -47,10 +40,7 @@ function Logo() {
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
-
-  // Przed hydracją — placeholder żeby nie było skoku layoutu
   if (!mounted) return <div className="h-8 w-28" />
-
   return (
     <Image
       src={resolvedTheme === 'dark' ? '/neoneon-dark.webp' : '/neoneon-light.webp'}
@@ -64,10 +54,19 @@ function Logo() {
 }
 
 export function Nav() {
+  const t = useTranslations('nav')
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
   const [pillVisible, setPillVisible] = useState(true)
   const lastY = useRef(0)
+
+  const links = [
+    { href: '/content-writing' as const, label: t('contentWriting') },
+    { href: '/ux-strategies' as const, label: t('uxStrategies') },
+    { href: '/data-visualisation' as const, label: t('dataVisualisation') },
+    { href: '/about' as const, label: t('about') },
+    { href: '/contact' as const, label: t('contact') },
+  ]
 
   useEffect(() => {
     const onScroll = () => {
@@ -82,7 +81,7 @@ export function Nav() {
 
   return (
     <>
-      {/* Górny navbar */}
+      {/* Górny navbar — desktop */}
       <header className="fixed top-0 inset-x-0 z-50 bg-paper/90 dark:bg-ink/90 backdrop-blur-sm border-b border-border dark:border-white/10">
         <nav className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center">
@@ -105,6 +104,7 @@ export function Nav() {
               <Search size={16} strokeWidth={1.5}/>
             </Link>
             <ThemeToggle/>
+            <LanguageSwitcher />
           </div>
         </nav>
       </header>
@@ -114,8 +114,9 @@ export function Nav() {
         className="md:hidden fixed inset-x-0 z-50 flex justify-center transition-all duration-300"
         style={{ bottom: pillVisible ? '24px' : '-80px', opacity: pillVisible ? 1 : 0 }}
       >
-        <div className="flex items-center gap-7 px-9 py-4 rounded-full" style={glass}>
+        <div className="flex items-center gap-6 px-9 py-4 rounded-full" style={glass}>
           <ThemeToggle className="text-white w-6 h-6"/>
+          <LanguageSwitcher dark />
           <button
             onClick={() => setMenuOpen(o => !o)}
             aria-label="Toggle menu"

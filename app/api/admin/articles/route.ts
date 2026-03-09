@@ -12,7 +12,7 @@ export async function POST(request: Request) {
 
     const supabase = createAdminClient()
     const payload = await request.json()
-    const { title, slug, excerpt, category, status, cover_image_url, cover_focal_x, cover_focal_y, content, tag_ids } = payload
+    const { title, slug, excerpt, category, status, locale, translation_id, cover_image_url, cover_focal_x, cover_focal_y, content, tag_ids } = payload
 
     const finalSlug = slug || slugify(title)
     const published_at = status === 'published' ? new Date().toISOString() : null
@@ -25,6 +25,8 @@ export async function POST(request: Request) {
         excerpt: excerpt || null,
         category,
         status,
+        locale: locale ?? 'pl',
+        translation_id: translation_id || null,
         cover_image_url: cover_image_url || null,
         cover_focal_x: cover_focal_x ?? 0.5,
         cover_focal_y: cover_focal_y ?? 0.5,
