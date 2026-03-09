@@ -33,7 +33,7 @@ export async function getArticles(options?: {
       .select(`*, tags:article_tags(tag:tags(*))`)
       .eq('status', 'published')
       .eq('locale', options?.locale ?? 'pl')
-      .in('id', articleIds.map((r) => r.article_id))
+      .in('id', articleIds.map((r: any) => r.article_id))
       .order('published_at', { ascending: false })
 
     if (options?.category) query = query.eq('category', options.category)
