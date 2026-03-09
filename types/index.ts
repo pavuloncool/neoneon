@@ -29,6 +29,8 @@ export interface Article {
   content: any
   category: 'content-writing' | 'ux-strategies'
   cover_image_url?: string | null
+  cover_focal_x?: number | null
+  cover_focal_y?: number | null
   status: 'draft' | 'published'
   published_at?: string | null
   created_at: string
@@ -88,5 +90,5 @@ export interface Database {
   }
 }
 
-export type Category = 'content-writing' | 'ux-strategies'
+export type Category = 'content-writing' | 'ux-strategies' | 'data-visualisation'
 export type ArticleStatus = 'draft' | 'published'

@@ -11,6 +11,7 @@ import { Search } from 'lucide-react'
 const links = [
   { href: '/content-writing', label: 'Content Writing' },
   { href: '/ux-strategies', label: 'UX Strategies' },
+  { href: '/data-visualisation', label: 'Data Visualisation' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ]

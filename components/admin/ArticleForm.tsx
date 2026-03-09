@@ -24,6 +24,8 @@ export function ArticleForm({ article, allTags }: ArticleFormProps) {
   const [category, setCategory] = useState<Category>(article?.category ?? 'content-writing')
   const [status, setStatus] = useState<ArticleStatus>(article?.status ?? 'draft')
   const [coverImageUrl, setCoverImageUrl] = useState(article?.cover_image_url ?? '')
+  const [focalX, setFocalX] = useState<number>(article?.cover_focal_x ?? 0.5)
+  const [focalY, setFocalY] = useState<number>(article?.cover_focal_y ?? 0.5)
   const [content, setContent] = useState<object | null>(article?.content ?? null)
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
     article?.tags?.map((t) => t.id) ?? []
@@ -42,6 +44,14 @@ export function ArticleForm({ article, allTags }: ArticleFormProps) {
     )
   }
 
+  function handleFocalClick(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = Math.round(((e.clientX - rect.left) / rect.width) * 100) / 100
+    const y = Math.round(((e.clientY - rect.top) / rect.height) * 100) / 100
+    setFocalX(Math.min(1, Math.max(0, x)))
+    setFocalY(Math.min(1, Math.max(0, y)))
+  }
+
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
@@ -55,6 +65,8 @@ export function ArticleForm({ article, allTags }: ArticleFormProps) {
         category,
         status,
         cover_image_url: coverImageUrl || null,
+        cover_focal_x: focalX,
+        cover_focal_y: focalY,
         content,
         tag_ids: selectedTagIds,
       }
@@ -166,6 +178,7 @@ export function ArticleForm({ article, allTags }: ArticleFormProps) {
             >
               <option value="content-writing">Content Writing</option>
               <option value="ux-strategies">UX Strategies</option>
+              <option value="data-visualisation">Data Visualisation</option>
             </select>
           </div>
           <div className="flex flex-col gap-1.5">
@@ -208,7 +221,36 @@ export function ArticleForm({ article, allTags }: ArticleFormProps) {
             className="bg-transparent border border-border px-4 py-3 text-sm font-mono focus:outline-none focus:border-ink transition-colors"
           />
           {coverImageUrl && (
-            <img src={coverImageUrl} alt="Cover preview" className="h-32 w-full object-cover border border-border" />
+            <div className="flex flex-col gap-1.5">
+              <p className="text-xs text-muted tracking-widest uppercase">
+                Focal point — click to set ({Math.round(focalX * 100)}%, {Math.round(focalY * 100)}%)
+              </p>
+              <div
+                className="relative w-full cursor-crosshair border border-border overflow-hidden"
+                style={{ paddingBottom: '56.25%' }}
+                onClick={handleFocalClick}
+              >
+                <img
+                  src={coverImageUrl}
+                  alt="Cover preview"
+                  className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                  style={{ objectPosition: `${focalX * 100}% ${focalY * 100}%` }}
+                />
+                {/* Crosshair */}
+                <div
+                  className="absolute w-5 h-5 pointer-events-none"
+                  style={{
+                    left: `${focalX * 100}%`,
+                    top: `${focalY * 100}%`,
+                    transform: 'translate(-50%, -50%)',
+                  }}
+                >
+                  <div className="absolute inset-x-0 top-1/2 h-px bg-white shadow-[0_0_3px_rgba(0,0,0,0.8)]" />
+                  <div className="absolute inset-y-0 left-1/2 w-px bg-white shadow-[0_0_3px_rgba(0,0,0,0.8)]" />
+                  <div className="absolute inset-0 rounded-full border border-white shadow-[0_0_3px_rgba(0,0,0,0.8)]" />
+                </div>
+              </div>
+            </div>
           )}
         </div>
 

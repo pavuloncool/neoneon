@@ -16,7 +16,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     const supabase = createAdminClient()
     const payload = await request.json()
-    const { title, slug, excerpt, category, status, cover_image_url, content, tag_ids } = payload
+    const { title, slug, excerpt, category, status, cover_image_url, cover_focal_x, cover_focal_y, content, tag_ids } = payload
 
     const { data: existing } = await supabase
       .from('articles')
@@ -32,7 +32,18 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     const { error } = await supabase
       .from('articles')
-      .update({ title, slug, excerpt: excerpt || null, category, status, cover_image_url: cover_image_url || null, content: content || null, published_at })
+      .update({
+        title,
+        slug,
+        excerpt: excerpt || null,
+        category,
+        status,
+        cover_image_url: cover_image_url || null,
+        cover_focal_x: cover_focal_x ?? 0.5,
+        cover_focal_y: cover_focal_y ?? 0.5,
+        content: content || null,
+        published_at,
+      })
       .eq('id', id)
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })

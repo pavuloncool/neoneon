@@ -1,6 +1,6 @@
 // app/(blog)/about/page.tsx
-
 import type { Metadata } from 'next'
+import Image from 'next/image'
 
 export const metadata: Metadata = {
   title: 'About',
@@ -16,14 +16,15 @@ export default function AboutPage() {
           Paweł Kuligowski
         </h1>
       </header>
-
       <div className="grid md:grid-cols-[1fr_2fr] gap-12 mb-16">
-        <div className="aspect-[3/4] bg-border w-full max-w-xs">
-          <div className="w-full h-full flex items-center justify-center text-xs text-muted tracking-widest uppercase">
-            Photo
-          </div>
+        <div className="aspect-[3/4] w-full max-w-xs overflow-hidden relative">
+          <Image
+            src="/neoneon-pawel.webp"
+            alt="Paweł Kuligowski"
+            fill
+            className="object-cover"
+          />
         </div>
-
         <div className="flex flex-col gap-6 text-[1.0625rem] leading-relaxed">
           <p>
             I write about the intersection of content strategy and user experience —
@@ -45,7 +46,6 @@ export default function AboutPage() {
           </div>
         </div>
       </div>
-
       <section className="border-t border-border pt-12">
         <p className="text-xs tracking-widest text-muted uppercase mb-8">Areas of focus</p>
         <div className="grid md:grid-cols-2 gap-px bg-border">
@@ -55,7 +55,7 @@ export default function AboutPage() {
             { title: 'Content Design', desc: 'Bridging the gap between design systems and the words that live inside them.' },
             { title: 'Editorial', desc: 'Long-form articles, case studies, white papers and brand storytelling.' },
           ].map(({ title, desc }) => (
-            <div key={title} className="bg-paper p-8">
+            <div key={title} className="bg-paper dark:bg-ink text-ink dark:text-paper p-8">
               <h3 className="font-display text-xl font-light mb-2">{title}</h3>
               <p className="text-sm text-muted leading-relaxed">{desc}</p>
             </div>

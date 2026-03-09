@@ -12,14 +12,25 @@ export async function POST(request: Request) {
 
     const supabase = createAdminClient()
     const payload = await request.json()
-    const { title, slug, excerpt, category, status, cover_image_url, content, tag_ids } = payload
+    const { title, slug, excerpt, category, status, cover_image_url, cover_focal_x, cover_focal_y, content, tag_ids } = payload
 
     const finalSlug = slug || slugify(title)
     const published_at = status === 'published' ? new Date().toISOString() : null
 
     const { data: article, error } = await supabase
       .from('articles')
-      .insert({ title, slug: finalSlug, excerpt: excerpt || null, category, status, cover_image_url: cover_image_url || null, content: content || null, published_at })
+      .insert({
+        title,
+        slug: finalSlug,
+        excerpt: excerpt || null,
+        category,
+        status,
+        cover_image_url: cover_image_url || null,
+        cover_focal_x: cover_focal_x ?? 0.5,
+        cover_focal_y: cover_focal_y ?? 0.5,
+        content: content || null,
+        published_at,
+      })
       .select()
       .single()
 

@@ -130,7 +130,14 @@
   }
 }
 
-/* Dark mode: wszystkie text-muted stają się białe z 60% opacity */
+/* Dark mode: wszystkie text-muted stają się białe z 65% opacity */
 .dark .text-muted {
   color: rgba(255, 255, 255, 0.65) !important;
+}
+
+/* Hover fix: elementy z hover:text-paper lub hover:text-ink nie blokowane przez !important */
+.dark .group:hover .text-muted,
+.dark a:hover .text-muted,
+.dark nav a:hover {
+  color: rgba(15, 15, 15, 0.5) !important;
 }

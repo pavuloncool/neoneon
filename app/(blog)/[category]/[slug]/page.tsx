@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { category, slug } = await params
 
-  const validCategories: Category[] = ['content-writing', 'ux-strategies']
+  const validCategories: Category[] = ['content-writing', 'ux-strategies', 'data-visualisation']
   if (!validCategories.includes(category as Category)) notFound()
 
   const article = await getArticleBySlug(slug)
@@ -46,7 +46,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   const comments = await getCommentsByArticle(article.id)
 
-  const categoryLabel = article.category === 'content-writing' ? 'Content Writing' : 'UX Strategies'
+  const categoryLabel = article.category === 'content-writing' ? 'Content Writing' : article.category === 'ux-strategies' ? 'UX Strategies' : 'Data Visualisation'
 
   return (
     <article>
@@ -65,6 +65,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     fill
                     priority
                     className="object-cover"
+                    style={{ objectPosition: `${(article.cover_focal_x ?? 0.5) * 100}% ${(article.cover_focal_y ?? 0.5) * 100}%` }}
                     sizes="(max-width: 768px) 100vw, 45vw"
                   />
                 </div>
