@@ -33,29 +33,29 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-paper flex items-center justify-center px-6">
+    <div className="min-h-screen bg-paper flex items-center justify-center px-6" style={{ colorScheme: "light" }}>
       <div className="w-full max-w-sm">
         <h1 className="font-display text-4xl font-light mb-10 text-center">Admin</h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs tracking-widest text-muted uppercase">Email</label>
+            <label className="text-xs tracking-widest uppercase" style={{ color: "#6b6b6b" }}>Email</label>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-transparent border border-border px-4 py-3 text-sm focus:outline-none focus:border-ink transition-colors"
+              className="bg-transparent border border-border px-4 py-3 text-sm text-ink focus:outline-none focus:border-ink transition-colors"
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs tracking-widest text-muted uppercase">Password</label>
+            <label className="text-xs tracking-widest uppercase" style={{ color: "#6b6b6b" }}>Password</label>
             <input
               type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="bg-transparent border border-border px-4 py-3 text-sm focus:outline-none focus:border-ink transition-colors"
+              className="bg-transparent border border-border px-4 py-3 text-sm text-ink focus:outline-none focus:border-ink transition-colors"
             />
           </div>
 
