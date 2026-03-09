@@ -33,7 +33,7 @@ export async function getArticles(options?: {
       .select(`*, tags:article_tags(tag:tags(*))`)
       .eq('status', 'published')
       .eq('locale', options?.locale ?? 'pl')
-      .in('id', articleIds.map((r: any) => r.article_id))
+      .in('id', (articleIds as any[]).map((r) => r.article_id))
       .order('published_at', { ascending: false })
 
     if (options?.category) query = query.eq('category', options.category)
@@ -121,7 +121,6 @@ export async function getAllTags(): Promise<Tag[]> {
 export async function getTagsByCategory(category: string): Promise<Tag[]> {
   const supabase = await createClient()
 
-  // Znajdź artykuły z tej kategorii
   const { data: articles } = await supabase
     .from('articles')
     .select('id')
@@ -130,9 +129,8 @@ export async function getTagsByCategory(category: string): Promise<Tag[]> {
 
   if (!articles || articles.length === 0) return []
 
-  const articleIds = articles.map((a) => a.id)
+  const articleIds = (articles as any[]).map((a) => a.id)
 
-  // Znajdź tag_id dla tych artykułów
   const { data: articleTags } = await supabase
     .from('article_tags')
     .select('tag_id')
@@ -140,9 +138,8 @@ export async function getTagsByCategory(category: string): Promise<Tag[]> {
 
   if (!articleTags || articleTags.length === 0) return []
 
-  const tagIds = [...new Set(articleTags.map((at) => at.tag_id))]
+  const tagIds = [...new Set((articleTags as any[]).map((at) => at.tag_id))]
 
-  // Pobierz tagi
   const { data: tags } = await supabase
     .from('tags')
     .select('id, name, slug')
