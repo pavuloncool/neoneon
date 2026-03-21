@@ -38,13 +38,13 @@
     "area3Title": "Content Design",
     "area3Desc": "Łączenie systemów projektowania ze słowami, które w nich żyją.",
     "area4Title": "Redakcja",
-    "area4Desc": "Artykuły długoformowe, case studies, white papers i brand storytelling."
+    "area4Desc": "Artykuły promocyjne, advertoriale, case studies, white papers i brand storytelling."
   },
   "contact": {
     "label": "Kontakt",
     "heading": "Napisz do mnie",
-    "intro1": "Czy masz projekt, pytanie o moją pracę, czy po prostu chcesz się przywitać — chętnie usłyszę od Ciebie.",
-    "intro2": "Zazwyczaj odpowiadam w ciągu dwóch dni roboczych.",
+    "intro1": "Masz projekt? Pytanie o moją pracę? Czy po prostu pijesz kawę i chcesz pogadać? Chętnie dołączę.",
+    "intro2": "Zazwyczaj odpowiadam w ciągu kilku godzin.",
     "fieldName": "Imię",
     "fieldEmail": "Email",
     "fieldMessage": "Wiadomość",
