@@ -8,7 +8,7 @@ import type { Metadata } from 'next'
 export async function generateMetadata({ params }: { params: Promise<{ locale: 'pl' | 'en' }> }): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'home' })
-  const tagline = t('tagline').split(',').map(s => s.trim()).join(' ')
+  const tagline = t('tagline').split('|').map(s => s.trim()).join(' ')
   return { title: `neoneon — ${tagline}` }
 }
 
@@ -24,17 +24,17 @@ export default async function HomePage({ params }: { params: Promise<{ locale: '
       <section className="mb-20">
         <FadeUp>
           <h1 className="font-display text-7xl md:text-8xl font-light leading-none mb-6">
-            {t('tagline').split(',')[0]}<br />
-            <em>{t('tagline').split(',')[1]?.trim() ?? ''}</em>
+            {t('tagline').split('|')[0]}<br />
+            <em>{t('tagline').split('|')[1]?.trim() ?? ''}</em>
           </h1>
         </FadeUp>
-        <FadeUp delay={0.1}>
+        {/* <FadeUp delay={0.1}>
           <p className="text-muted text-lg max-w-xl">{t('subtitle')}</p>
-        </FadeUp>
+        </FadeUp> */}
       </section>
 
       <FadeUp delay={0.25}>
-        <section className="grid md:grid-cols-3 gap-px bg-border mb-20">
+        <section className="grid md:grid-cols-2 gap-px bg-border mb-20">
           <Link href="/content-writing" className="bg-paper dark:bg-ink dark:border dark:border-white/10 p-10 group hover:bg-ink dark:hover:bg-white transition-colors duration-500">
             <p className="text-xs tracking-widest text-muted group-hover:text-paper/60 dark:group-hover:text-ink/60 mb-3 uppercase transition-colors">{t('category')}</p>
             <h2 className="font-display text-4xl font-light group-hover:text-paper dark:text-white dark:group-hover:text-ink transition-colors">{tn('contentWriting')}</h2>
@@ -42,10 +42,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: '
           <Link href="/ux-strategies" className="bg-paper dark:bg-ink dark:border dark:border-white/10 p-10 group hover:bg-ink dark:hover:bg-white transition-colors duration-500">
             <p className="text-xs tracking-widest text-muted group-hover:text-paper/60 dark:group-hover:text-ink/60 mb-3 uppercase transition-colors">{t('category')}</p>
             <h2 className="font-display text-4xl font-light group-hover:text-paper dark:text-white dark:group-hover:text-ink transition-colors">{tn('uxStrategies')}</h2>
-          </Link>
-          <Link href="/data-visualisation" className="bg-paper dark:bg-ink dark:border dark:border-white/10 p-10 group hover:bg-ink dark:hover:bg-white transition-colors duration-500">
-            <p className="text-xs tracking-widest text-muted group-hover:text-paper/60 dark:group-hover:text-ink/60 mb-3 uppercase transition-colors">{t('category')}</p>
-            <h2 className="font-display text-4xl font-light group-hover:text-paper dark:text-white dark:group-hover:text-ink transition-colors">{tn('dataVisualisation')}</h2>
           </Link>
         </section>
       </FadeUp>

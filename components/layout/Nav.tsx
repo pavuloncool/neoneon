@@ -63,7 +63,7 @@ export function Nav() {
   const links = [
     { href: '/content-writing' as const, label: t('contentWriting') },
     { href: '/ux-strategies' as const, label: t('uxStrategies') },
-    { href: '/data-visualisation' as const, label: t('dataVisualisation') },
+    /*{ href: '/data-visualisation' as const, label: t('dataVisualisation') },*/
     { href: '/about' as const, label: t('about') },
     { href: '/contact' as const, label: t('contact') },
   ]
