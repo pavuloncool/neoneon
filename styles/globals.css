@@ -53,6 +53,7 @@
   .article-body h3 {
     font-family: var(--font-cormorant);
     font-weight: 600;
+    line-height: 1.2;
     margin-bottom: 0.75rem;
   }
 
