@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     await supabase.from('contacts').insert({ name, email, message })
 
     const { data, error } = await resend.emails.send({
-      from: 'onboarding@resend.dev',
+      from: 'formularz@neoneon.online',
       to: 'ask@neoneon.online',
       subject: `Nowa wiadomość od ${name}`,
       html: `
