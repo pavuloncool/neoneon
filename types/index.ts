@@ -1,6 +1,7 @@
 export interface Tag {
   id: string
   name: string
+  name_en: string | null
   slug: string
 }
 

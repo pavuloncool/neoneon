@@ -7,7 +7,7 @@
     "contact": "Kontakt"
   },
   "home": {
-    "tagline": "Content i UX|w produktach cyfrowych.",
+    "tagline": "Content i UX|w produktach cyfrowych",
     "subtitle": "Tworzę strategie contentu i doświadczenia UX dla użytkowników produktów cyfrowych",
     "recent": "Najnowsze",
     "category": "Kategoria"
@@ -56,6 +56,22 @@
     "error": "Coś poszło nie tak. Spróbuj ponownie.",
     "successTitle": "Dziękuję.",
     "successBody": "Twoja wiadomość dotarła. Odezwę się wkrótce."
+  },
+  "comments": {
+    "sectionZero": "Komentarze",
+    "sectionOne": "1 komentarz",
+    "sectionMany": "{count} komentarze",
+    "heading": "Zostaw komentarz",
+    "fieldName": "Imię",
+    "fieldEmail": "Email",
+    "fieldComment": "Komentarz",
+    "placeholderName": "Twoje imię",
+    "placeholderEmail": "twoj@email.com",
+    "placeholderComment": "Twoje przemyślenia...",
+    "submit": "Wyślij",
+    "submitting": "Wysyłanie...",
+    "error": "Coś poszło nie tak. Spróbuj ponownie.",
+    "success": "Dziękuję — komentarz oczekuje na moderację."
   },
   "search": {
     "heading": "Szukaj",

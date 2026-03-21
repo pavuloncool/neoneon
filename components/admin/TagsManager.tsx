@@ -11,6 +11,7 @@ export function TagsManager({ initialTags }: { initialTags: Tag[] }) {
   const router = useRouter()
   const [tags, setTags] = useState<Tag[]>(initialTags)
   const [name, setName] = useState('')
+  const [nameEn, setNameEn] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -23,7 +24,11 @@ export function TagsManager({ initialTags }: { initialTags: Tag[] }) {
     const res = await fetch('/api/admin/tags', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name.trim(), slug: slugify(name.trim()) }),
+      body: JSON.stringify({
+        name: name.trim(),
+        name_en: nameEn.trim() || null,
+        slug: slugify(name.trim()),
+      }),
     })
 
     if (!res.ok) {
@@ -36,6 +41,7 @@ export function TagsManager({ initialTags }: { initialTags: Tag[] }) {
     const newTag = await res.json()
     setTags((prev) => [...prev, newTag])
     setName('')
+    setNameEn('')
     setSaving(false)
     router.refresh()
   }
@@ -50,23 +56,40 @@ export function TagsManager({ initialTags }: { initialTags: Tag[] }) {
     }
   }
 
+  const inputClass = "bg-transparent border border-border px-4 py-3 text-sm focus:outline-none focus:border-ink transition-colors"
+
   return (
     <div className="p-10 max-w-2xl">
       <h1 className="font-display text-4xl font-light mb-10">Tags</h1>
 
       {/* Formularz dodawania */}
-      <form onSubmit={handleAdd} className="flex gap-0 mb-10">
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Tag name"
-          className="flex-1 bg-transparent border border-border px-4 py-3 text-sm focus:outline-none focus:border-ink transition-colors"
-        />
+      <form onSubmit={handleAdd} className="flex flex-col gap-3 mb-10">
+        <div className="flex gap-0">
+          <div className="flex-1 flex flex-col">
+            <label className="text-xs text-muted uppercase tracking-widest mb-1.5">PL</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Nazwa po polsku"
+              className={inputClass + ' w-full'}
+            />
+          </div>
+          <div className="flex-1 flex flex-col">
+            <label className="text-xs text-muted uppercase tracking-widest mb-1.5">EN</label>
+            <input
+              type="text"
+              value={nameEn}
+              onChange={(e) => setNameEn(e.target.value)}
+              placeholder="English name"
+              className={inputClass + ' w-full border-l-0'}
+            />
+          </div>
+        </div>
         <button
           type="submit"
           disabled={saving || !name.trim()}
-          className="border border-l-0 border-ink px-6 py-3 text-xs tracking-widest uppercase text-ink hover:bg-ink hover:text-paper transition-colors disabled:border-border disabled:text-muted disabled:cursor-not-allowed"
+          className="self-start border border-ink px-6 py-3 text-xs tracking-widest uppercase text-ink hover:bg-ink hover:text-paper transition-colors disabled:border-border disabled:text-muted disabled:cursor-not-allowed"
         >
           {saving ? '...' : 'Add tag'}
         </button>
@@ -82,7 +105,12 @@ export function TagsManager({ initialTags }: { initialTags: Tag[] }) {
           {tags.map((tag) => (
             <div key={tag.id} className="flex items-center justify-between py-3">
               <div>
-                <p className="text-sm text-ink">{tag.name}</p>
+                <p className="text-sm text-ink">
+                  {tag.name}
+                  {tag.name_en && (
+                    <span className="text-muted ml-2">/ {tag.name_en}</span>
+                  )}
+                </p>
                 <p className="text-xs text-muted font-mono mt-0.5">{tag.slug}</p>
               </div>
               <button

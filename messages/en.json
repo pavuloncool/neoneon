@@ -57,6 +57,22 @@
     "successTitle": "Thank you.",
     "successBody": "Your message has been received. I will be in touch soon."
   },
+  "comments": {
+    "sectionZero": "Comments",
+    "sectionOne": "1 comment",
+    "sectionMany": "{count} comments",
+    "heading": "Leave a comment",
+    "fieldName": "Name",
+    "fieldEmail": "Email",
+    "fieldComment": "Comment",
+    "placeholderName": "Your name",
+    "placeholderEmail": "your@email.com",
+    "placeholderComment": "Your thoughts...",
+    "submit": "Submit",
+    "submitting": "Sending...",
+    "error": "Something went wrong. Please try again.",
+    "success": "Thank you — your comment is awaiting moderation."
+  },
   "search": {
     "heading": "Search",
     "placeholder": "Search articles...",

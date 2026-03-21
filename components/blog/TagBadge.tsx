@@ -1,5 +1,7 @@
 // components/blog/TagBadge.tsx
+'use client'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 import { cn } from '@/lib/utils'
 import type { Tag } from '@/types'
 
@@ -11,6 +13,9 @@ interface TagBadgeProps {
 }
 
 export function TagBadge({ tag, active = false, href, className }: TagBadgeProps) {
+  const locale = useLocale()
+  const label = locale === 'en' && tag.name_en ? tag.name_en : tag.name
+
   const resolvedHref = href ?? `/search?tag=${tag.slug}`
 
   return (
@@ -24,7 +29,7 @@ export function TagBadge({ tag, active = false, href, className }: TagBadgeProps
         className
       )}
     >
-      {tag.name}
+      {label}
     </Link>
   )
 }

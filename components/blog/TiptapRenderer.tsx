@@ -1,10 +1,8 @@
-'use client'
-
 // components/blog/TiptapRenderer.tsx
-// Renderuje JSON z Tiptap do HTML — Client Component, aby skrypty embedów działały
-// przy nawigacji client-side (Instagram, Twitter itp.)
+// Server Component — renderuje JSON z Tiptap do HTML bez hydratacji.
+// Uruchamianie skryptów embedów (Instagram itp.) obsługuje EmbedActivator.
 
-import { useEffect, useRef } from 'react'
+import { EmbedActivator } from './EmbedActivator'
 import type { TiptapContent, TiptapNode } from '@/types'
 
 function renderNode(node: TiptapNode): string {
@@ -73,7 +71,6 @@ function renderNode(node: TiptapNode): string {
     }
 
     default:
-      // Nieznany node — renderuj dzieci jeśli są
       return (node.content ?? []).map(renderNode).join('')
   }
 }
@@ -84,35 +81,14 @@ interface TiptapRendererProps {
 
 export function TiptapRenderer({ content }: TiptapRendererProps) {
   const html = renderNode(content)
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const container = ref.current
-    if (!container) return
-
-    // Skrypty wstrzyknięte przez dangerouslySetInnerHTML nie są wykonywane
-    // przez przeglądarkę. Zastępujemy każdy <script> nowym węzłem,
-    // co wymusza jego wykonanie (działa zarówno dla src= jak i inline).
-    container.querySelectorAll('script').forEach((oldScript) => {
-      const newScript = document.createElement('script')
-      oldScript.getAttributeNames().forEach((attr) =>
-        newScript.setAttribute(attr, oldScript.getAttribute(attr)!)
-      )
-      newScript.textContent = oldScript.textContent
-      oldScript.replaceWith(newScript)
-    })
-
-    // Jeśli Instagram embed.js był już załadowany wcześniej (np. z cache),
-    // ręcznie wywołujemy przetworzenie embedów.
-    const win = window as Window & { instgrm?: { Embeds: { process: () => void } } }
-    win.instgrm?.Embeds.process()
-  }, [html])
 
   return (
-    <div
-      ref={ref}
-      className="article-body"
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+    <>
+      <div
+        className="article-body"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+      <EmbedActivator />
+    </>
   )
 }

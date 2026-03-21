@@ -41,13 +41,13 @@ export function ArticleCard({ article, variant = 'default', locale = 'pl' }: Art
                 {article.excerpt}
               </p>
             )}
-            {article.tags && article.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-4">
-                {article.tags.map((tag) => <TagBadge key={tag.id} tag={tag} />)}
-              </div>
-            )}
           </div>
         </Link>
+        {article.tags && article.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-4">
+            {article.tags.map((tag) => <TagBadge key={tag.id} tag={tag} />)}
+          </div>
+        )}
       </motion.article>
     )
   }
@@ -80,13 +80,13 @@ export function ArticleCard({ article, variant = 'default', locale = 'pl' }: Art
               </p>
             )}
           </div>
-          {article.tags && article.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-3">
-              {article.tags.map((tag) => <TagBadge key={tag.id} tag={tag} />)}
-            </div>
-          )}
         </div>
       </Link>
+      {article.tags && article.tags.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-3">
+          {article.tags.map((tag) => <TagBadge key={tag.id} tag={tag} />)}
+        </div>
+      )}
     </motion.article>
   )
 }

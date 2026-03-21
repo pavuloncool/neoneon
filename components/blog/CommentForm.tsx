@@ -3,6 +3,7 @@
 // components/blog/CommentForm.tsx
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 
 interface CommentFormProps {
@@ -10,6 +11,7 @@ interface CommentFormProps {
 }
 
 export function CommentForm({ articleId }: CommentFormProps) {
+  const t = useTranslations('comments')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [form, setForm] = useState({ author_name: '', author_email: '', body: '' })
 
@@ -35,37 +37,37 @@ export function CommentForm({ articleId }: CommentFormProps) {
 
   return (
     <div className="mt-12 pt-10 border-t border-border">
-      <h3 className="font-display text-2xl font-light mb-6">Leave a comment</h3>
+      <h3 className="font-display text-2xl font-light mb-6">{t('heading')}</h3>
 
       {status === 'success' ? (
         <p className="text-sm text-muted dark:text-white/70 border border-border dark:border-white px-4 py-3">
-          Thank you — your comment is awaiting moderation.
+          {t('success')}
         </p>
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>Name</label>
+              <label className={labelClass}>{t('fieldName')}</label>
               <input type="text" required value={form.author_name}
                 onChange={(e) => setForm({ ...form, author_name: e.target.value })}
-                placeholder="Your name" className={inputClass} />
+                placeholder={t('placeholderName')} className={inputClass} />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>Email</label>
+              <label className={labelClass}>{t('fieldEmail')}</label>
               <input type="email" required value={form.author_email}
                 onChange={(e) => setForm({ ...form, author_email: e.target.value })}
-                placeholder="your@email.com" className={inputClass} />
+                placeholder={t('placeholderEmail')} className={inputClass} />
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>Comment</label>
+            <label className={labelClass}>{t('fieldComment')}</label>
             <textarea required rows={5} value={form.body}
               onChange={(e) => setForm({ ...form, body: e.target.value })}
-              placeholder="Your thoughts..."
+              placeholder={t('placeholderComment')}
               className={cn(inputClass, "resize-none")} />
           </div>
           {status === 'error' && (
-            <p className="text-xs text-red-500">Something went wrong. Please try again.</p>
+            <p className="text-xs text-red-500">{t('error')}</p>
           )}
           <button
             type="submit"
@@ -77,7 +79,7 @@ export function CommentForm({ articleId }: CommentFormProps) {
                 : 'border-ink text-ink hover:bg-ink hover:text-paper dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-ink'
             )}
           >
-            {status === 'loading' ? 'Sending...' : 'Submit'}
+            {status === 'loading' ? t('submitting') : t('submit')}
           </button>
         </form>
       )}

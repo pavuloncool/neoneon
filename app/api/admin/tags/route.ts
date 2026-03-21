@@ -10,10 +10,10 @@ export async function POST(request: Request) {
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const supabase = createAdminClient()
-    const { name, slug } = await request.json()
+    const { name, name_en, slug } = await request.json()
     if (!name || !slug) return NextResponse.json({ error: 'name and slug required.' }, { status: 400 })
 
-    const { data, error } = await supabase.from('tags').insert({ name, slug }).select().single()
+    const { data, error } = await supabase.from('tags').insert({ name, name_en: name_en ?? null, slug }).select().single()
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     return NextResponse.json(data, { status: 201 })
   } catch {

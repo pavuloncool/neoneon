@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { getArticleBySlug, getCommentsByArticle, getArticleTranslation } from '@/lib/queries'
@@ -40,6 +41,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   if (article.category !== category) notFound()
 
   const comments = await getCommentsByArticle(article.id)
+  const t = await getTranslations('comments')
 
   const targetLocale = locale === 'pl' ? 'en' : 'pl'
   const translation = article.translation_id
@@ -112,7 +114,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               <div className="mt-16 pt-8 border-t border-border" />
               <section className="mt-2 pb-8">
                 <h2 className="font-display text-3xl font-light mb-8">
-                  {comments.length > 0 ? `${comments.length} comment${comments.length === 1 ? '' : 's'}` : 'Comments'}
+                  {comments.length === 0 ? t('sectionZero') : comments.length === 1 ? t('sectionOne') : t('sectionMany', { count: comments.length })}
                 </h2>
                 {comments.length > 0 && (
                   <ul className="divide-y divide-border mb-4">
