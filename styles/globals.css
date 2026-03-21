@@ -68,6 +68,13 @@
     margin-top: 1.25rem;
   }
 
+  /* Usuwa dodatkowe białe miejsce pod embedami (Instagram, itp.)
+     które są przechowywane jako bloki kodu w TipTap */
+  .article-body pre code:has(iframe) {
+    display: block;
+    line-height: 0;
+  }
+
   .article-body p { margin-bottom: 1.5rem; }
 
   .article-body img {
