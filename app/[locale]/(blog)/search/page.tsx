@@ -53,7 +53,14 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
         <section className="mb-12">
           <p className="text-xs tracking-widest text-muted dark:text-white/50 uppercase mb-4">{t('filterByTag')}</p>
           <div className="flex flex-wrap gap-2">
-            {tags.map((tg) => <TagBadge key={tg.id} tag={tg} active={tg.slug === tag} />)}
+            {tags.map((tg) => (
+              <TagBadge
+                key={tg.id}
+                tag={tg}
+                active={tg.slug === tag}
+                href={tg.slug === tag ? '/search' : `/search?tag=${tg.slug}`}
+              />
+            ))}
           </div>
         </section>
       )}
@@ -62,7 +69,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
         <p className="text-xs tracking-widest text-muted dark:text-white/50 uppercase mb-8">
           {resultCount === 0 ? t('noResults') : `${resultCount} ${resultCount === 1 ? t('result') : t('results')}`}
           {q && ` for "${q}"`}
-          {tag && ` tagged "${tag}"`}
+          {tag && ` ${t('taggedWith', { tag })}`}
         </p>
       )}
 

@@ -38,7 +38,7 @@ export default async function AdminArticlesPage() {
                 <Link href={`/admin/articles/${article.id}`} className="text-xs text-[#0f0f0f] hover:text-accent transition-colors">
                   Edit →
                 </Link>
-                <Link href={`/${article.category}/${article.slug}`} target="_blank" className="text-xs text-[#0f0f0f] hover:text-accent transition-colors">
+                <Link href={`/${article.locale ?? 'pl'}/${article.category}/${article.slug}`} target="_blank" className="text-xs text-[#0f0f0f] hover:text-accent transition-colors">
                   View ↗
                 </Link>
               </div>

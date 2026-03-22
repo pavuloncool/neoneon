@@ -82,6 +82,7 @@
     "result": "result",
     "results": "results",
     "tryDifferent": "Try a different search term or browse by tag.",
-    "enterTerm": "Enter a search term or select a tag above."
+    "enterTerm": "Enter a search term or select a tag above.",
+    "taggedWith": "tagged \"{tag}\""
   }
 }

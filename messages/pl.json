@@ -82,6 +82,7 @@
     "result": "wynik",
     "results": "wyniki",
     "tryDifferent": "Spróbuj innego zapytania lub przeglądaj po tagach.",
-    "enterTerm": "Wpisz zapytanie lub wybierz tag powyżej."
+    "enterTerm": "Wpisz zapytanie lub wybierz tag powyżej.",
+    "taggedWith": "z tagiem \"{tag}\""
   }
 }

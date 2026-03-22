@@ -5,6 +5,15 @@
 import { EmbedActivator } from './EmbedActivator'
 import type { TiptapContent, TiptapNode } from '@/types'
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 function renderNode(node: TiptapNode): string {
   switch (node.type) {
     case 'doc':
@@ -19,15 +28,15 @@ function renderNode(node: TiptapNode): string {
     }
 
     case 'text': {
-      let text = node.text ?? ''
+      let text = escapeHtml(node.text ?? '')
       for (const mark of node.marks ?? []) {
         if (mark.type === 'bold') text = `<strong>${text}</strong>`
         if (mark.type === 'italic') text = `<em>${text}</em>`
         if (mark.type === 'code') text = `<code>${text}</code>`
         if (mark.type === 'strike') text = `<s>${text}</s>`
         if (mark.type === 'link') {
-          const href = mark.attrs?.href as string ?? '#'
-          const target = mark.attrs?.target as string ?? '_blank'
+          const href = escapeHtml(mark.attrs?.href as string ?? '#')
+          const target = escapeHtml(mark.attrs?.target as string ?? '_blank')
           text = `<a href="${href}" target="${target}" rel="noopener noreferrer">${text}</a>`
         }
       }
