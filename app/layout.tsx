@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
 import { Cormorant_Garamond, DM_Sans, DM_Mono } from 'next/font/google'
-import { ThemeProvider } from '@/components/layout/ThemeProvider'
 import '@/styles/globals.css'
 
-const cormorant = Cormorant_Garamond({
+export const cormorant = Cormorant_Garamond({
   subsets: ['latin', 'latin-ext'],
   weight: ['300', '400', '500', '600', '700'],
   style: ['normal', 'italic'],
@@ -11,14 +10,14 @@ const cormorant = Cormorant_Garamond({
   display: 'swap',
 })
 
-const dmSans = DM_Sans({
+export const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['300', '400', '500'],
   variable: '--font-dm-sans',
   display: 'swap',
 })
 
-const dmMono = DM_Mono({
+export const dmMono = DM_Mono({
   subsets: ['latin'],
   weight: ['400', '500'],
   variable: '--font-dm-mono',
@@ -46,17 +45,8 @@ export const metadata: Metadata = {
   },
 }
 
+// Root layout — minimal shell wymagany przez Next.js.
+// Lang i body są ustawiane w [locale]/layout.tsx, który ma dostęp do locale.
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html
-      suppressHydrationWarning
-      className={`${cormorant.variable} ${dmSans.variable} ${dmMono.variable}`}
-    >
-      <body className="bg-paper text-ink antialiased transition-colors duration-300">
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
-      </body>
-    </html>
-  )
+  return children as React.ReactElement
 }

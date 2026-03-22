@@ -2,6 +2,8 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { routing } from '@/i18n/routing'
+import { ThemeProvider } from '@/components/layout/ThemeProvider'
+import { cormorant, dmSans, dmMono } from '@/app/layout'
 
 export default async function LocaleLayout({
   children,
@@ -19,8 +21,18 @@ export default async function LocaleLayout({
   const messages = await getMessages()
 
   return (
-    <NextIntlClientProvider messages={messages}>
-      {children}
-    </NextIntlClientProvider>
+    <html
+      lang={locale}
+      suppressHydrationWarning
+      className={`${cormorant.variable} ${dmSans.variable} ${dmMono.variable}`}
+    >
+      <body className="bg-paper text-ink antialiased transition-colors duration-300">
+        <ThemeProvider>
+          <NextIntlClientProvider messages={messages}>
+            {children}
+          </NextIntlClientProvider>
+        </ThemeProvider>
+      </body>
+    </html>
   )
 }

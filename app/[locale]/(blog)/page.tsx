@@ -21,9 +21,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: '
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-16">
-      <section className="mb-20">
+      {/* SC 1.3.6 — aria-labelledby wskazuje na h1 wewnątrz sekcji */}
+      <section aria-labelledby="home-heading" className="mb-20">
         <FadeUp>
-          <h1 className="font-display text-7xl md:text-8xl font-light leading-none mb-6">
+          <h1 id="home-heading" className="font-display text-7xl md:text-8xl font-light leading-none mb-6">
             {t('tagline').split('|')[0]}<br />
             <em>{t('tagline').split('|')[1]?.trim() ?? ''}</em>
           </h1>
@@ -34,7 +35,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: '
       </section>
 
       <FadeUp delay={0.25}>
-        <section className="grid md:grid-cols-2 gap-px bg-border mb-20">
+        {/* SC 1.3.6 — aria-label dla sekcji kategorii */}
+        <section aria-label="Kategorie" className="grid md:grid-cols-2 gap-px bg-border mb-20">
           <Link href="/content-writing" className="bg-paper dark:bg-ink dark:border dark:border-white/10 p-10 group hover:bg-ink dark:hover:bg-white transition-colors duration-500">
             <p className="text-xs tracking-widest text-muted group-hover:text-paper/60 dark:group-hover:text-ink/60 mb-3 uppercase transition-colors">{t('category')}</p>
             <h2 className="font-display text-4xl font-light group-hover:text-paper dark:text-white dark:group-hover:text-ink transition-colors">{tn('contentWriting')}</h2>
@@ -47,22 +49,34 @@ export default async function HomePage({ params }: { params: Promise<{ locale: '
       </FadeUp>
 
       {recent.length > 0 && (
-        <section>
+        /* SC 1.3.6 — aria-labelledby wskazuje na h3 "Najnowsze" */
+        <section aria-labelledby="recent-heading">
           <FadeUp delay={0.35}>
-            <h3 className="text-xs tracking-widest text-muted uppercase mb-4">{t('recent')}</h3>
+            <h3 id="recent-heading" className="text-xs tracking-widest text-muted uppercase mb-4">{t('recent')}</h3>
           </FadeUp>
           <StaggerList>
-            {recent.map((article) => (
-              <StaggerItem key={article.id}>
-                <Link
-                  href={`/${article.category}/${article.slug}`}
-                  className="flex flex-col md:flex-row md:items-baseline justify-between px-4 py-5 gap-2 group border-t border-border hover:bg-ink dark:hover:bg-white transition-colors duration-300"
-                >
-                  <span className="font-display text-2xl font-light group-hover:text-paper dark:group-hover:text-ink transition-colors duration-300">{article.title}</span>
-                  <span className="text-sm text-muted group-hover:text-paper/60 dark:group-hover:text-ink/60 shrink-0 transition-colors duration-300">{formatDate(article.published_at ?? article.created_at, dateLocale)}</span>
-                </Link>
-              </StaggerItem>
-            ))}
+            {recent.map((article) => {
+              const dateIso = article.published_at ?? article.created_at
+              return (
+                <StaggerItem key={article.id}>
+                  {/* SC 1.3.1 — aria-label łączy tytuł i datę w jedną czytelną nazwę linku */}
+                  <Link
+                    href={`/${article.category}/${article.slug}`}
+                    aria-label={`${article.title}, ${formatDate(dateIso, dateLocale)}`}
+                    className="flex flex-col md:flex-row md:items-baseline justify-between px-4 py-5 gap-2 group border-t border-border hover:bg-ink dark:hover:bg-white transition-colors duration-300"
+                  >
+                    <span className="font-display text-2xl font-light group-hover:text-paper dark:group-hover:text-ink transition-colors duration-300">{article.title}</span>
+                    {/* SC 1.3.1 — <time> z atrybutem datetime dla czytników ekranu i robotów */}
+                    <time
+                      dateTime={dateIso}
+                      className="text-sm text-muted group-hover:text-paper/60 dark:group-hover:text-ink/60 shrink-0 transition-colors duration-300"
+                    >
+                      {formatDate(dateIso, dateLocale)}
+                    </time>
+                  </Link>
+                </StaggerItem>
+              )
+            })}
           </StaggerList>
         </section>
       )}

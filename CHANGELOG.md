@@ -1,5 +1,45 @@
 # Changelog
 
+## 2026-03-23
+
+### Audyt dostępności WCAG 2.2 — wdrożenie poprawek (11 punktów)
+
+**Zmienione pliki:**
+- `app/layout.tsx`
+- `app/[locale]/layout.tsx`
+- `app/[locale]/(blog)/layout.tsx`
+- `app/[locale]/(blog)/page.tsx`
+- `components/layout/Nav.tsx`
+- `components/layout/LanguageSwitcher.tsx`
+- `components/layout/Footer.tsx`
+- `styles/globals.css`
+
+**Co zostało zmienione:**
+
+**SC 3.1.1 — Język strony (`lang` na `<html>`):** Root layout (`app/layout.tsx`) oddał elementy `<html>` i `<body>` do `app/[locale]/layout.tsx`, który ma bezpośredni dostęp do segmentu `locale`. Dzięki temu `<html lang={locale}>` przyjmuje wartość `"pl"` lub `"en"` w zależności od aktywnej wersji językowej. Fonty (`cormorant`, `dmSans`, `dmMono`) i `ThemeProvider` przeniesione razem do locale layout. Root layout stał się minimalnym pass-through wymaganym przez Next.js.
+
+**SC 2.4.1 — Pomiń bloki (skip link):** W `app/[locale]/(blog)/layout.tsx` dodany link "Przejdź do treści głównej" jako pierwszy element DOM przed `<Nav>`. Wizualnie ukryty klasą `sr-only`, pojawia się przy fokusie klawiatury (`focus:not-sr-only`). Element `<main>` otrzymał `id="main-content"` jako cel linku.
+
+**SC 4.1.2 — Linki ikon bez tekstu:** Oba linki wyszukiwania w `Nav.tsx` (desktop i mobile) otrzymały `aria-label="Szukaj"`. Ikony `<Search>` z Lucide opatrzone `aria-hidden="true"`, żeby czytnik nie dublował roli. Separator `|` w `LanguageSwitcher.tsx` oznaczony `aria-hidden="true"`.
+
+**SC 4.1.2 — Przycisk menu hamburger:** Przycisk mobilny otrzymał `aria-expanded={menuOpen}` (dynamicznie `true`/`false`) oraz `aria-controls="mobile-menu"`. Kontener menu dostał odpowiadające `id="mobile-menu"`. Zmieniony też `aria-label` na bardziej opisowy "Otwórz menu nawigacyjne".
+
+**SC 4.1.2 — Przyciski języka:** W `LanguageSwitcher.tsx` dodane `aria-pressed={locale === 'pl'/'en'}` i `aria-label="Polski"/"English"` — czytnik ekranu informuje teraz o aktywnym języku i stanie przycisku.
+
+**SC 1.4.3 / 4.1.2 — Link `·` w stopce:** Link do `/login` (panel admina) w `Footer.tsx` otrzymał `aria-hidden="true"` i `tabIndex={-1}` — jest niewidoczny dla czytników ekranu i niedostępny z klawiatury. Wizualnie pozostaje bez zmian.
+
+**SC 2.5.8 — Obszary dotyku min. 24×24 px:** Link wyszukiwania desktop otrzymał `p-1` (łączny obszar ~24px). Przyciski `PL`/`EN` w `LanguageSwitcher.tsx` — `py-0.5` zmienione na `py-1` (min. 24px wysokości obszaru klikalnego).
+
+**SC 1.3.1 — Nawigacje z etykietami:** W `Nav.tsx` dodane `aria-label="Główna nawigacja"` (desktop) i `aria-label="Nawigacja mobilna"` (mobile). W `Footer.tsx` dodane `aria-label="Linki w stopce"`. Czytniki ekranu mogą teraz odróżnić i nazwać każdy region nawigacyjny.
+
+**SC 1.3.6 — Sekcje bez nazw:** Trzy elementy `<section>` na stronie głównej (`page.tsx`) otrzymały etykiety: sekcja hero — `aria-labelledby="home-heading"` (wskazuje na `<h1 id="home-heading">`), sekcja kategorii — `aria-label="Kategorie"`, sekcja najnowszych artykułów — `aria-labelledby="recent-heading"` (wskazuje na `<h3 id="recent-heading">`).
+
+**SC 1.3.1 — Daty artykułów sklejone z tytułem:** Daty w liście artykułów na stronie głównej opakowane w `<time dateTime={isoString}>` z poprawnym atrybutem `datetime`. Na całym linku artykułu dodane `aria-label={tytuł + data}` — czytnik odczytuje pełną, gramatyczną nazwę linku zamiast sklejonego "tytuł21 marca 2026".
+
+**SC 2.3.3 — prefers-reduced-motion:** W `globals.css` dodana reguła `@media (prefers-reduced-motion: reduce)` wyłączająca wszystkie animacje CSS i przejścia (`animation-duration: 0.01ms`, `transition-duration: 0.01ms`) dla użytkowników z tą preferencją ustawioną w systemie operacyjnym.
+
+---
+
 ## 2026-03-22
 
 ### Naprawa linku "View" w adminie — błędny locale (404 dla artykułów EN)

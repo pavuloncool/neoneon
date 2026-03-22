@@ -83,7 +83,8 @@ export function Nav() {
     <>
       {/* Górny navbar — desktop */}
       <header className="fixed top-0 inset-x-0 z-50 bg-paper/90 dark:bg-ink/90 backdrop-blur-sm border-b border-border dark:border-white/10">
-        <nav className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+        {/* SC 1.3.1 / 4.1.2 — aria-label odróżnia nawigację desktopową od mobilnej */}
+        <nav aria-label="Główna nawigacja" className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center">
             <Logo />
           </Link>
@@ -100,8 +101,13 @@ export function Nav() {
                 </li>
               ))}
             </ul>
-            <Link href="/search" className="text-muted hover:text-ink dark:hover:text-white transition-colors">
-              <Search size={16} strokeWidth={1.5}/>
+            {/* SC 4.1.2 + SC 2.5.8 — aria-label dla linku ikony + padding na min. 24×24 px obszar dotyku */}
+            <Link
+              href="/search"
+              aria-label="Szukaj"
+              className="text-muted hover:text-ink dark:hover:text-white transition-colors p-1"
+            >
+              <Search size={16} strokeWidth={1.5} aria-hidden="true"/>
             </Link>
             <ThemeToggle/>
             <LanguageSwitcher />
@@ -117,23 +123,32 @@ export function Nav() {
         <div className="flex items-center gap-6 px-9 py-4 rounded-full" style={glass}>
           <ThemeToggle className="text-white w-6 h-6"/>
           <LanguageSwitcher dark />
+          {/* SC 4.1.2 — aria-expanded informuje czytnik ekranu o stanie menu */}
           <button
             onClick={() => setMenuOpen(o => !o)}
-            aria-label="Toggle menu"
+            aria-label="Otwórz menu nawigacyjne"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
             className="w-6 h-6 flex flex-col gap-[5px] items-center justify-center"
           >
             <span className={cn('block w-5 h-px bg-white transition-transform duration-200', menuOpen && 'translate-y-[6px] rotate-45')}/>
             <span className={cn('block w-5 h-px bg-white transition-opacity duration-200', menuOpen && 'opacity-0')}/>
             <span className={cn('block w-5 h-px bg-white transition-transform duration-200', menuOpen && '-translate-y-[6px] -rotate-45')}/>
           </button>
-          <Link href="/search" className="text-white w-6 h-6 flex items-center justify-center">
-            <Search size={18} strokeWidth={1.5}/>
+          {/* SC 4.1.2 + SC 2.5.8 — aria-label dla linku ikony */}
+          <Link
+            href="/search"
+            aria-label="Szukaj"
+            className="text-white w-6 h-6 flex items-center justify-center"
+          >
+            <Search size={18} strokeWidth={1.5} aria-hidden="true"/>
           </Link>
         </div>
       </div>
 
       {/* Mobile menu nad pillem */}
       <div
+        id="mobile-menu"
         className="md:hidden fixed inset-x-0 z-50 flex justify-center transition-all duration-200"
         style={{
           bottom: '110px',
@@ -142,7 +157,8 @@ export function Nav() {
           pointerEvents: menuOpen ? 'auto' : 'none',
         }}
       >
-        <div className="w-72 rounded-3xl overflow-hidden" style={glass}>
+        {/* SC 1.3.1 — aria-label odróżnia nawigację mobilną */}
+        <nav aria-label="Nawigacja mobilna" className="w-72 rounded-3xl overflow-hidden" style={glass}>
           {menuOpen && (
             <div className="fixed inset-0 z-[-1]" onClick={() => setMenuOpen(false)}/>
           )}
@@ -164,7 +180,7 @@ export function Nav() {
               </li>
             ))}
           </ul>
-        </div>
+        </nav>
       </div>
     </>
   )

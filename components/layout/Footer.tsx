@@ -12,12 +12,19 @@ export async function Footer() {
         <p className="text-sm text-muted">
           © {year} NEONEON. {tf('allRightsReserved')}
         </p>
-        <nav className="flex gap-6">
+        {/* SC 1.3.1 — aria-label odróżnia nawigację stopki */}
+        <nav aria-label="Linki w stopce" className="flex gap-6">
           <Link href="/content-writing" className="text-sm text-muted hover:text-ink transition-colors">{t('contentWriting')}</Link>
           <Link href="/ux-strategies" className="text-sm text-muted hover:text-ink transition-colors">{t('uxStrategies')}</Link>
-<Link href="/about" className="text-sm text-muted hover:text-ink transition-colors">{t('about')}</Link>
+          <Link href="/about" className="text-sm text-muted hover:text-ink transition-colors">{t('about')}</Link>
           <Link href="/contact" className="text-sm text-muted hover:text-ink transition-colors">{t('contact')}</Link>
-          <NextLink href="/login" className="text-sm text-muted/40 hover:text-muted transition-colors">·</NextLink>
+          {/* SC 1.4.3 / 4.1.2 — link do panelu admina ukryty przed AT i klawiaturą */}
+          <NextLink
+            href="/login"
+            aria-hidden="true"
+            tabIndex={-1}
+            className="text-sm text-muted/40 hover:text-muted transition-colors select-none"
+          >·</NextLink>
         </nav>
       </div>
     </footer>
