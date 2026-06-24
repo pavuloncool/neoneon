@@ -14,6 +14,22 @@ function escapeHtml(str: string): string {
     .replace(/'/g, '&#39;')
 }
 
+function renderPlainText(node: TiptapNode): string {
+  if (node.type === 'text') return node.text ?? ''
+  return (node.content ?? []).map(renderPlainText).join('')
+}
+
+function isEmbedHtml(html: string): boolean {
+  const normalized = html.trim().toLowerCase()
+  if (!normalized.includes('<') || !normalized.includes('>')) return false
+
+  return [
+    '<iframe',
+    '<blockquote',
+    '<script',
+  ].some((tag) => normalized.includes(tag))
+}
+
 function renderNode(node: TiptapNode): string {
   switch (node.type) {
     case 'doc':
@@ -57,7 +73,12 @@ function renderNode(node: TiptapNode): string {
 
     case 'codeBlock': {
       const lang = node.attrs?.language as string ?? ''
-      const code = (node.content ?? []).map(renderNode).join('')
+      const rawCode = renderPlainText(node)
+      if (isEmbedHtml(rawCode)) {
+        return `<div class="embed-container">${rawCode}</div>`
+      }
+
+      const code = escapeHtml(rawCode)
       return `<pre><code class="language-${lang}">${code}</code></pre>`
     }
 

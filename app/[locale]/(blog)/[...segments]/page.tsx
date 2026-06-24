@@ -14,11 +14,17 @@ import type { Metadata } from 'next'
 import type { Category } from '@/types'
 
 interface ArticlePageProps {
-  params: Promise<{ locale: 'pl' | 'en'; category: string; slug: string }>
+  params: Promise<{ locale: 'pl' | 'en'; segments: string[] }>
+}
+
+function getRouteParams(segments: string[]) {
+  if (segments.length !== 2) notFound()
+  return { category: segments[0], slug: segments[1] }
 }
 
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
-  const { slug, locale } = await params
+  const { locale, segments } = await params
+  const { slug } = getRouteParams(segments)
   const article = await getArticleBySlug(slug, locale)
   if (!article) return {}
   return {
@@ -33,7 +39,8 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
-  const { category, slug, locale } = await params
+  const { locale, segments } = await params
+  const { category, slug } = getRouteParams(segments)
 
   const validCategories: Category[] = ['content-writing', 'ux-strategies', 'data-visualisation']
   if (!validCategories.includes(category as Category)) notFound()

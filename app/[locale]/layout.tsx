@@ -3,7 +3,7 @@ import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { routing } from '@/i18n/routing'
 import { ThemeProvider } from '@/components/layout/ThemeProvider'
-import { cormorant, dmSans, dmMono } from '@/app/layout'
+import { cormorant, dmSans, dmMono } from '@/app/fonts'
 
 export default async function LocaleLayout({
   children,

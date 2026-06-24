@@ -49,12 +49,14 @@ export function CommentForm({ articleId }: CommentFormProps) {
             <div className="flex flex-col gap-1.5">
               <label className={labelClass}>{t('fieldName')}</label>
               <input type="text" required value={form.author_name}
+                suppressHydrationWarning
                 onChange={(e) => setForm({ ...form, author_name: e.target.value })}
                 placeholder={t('placeholderName')} className={inputClass} />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className={labelClass}>{t('fieldEmail')}</label>
               <input type="email" required value={form.author_email}
+                suppressHydrationWarning
                 onChange={(e) => setForm({ ...form, author_email: e.target.value })}
                 placeholder={t('placeholderEmail')} className={inputClass} />
             </div>
@@ -62,6 +64,7 @@ export function CommentForm({ articleId }: CommentFormProps) {
           <div className="flex flex-col gap-1.5">
             <label className={labelClass}>{t('fieldComment')}</label>
             <textarea required rows={5} value={form.body}
+              suppressHydrationWarning
               onChange={(e) => setForm({ ...form, body: e.target.value })}
               placeholder={t('placeholderComment')}
               className={cn(inputClass, "resize-none")} />
