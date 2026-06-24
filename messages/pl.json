@@ -7,13 +7,13 @@
     "contact": "Kontakt"
   },
   "home": {
-    "tagline": "Content i UX|w produktach cyfrowych",
+    "tagline": "Content i UX dla | produktów cyfrowych",
     "subtitle": "Tworzę strategie contentu i doświadczenia UX dla użytkowników produktów cyfrowych",
     "recent": "Najnowsze",
     "category": "Kategoria"
   },
   "article": {
-    "readMore": "Czytaj więcej",
+    "readMore": "Czytaj dalej",
     "publishedAt": "Opublikowano"
   },
   "footer": {
@@ -26,9 +26,9 @@
   },
   "about": {
     "label": "O mnie",
-    "bio1": "Piszę o punkcie przecięcia strategii treści i doświadczeń użytkownika — dwóch dyscyplin, które dobrze wykonane stają się od siebie nieodróżnialne.",
-    "bio2": "Od kilku lat pomagam firmom znaleźć swój głos online, porządkować informacje, które użytkownicy faktycznie czytają, i budować systemy treści, które się skalują bez utraty człowieczeństwa.",
-    "bio3": "Gdy nie piszę, prawdopodobnie czytam coś o typografii, psychologii poznawczej lub historii wydawnictw.",
+    "bio1": "Piszę treści, które oddziałują na użytkowników, prowadząc ich w kierunku pożądanej zmiany. Buduję autentyczne komunikaty spójne z wizją marki i oczekiwaniami interesariuszy.",
+    "bio2": "Tworzę interfejsy, które w intuicyjny i jednoznaczny sposób prowadzą użytkowników do skutecznego rozwiązania zadania na stronach i w aplikacjach.",
+    "bio3": "Gdy nie piszę ani nie tworzę, najczęściej można spotkać mnie w lesie lub nad morzem, gdzie moja wyobraźnia otwiera nowe okna.",
     "cta": "Skontaktuj się →",
     "areasLabel": "Obszary działania",
     "area1Title": "Strategia treści",
