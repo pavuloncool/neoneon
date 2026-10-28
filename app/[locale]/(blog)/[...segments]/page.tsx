@@ -53,9 +53,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const t = await getTranslations('comments')
 
   const targetLocale = locale === 'pl' ? 'en' : 'pl'
-  const translation = article.translation_id
-    ? await getArticleTranslation(article.translation_id, targetLocale)
-    : null
+  const translation = await getArticleTranslation(article.id, targetLocale)
 
   const categoryLabel =
     article.category === 'content-writing' ? 'Content Writing' :

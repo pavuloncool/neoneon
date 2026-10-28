@@ -1,6 +1,7 @@
 // sanity/schemaTypes/article.ts
 // Pola odpowiadają dawnej tabeli `articles` w Supabase.
-// _id artykułów zmigrowanych = dawny UUID — na nim opierają się komentarze w Supabase.
+// _id artykułów zmigrowanych = dawny UUID z Supabase.
+// Wersje PL/EN łączy dokument translation.metadata (wtyczka @sanity/document-internationalization).
 
 import { defineField, defineType } from 'sanity'
 
@@ -24,18 +25,12 @@ export const article = defineType({
       validation: (r) => r.required(),
     }),
     defineField({
+      // Ustawiane przez wtyczkę document-internationalization (languageField: 'locale')
       name: 'locale',
       title: 'Język',
       type: 'string',
-      options: { list: [{ title: 'Polski', value: 'pl' }, { title: 'English', value: 'en' }], layout: 'radio', direction: 'horizontal' },
-      initialValue: 'pl',
+      readOnly: true,
       validation: (r) => r.required(),
-    }),
-    defineField({
-      name: 'translationId',
-      title: 'ID tłumaczenia',
-      description: 'Ta sama wartość w wersji PL i EN łączy artykuły w parę (przełącznik języka).',
-      type: 'string',
     }),
     defineField({
       name: 'category',

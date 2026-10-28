@@ -32,7 +32,6 @@ export interface Article {
   updated_at: string
   tags?: Tag[]
   locale: 'pl' | 'en'
-  translation_id?: string | null
 }
 
 export type Category = 'content-writing' | 'ux-strategies' | 'data-visualisation'

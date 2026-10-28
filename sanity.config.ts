@@ -2,14 +2,24 @@
 
 // sanity.config.ts — Studio osadzone pod /studio (app/studio/[[...tool]]/page.tsx)
 
-import { defineConfig } from 'sanity'
+import { defineConfig, type DocumentActionComponent } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { visionTool } from '@sanity/vision'
+import {
+  documentInternationalization,
+  useDeleteTranslationAction,
+  useDuplicateWithTranslationsAction,
+} from '@sanity/document-internationalization'
 import { apiVersion, dataset, projectId } from './sanity/env'
 import { schemaTypes } from './sanity/schemaTypes'
 
-// Komentarze i wiadomości powstają tylko z formularzy na stronie
-const FORM_TYPES = ['comment', 'contactMessage']
+// Akcje wtyczki typują `action` jako string, a Sanity 6 oczekuje klucza akcji — w działaniu zgodne
+const TRANSLATION_ACTIONS = [useDeleteTranslationAction, useDuplicateWithTranslationsAction] as DocumentActionComponent[]
+
+// Komentarze i wiadomości powstają tylko z formularzy na stronie.
+// Artykuł tworzymy z szablonu z językiem („Polski Artykuł” / „English Artykuł”) — bazowy
+// szablon `article` (bez języka) i techniczny `article-parameterized` są ukryte.
+const HIDDEN_TEMPLATES = ['comment', 'contactMessage', 'article', 'article-parameterized']
 
 export default defineConfig({
   name: 'neoneon',
@@ -19,10 +29,11 @@ export default defineConfig({
   dataset,
   schema: { types: schemaTypes },
   document: {
-    newDocumentOptions: (prev) => prev.filter((item) => !FORM_TYPES.includes(item.templateId)),
+    newDocumentOptions: (prev) => prev.filter((item) => !HIDDEN_TEMPLATES.includes(item.templateId)),
     actions: (prev, { schemaType }) => {
       if (schemaType === 'contactMessage') return prev.filter(({ action }) => action === 'delete')
       if (schemaType === 'comment') return prev.filter(({ action }) => action === 'publish' || action === 'unpublish' || action === 'delete')
+      if (schemaType === 'article') return [...prev, ...TRANSLATION_ACTIONS]
       return prev
     },
   },
@@ -56,6 +67,18 @@ export default defineConfig({
             ),
             S.documentTypeListItem('contactMessage').title('Wiadomości kontaktowe'),
           ]),
+    }),
+    // Oryginał → tłumaczenie: przycisk „Translations” w artykule tworzy wersję w drugim języku,
+    // połączoną z oryginałem dokumentem translation.metadata
+    documentInternationalization({
+      supportedLanguages: [
+        { id: 'pl', title: 'Polski' },
+        { id: 'en', title: 'English' },
+      ],
+      schemaTypes: ['article'],
+      languageField: 'locale',
+      apiVersion,
+      metadataOmnisearchVisibility: false,
     }),
     visionTool({ defaultApiVersion: apiVersion }),
   ],

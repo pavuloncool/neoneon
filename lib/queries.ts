@@ -24,8 +24,7 @@ const ARTICLE_PROJECTION = groq`{
   "created_at": _createdAt,
   "updated_at": _updatedAt,
   "tags": tags[]->${TAG_PROJECTION},
-  locale,
-  "translation_id": translationId
+  locale
 }`
 
 // ── Artykuły ────────────────────────────────────────────────
@@ -90,13 +89,14 @@ export async function searchArticles(
   }
 }
 
+// Wersja artykułu w drugim języku — powiązanie przez dokument translation.metadata
 export async function getArticleTranslation(
-  translationId: string,
+  articleId: string,
   targetLocale: 'pl' | 'en'
 ): Promise<Article | null> {
   return client.fetch<Article | null>(
-    groq`*[_type == "article" && translationId == $translationId && locale == $targetLocale][0] ${ARTICLE_PROJECTION}`,
-    { translationId, targetLocale }
+    groq`*[_type == "article" && locale == $targetLocale && _id in *[_type == "translation.metadata" && references($articleId)].translations[].value._ref][0] ${ARTICLE_PROJECTION}`,
+    { articleId, targetLocale }
   )
 }
 

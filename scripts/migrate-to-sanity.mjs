@@ -200,7 +200,6 @@ for (const a of articles) {
     title: a.title,
     slug: { _type: 'slug', current: a.slug },
     locale: a.locale ?? 'pl',
-    translationId: a.translation_id ?? undefined,
     category: a.category,
     excerpt: a.excerpt ?? undefined,
     publishedAt: a.published_at ?? undefined,
@@ -220,6 +219,32 @@ for (const a of articles) {
   docs.push(doc)
   report.articles++
   if (a.status === 'draft') report.drafts++
+}
+
+// Pary PL/EN (dawne translation_id) → dokumenty translation.metadata wtyczki
+// @sanity/document-internationalization. Format pozycji jak w jej createReference():
+// opublikowany artykuł — zwykła referencja, szkic — słaba z _strengthenOnPublish.
+const groups = new Map()
+for (const a of articles) {
+  if (!a.translation_id) continue
+  groups.set(a.translation_id, [...(groups.get(a.translation_id) ?? []), a])
+}
+for (const [translationId, group] of groups) {
+  if (group.length < 2) continue
+  docs.push({
+    _id: `translation-${translationId}`,
+    _type: 'translation.metadata',
+    schemaTypes: ['article'],
+    translations: group.map((a) => ({
+      _key: a.locale,
+      _type: 'internationalizedArrayReferenceValue',
+      language: a.locale,
+      value: a.status === 'draft'
+        ? { _type: 'reference', _ref: a.id, _weak: true, _strengthenOnPublish: { type: 'article' } }
+        : { _type: 'reference', _ref: a.id },
+    })),
+  })
+  report.translations = (report.translations ?? 0) + 1
 }
 
 for (const c of comments) {

@@ -27,6 +27,8 @@
 
 **Formularz kontaktowy:** `/api/contact` wysyła mail przez Resend jak dotąd, a kopię zapisuje w Sanity jako szkic (lista „Wiadomości kontaktowe” w Studio). Dane w treści maila są teraz escapowane.
 
+**Tłumaczenia (oryginał → tłumaczenie):** wersje PL/EN łączy wtyczka `@sanity/document-internationalization` (dokumenty `translation.metadata`) zamiast ręcznie wpisywanego pola `translationId`. W Studio: przycisk tłumaczeń w artykule tworzy wersję w drugim języku połączoną z oryginałem; nowe artykuły zakłada się z szablonu z językiem („Polski Artykuł” / „English Artykuł”). Pole `locale` ustawia wtyczka (tylko do odczytu). Przełącznik języka na stronie korzysta z `translation.metadata` — 5 istniejących par przeniesione. Wymagane peer dependencies (`sanity-plugin-internationalized-array`, `@sanity/language-filter`) dodane jawnie, bo `.npmrc` ma `legacy-peer-deps=true`.
+
 **Dataset prywatny:** komentarze i wiadomości zawierają adresy e-mail, więc dataset nie jest publiczny. Strona czyta dane po stronie serwera tokenem Viewer.
 
 **Usunięte:** panel `/admin`, strona `/login`, kropka w stopce prowadząca do logowania, `lib/supabase`, edytor Tiptap i upload obrazów oraz zależności `@tiptap/*` i `@supabase/ssr`. `@supabase/supabase-js` zostaje tylko jako devDependency skryptu migracji.
