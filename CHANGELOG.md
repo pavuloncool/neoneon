@@ -2,6 +2,12 @@
 
 ## 2026-10-28
 
+### Porządki po migracji — usunięcie Supabase
+
+- Usunięte: `scripts/migrate-to-sanity.mjs` (migracja zakończona) i devDependency `@supabase/supabase-js`.
+- Z `.env.local.example` (i lokalnego `.env.local`) usunięte zmienne Supabase; z Vercel usunięte `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
+- `scripts/export_supabase_backup.sh` i katalog `supabase/` zostają do czasu usunięcia projektu Supabase (ostatni backup / historia schematu).
+
 ### Ochrona formularzy (Cloudflare Turnstile) i powiadomienia o komentarzach
 
 **Nowe pliki:**
