@@ -29,6 +29,8 @@ export function CommentForm({ articleId }: CommentFormProps) {
       })
       if (res.status === 403) {
         setStatus('captcha')
+        // Odrzucony token → nowy do ponownej próby
+        turnstile.current?.reset()
         return
       }
       if (!res.ok) throw new Error()
@@ -36,8 +38,8 @@ export function CommentForm({ articleId }: CommentFormProps) {
       setForm({ author_name: '', author_email: '', body: '' })
     } catch {
       setStatus('error')
-    } finally {
-      // Token Turnstile jest jednorazowy
+      // Token Turnstile jest jednorazowy i już zużyty — nowy do ponownej próby.
+      // Po sukcesie resetu nie ma: formularz znika, a porzucone wyzwanie liczyłoby się jako „bot”.
       turnstile.current?.reset()
     }
   }

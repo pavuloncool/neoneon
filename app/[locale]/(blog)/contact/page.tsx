@@ -23,6 +23,8 @@ export default function ContactPage() {
       })
       if (res.status === 403) {
         setStatus('captcha')
+        // Odrzucony token → nowy do ponownej próby
+        turnstile.current?.reset()
         return
       }
       if (!res.ok) throw new Error()
@@ -30,8 +32,8 @@ export default function ContactPage() {
       setForm({ name: '', email: '', message: '' })
     } catch {
       setStatus('error')
-    } finally {
-      // Token Turnstile jest jednorazowy
+      // Token Turnstile jest jednorazowy i już zużyty — nowy do ponownej próby.
+      // Po sukcesie resetu nie ma: formularz znika, a porzucone wyzwanie liczyłoby się jako „bot”.
       turnstile.current?.reset()
     }
   }
