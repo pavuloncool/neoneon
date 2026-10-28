@@ -2,6 +2,21 @@
 
 ## 2026-10-28
 
+### Page builder — cała treść strony edytowalna w Sanity Studio
+
+**Model treści (Sanity):**
+- `page` — strony z sekcji (PL/EN, łączone wtyczką tłumaczeń): strona główna (`isHome`), „O mnie” (`about`), „Kontakt” (`contact`) i nowe strony pod `/{locale}/{slug}`. Sekcje: Nagłówek strony, Kafelki kategorii, Najnowsze artykuły, Tekst ze zdjęciem, Siatka obszarów, Formularz kontaktowy, Tekst.
+- `siteSettings` (po jednym na język) — SEO domyślne, logo, nawigacja, stopka, etykiety dla czytników ekranu.
+- `uiStrings` (po jednym na język) — teksty interfejsu (kategorie, komentarze, formularz kontaktowy, wyszukiwarka). `i18n/request.ts` nakłada je na `messages/*.json`; puste pole = tekst z JSON.
+
+**Frontend:** `components/sections/*` (klasy 1:1 z dawnych stron), `components/blog/ContactForm.tsx` (logika formularza i Turnstile bez zmian), `Nav`/`Footer`/`LanguageSwitcher` z danymi z ustawień, `lib/links.ts`, `lib/metadata.ts`. Trasy `about/` i `contact/` zastąpione przez `[...segments]` (1 segment = strona). Znaczniki edycji (stega) w podglądzie tylko dla artykułów i tagów.
+
+**Dane startowe:** `scripts/seed-site-content.ts` (`node --experimental-strip-types …`, `--dry-run`, domyślnie tworzy tylko brakujące dokumenty, `--overwrite` nadpisuje). Strony identyczne z poprzednią wersją (porównanie 12 stron PL/EN: tekst, struktura i klasy, linki, metadane, wysokości).
+
+**Poprawki dostępności przy okazji:** etykiety `aria-label` i link „przejdź do treści” w wersji EN są po angielsku; „Toggle theme” po polsku to „Przełącz motyw”.
+
+**Inne:** `tsconfig.json` — `allowImportingTsExtensions` (skrypt TS uruchamiany przez Node importuje `sanity/uiStringFields.ts`); tytuł domyślny i szablon tytułów z ustawień strony (usunięte z `app/layout.tsx`).
+
 ### Presentation Tool (podgląd z klikalną edycją) w Studio
 
 **Nowe pliki:**

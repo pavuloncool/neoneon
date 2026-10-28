@@ -3,7 +3,9 @@ export const dynamic = 'force-dynamic'
 import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
-import { getArticleBySlug, getCommentsByArticle, getArticleTranslation } from '@/lib/queries'
+import { getArticleBySlug, getCommentsByArticle, getArticleTranslation, getPage } from '@/lib/queries'
+import { PageSections } from '@/components/sections/SectionRenderer'
+import { pageMetadata } from '@/lib/metadata'
 import { formatDate, readingTime } from '@/lib/utils'
 import { PortableTextRenderer } from '@/components/blog/PortableTextRenderer'
 import { TagBadge } from '@/components/blog/TagBadge'
@@ -18,6 +20,8 @@ interface ArticlePageProps {
   params: Promise<{ locale: 'pl' | 'en'; segments: string[] }>
 }
 
+// /{locale}/{slug} = strona z page buildera („O mnie”, „Kontakt”, nowe strony);
+// /{locale}/{kategoria}/{slug} = artykuł
 function getRouteParams(segments: string[]) {
   if (segments.length !== 2) notFound()
   return { category: segments[0], slug: segments[1] }
@@ -25,6 +29,7 @@ function getRouteParams(segments: string[]) {
 
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const { locale, segments } = await params
+  if (segments.length === 1) return pageMetadata(await getPage(locale, segments[0]))
   const { slug } = getRouteParams(segments)
   const article = await getArticleBySlug(slug, locale)
   if (!article) return {}
@@ -44,6 +49,13 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { locale, segments } = await params
+
+  if (segments.length === 1) {
+    const page = await getPage(locale, segments[0])
+    if (!page) notFound()
+    return <PageSections page={page} locale={locale} />
+  }
+
   const { category, slug } = getRouteParams(segments)
 
   const validCategories: Category[] = ['content-writing', 'ux-strategies', 'data-visualisation']

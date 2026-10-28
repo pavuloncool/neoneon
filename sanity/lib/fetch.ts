@@ -7,8 +7,10 @@ import { draftMode } from 'next/headers'
 import type { QueryParams } from 'next-sanity'
 import { client } from './client'
 
-// Pola, które w podglądzie dostają niewidoczne znaczniki edycji (stega).
+// Pola, które w podglądzie dostają niewidoczne znaczniki edycji (stega) — tylko w artykułach
+// i tagach. Strony, ustawienia i teksty interfejsu edytuje się w formularzu (bez znaczników).
 // Slugi, kategorie, języki, ID i daty muszą zostać czyste — od nich zależą adresy i logika stron.
+const STEGA_TYPES = new Set(['article', 'tag'])
 const EDITABLE_FIELDS = new Set(['title', 'excerpt', 'name', 'nameEn'])
 
 const previewClient = client.withConfig({
@@ -19,6 +21,7 @@ const previewClient = client.withConfig({
     enabled: true,
     studioUrl: '/studio',
     filter: (props) => {
+      if (!STEGA_TYPES.has(props.sourceDocument?._type)) return false
       if (props.sourcePath[0] === 'content') return props.filterDefault(props)
       return EDITABLE_FIELDS.has(String(props.sourcePath.at(-1)))
     },

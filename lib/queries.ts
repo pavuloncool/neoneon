@@ -3,10 +3,12 @@
 // Projekcja GROQ zwraca ten sam kształt co dawne wiersze Supabase (typ Article),
 // dzięki czemu strony i komponenty nie wymagają zmian.
 
+import { cache } from 'react'
 import { groq } from 'next-sanity'
 import { draftsClient } from '@/sanity/lib/client'
 import { sanityFetch } from '@/sanity/lib/fetch'
-import type { Article, Category, Tag, Comment } from '@/types'
+import { LINK_PROJECTION } from '@/lib/links'
+import type { Article, Category, Tag, Comment, Page, SiteSettings } from '@/types'
 
 const TAG_PROJECTION = groq`{ "id": _id, name, "name_en": nameEn, "slug": slug.current }`
 
@@ -131,3 +133,54 @@ export async function getCommentsByArticle(articleId: string): Promise<Comment[]
     { articleId }
   )
 }
+
+// ── Treść strony: ustawienia, strony z sekcji, teksty interfejsu ──────────
+
+const IMAGE_PROJECTION = groq`{ "url": asset->url, alt, "width": asset->metadata.dimensions.width, "height": asset->metadata.dimensions.height, hotspot }`
+const NAV_PROJECTION = groq`{ label, "link": link${LINK_PROJECTION} }`
+
+// cache(): layout, metadane i strona w jednym żądaniu dzielą jedno zapytanie
+export const getSiteSettings = cache(async (locale: 'pl' | 'en'): Promise<SiteSettings | null> =>
+  sanityFetch<SiteSettings | null>(
+    groq`*[_type == "siteSettings" && locale == $locale][0]{
+      siteTitle, titleTemplate, description,
+      "ogImage": ogImage${IMAGE_PROJECTION},
+      "logoLight": logoLight${IMAGE_PROJECTION},
+      "logoDark": logoDark${IMAGE_PROJECTION},
+      logoAlt,
+      "navigation": navigation[]${NAV_PROJECTION},
+      footerText,
+      "footerLinks": footerLinks[]${NAV_PROJECTION},
+      a11y
+    }`,
+    { locale }
+  )
+)
+
+const PAGE_PROJECTION = groq`{
+  "id": _id, title, "slug": slug.current, isHome, width,
+  "seo": seo{ title, description, "image": image${IMAGE_PROJECTION} },
+  "sections": sections[]{
+    ...,
+    _type == "textImage" => { "image": image${IMAGE_PROJECTION}, "ctaLink": ctaLink${LINK_PROJECTION} }
+  }
+}`
+
+export const getHomePage = cache(async (locale: 'pl' | 'en'): Promise<Page | null> =>
+  sanityFetch<Page | null>(groq`*[_type == "page" && isHome == true && locale == $locale][0]${PAGE_PROJECTION}`, { locale })
+)
+
+export const getPage = cache(async (locale: 'pl' | 'en', slug: string): Promise<Page | null> =>
+  sanityFetch<Page | null>(
+    groq`*[_type == "page" && isHome != true && slug.current == $slug && locale == $locale][0]${PAGE_PROJECTION}`,
+    { locale, slug }
+  )
+)
+
+// Teksty interfejsu — nakładane na messages/*.json w i18n/request.ts
+export const getUiStrings = cache(async (locale: string): Promise<Record<string, Record<string, string>> | null> =>
+  sanityFetch<Record<string, Record<string, string>> | null>(
+    groq`*[_type == "uiStrings" && locale == $locale][0]`,
+    { locale }
+  )
+)

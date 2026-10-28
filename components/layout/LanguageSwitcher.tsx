@@ -4,7 +4,11 @@ import { useLocale } from 'next-intl'
 import { usePathname, useRouter } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 
-export function LanguageSwitcher({ dark = false, className }: { dark?: boolean; className?: string }) {
+export function LanguageSwitcher({
+  dark = false,
+  className,
+  labels = { pl: 'Polski', en: 'English' },
+}: { dark?: boolean; className?: string; labels?: { pl: string; en: string } }) {
   const locale = useLocale()
   const pathname = usePathname()
   const router = useRouter()
@@ -29,7 +33,7 @@ export function LanguageSwitcher({ dark = false, className }: { dark?: boolean; 
       <button
         onClick={() => switchTo('pl')}
         aria-pressed={locale === 'pl'}
-        aria-label="Polski"
+        aria-label={labels.pl}
         className={cn(
           'px-1.5 py-1 transition-colors duration-200',
           locale === 'pl'
@@ -43,7 +47,7 @@ export function LanguageSwitcher({ dark = false, className }: { dark?: boolean; 
       <button
         onClick={() => switchTo('en')}
         aria-pressed={locale === 'en'}
-        aria-label="English"
+        aria-label={labels.en}
         className={cn(
           'px-1.5 py-1 transition-colors duration-200',
           locale === 'en'

@@ -1,11 +1,9 @@
 import type { Metadata } from 'next'
 import '@/styles/globals.css'
 
+// Tytuł domyślny i szablon tytułów pochodzą z ustawień strony w Sanity
+// (generateMetadata w app/[locale]/layout.tsx); tu tylko wartości awaryjne.
 export const metadata: Metadata = {
-  title: {
-    default: 'neoneon — Content Writing & UX Strategies',
-    template: '%s | neoneon',
-  },
   description: 'Writing about online content strategy, UX design and digital communication that work for AI-powered search engines.',
   openGraph: {
     type: 'website',

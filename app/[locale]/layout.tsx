@@ -7,6 +7,23 @@ import { routing } from '@/i18n/routing'
 import { ThemeProvider } from '@/components/layout/ThemeProvider'
 import { cormorant, dmSans, dmMono } from '@/app/fonts'
 import { DraftModeBanner } from '@/components/layout/DraftModeBanner'
+import { getSiteSettings } from '@/lib/queries'
+import type { Metadata } from 'next'
+
+// Domyślne SEO z ustawień strony w Sanity; brakujące pola uzupełnia app/layout.tsx
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params
+  const settings = await getSiteSettings(locale === 'en' ? 'en' : 'pl')
+  if (!settings) return {}
+  const og = settings.ogImage?.url
+    ? { url: settings.ogImage.url, width: settings.ogImage.width ?? undefined, height: settings.ogImage.height ?? undefined, alt: settings.logoAlt ?? 'neoneon' }
+    : null
+  return {
+    ...(settings.siteTitle ? { title: { default: settings.siteTitle, template: settings.titleTemplate ?? '%s' } } : {}),
+    ...(settings.description ? { description: settings.description } : {}),
+    ...(og ? { openGraph: { type: 'website', url: 'https://neoneon.vercel.app', siteName: 'neoneon', images: [og] } } : {}),
+  }
+}
 
 export default async function LocaleLayout({
   children,

@@ -6,8 +6,22 @@ import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
 import { useState, useEffect, useRef } from 'react'
 import { Search } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher'
+
+// Dane z ustawień strony w Sanity (siteSettings) — przygotowuje je app/[locale]/(blog)/layout.tsx
+export interface NavProps {
+  links: { href: string; label: string; external: boolean }[]
+  logo: { light: string; dark: string; alt: string }
+  labels: {
+    mainNav: string
+    mobileNav: string
+    search: string
+    menu: string
+    themeToggle: string
+    languagePl: string
+    languageEn: string
+  }
+}
 
 const glass: React.CSSProperties = {
   background: 'rgba(20,20,20,0.55)',
@@ -17,7 +31,7 @@ const glass: React.CSSProperties = {
   boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
 }
 
-function ThemeToggle({ className }: { className?: string }) {
+function ThemeToggle({ className, label }: { className?: string; label: string }) {
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
@@ -25,7 +39,7 @@ function ThemeToggle({ className }: { className?: string }) {
   return (
     <button
       onClick={() => mounted && setTheme(isDark ? 'light' : 'dark')}
-      aria-label="Toggle theme"
+      aria-label={label}
       className={cn('flex items-center justify-center', className)}
     >
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -36,15 +50,15 @@ function ThemeToggle({ className }: { className?: string }) {
   )
 }
 
-function Logo() {
+function Logo({ logo }: { logo: NavProps['logo'] }) {
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
   if (!mounted) return <div className="h-8 w-28" />
   return (
     <Image
-      src={resolvedTheme === 'dark' ? '/neoneon-dark.webp' : '/neoneon-light.webp'}
-      alt="neoneon"
+      src={resolvedTheme === 'dark' ? logo.dark : logo.light}
+      alt={logo.alt}
       width={120}
       height={40}
       className="h-8 w-auto"
@@ -53,20 +67,19 @@ function Logo() {
   )
 }
 
-export function Nav() {
-  const t = useTranslations('nav')
+// Link wewnętrzny (z prefiksem języka) albo zewnętrzny
+function NavLink({ link, className, onClick }: { link: NavProps['links'][number]; className: string; onClick?: () => void }) {
+  if (link.external) {
+    return <a href={link.href} className={className} onClick={onClick} target="_blank" rel="noopener noreferrer">{link.label}</a>
+  }
+  return <Link href={link.href} className={className} onClick={onClick}>{link.label}</Link>
+}
+
+export function Nav({ links, logo, labels }: NavProps) {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
   const [pillVisible, setPillVisible] = useState(true)
   const lastY = useRef(0)
-
-  const links = [
-    { href: '/content-writing' as const, label: t('contentWriting') },
-    { href: '/ux-strategies' as const, label: t('uxStrategies') },
-    /*{ href: '/data-visualisation' as const, label: t('dataVisualisation') },*/
-    { href: '/about' as const, label: t('about') },
-    { href: '/contact' as const, label: t('contact') },
-  ]
 
   useEffect(() => {
     const onScroll = () => {
@@ -84,33 +97,33 @@ export function Nav() {
       {/* Górny navbar — desktop */}
       <header className="fixed top-0 inset-x-0 z-50 bg-paper/90 dark:bg-ink/90 backdrop-blur-sm border-b border-border dark:border-white/10">
         {/* SC 1.3.1 / 4.1.2 — aria-label odróżnia nawigację desktopową od mobilnej */}
-        <nav aria-label="Główna nawigacja" className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+        <nav aria-label={labels.mainNav} className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center">
-            <Logo />
+            <Logo logo={logo} />
           </Link>
           <div className="hidden md:flex items-center gap-3">
             <ul className="flex items-center gap-1">
-              {links.map(({ href, label }) => (
-                <li key={href}>
-                  <Link href={href} className={cn(
+              {links.map((link) => (
+                <li key={link.href}>
+                  <NavLink link={link} className={cn(
                     'text-sm tracking-wide px-3 py-1.5 transition-colors',
-                    pathname?.startsWith(href)
+                    !link.external && pathname?.startsWith(link.href)
                       ? 'bg-ink text-paper dark:bg-white dark:text-ink'
                       : 'text-muted hover:bg-ink hover:text-paper dark:hover:bg-white dark:hover:text-ink'
-                  )}>{label}</Link>
+                  )} />
                 </li>
               ))}
             </ul>
             {/* SC 4.1.2 + SC 2.5.8 — aria-label dla linku ikony + padding na min. 24×24 px obszar dotyku */}
             <Link
               href="/search"
-              aria-label="Szukaj"
+              aria-label={labels.search}
               className="text-muted hover:text-ink dark:hover:text-white transition-colors p-1"
             >
               <Search size={16} strokeWidth={1.5} aria-hidden="true"/>
             </Link>
-            <ThemeToggle/>
-            <LanguageSwitcher />
+            <ThemeToggle label={labels.themeToggle}/>
+            <LanguageSwitcher labels={{ pl: labels.languagePl, en: labels.languageEn }} />
           </div>
         </nav>
       </header>
@@ -121,12 +134,12 @@ export function Nav() {
         style={{ bottom: pillVisible ? '24px' : '-80px', opacity: pillVisible ? 1 : 0 }}
       >
         <div className="flex items-center gap-6 px-9 py-4 rounded-full" style={glass}>
-          <ThemeToggle className="text-white w-6 h-6"/>
-          <LanguageSwitcher dark />
+          <ThemeToggle className="text-white w-6 h-6" label={labels.themeToggle}/>
+          <LanguageSwitcher dark labels={{ pl: labels.languagePl, en: labels.languageEn }} />
           {/* SC 4.1.2 — aria-expanded informuje czytnik ekranu o stanie menu */}
           <button
             onClick={() => setMenuOpen(o => !o)}
-            aria-label="Otwórz menu nawigacyjne"
+            aria-label={labels.menu}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             className="w-6 h-6 flex flex-col gap-[5px] items-center justify-center"
@@ -138,7 +151,7 @@ export function Nav() {
           {/* SC 4.1.2 + SC 2.5.8 — aria-label dla linku ikony */}
           <Link
             href="/search"
-            aria-label="Szukaj"
+            aria-label={labels.search}
             className="text-white w-6 h-6 flex items-center justify-center"
           >
             <Search size={18} strokeWidth={1.5} aria-hidden="true"/>
@@ -158,25 +171,23 @@ export function Nav() {
         }}
       >
         {/* SC 1.3.1 — aria-label odróżnia nawigację mobilną */}
-        <nav aria-label="Nawigacja mobilna" className="w-72 rounded-3xl overflow-hidden" style={glass}>
+        <nav aria-label={labels.mobileNav} className="w-72 rounded-3xl overflow-hidden" style={glass}>
           {menuOpen && (
             <div className="fixed inset-0 z-[-1]" onClick={() => setMenuOpen(false)}/>
           )}
           <ul className="flex flex-col p-3">
-            {links.map(({ href, label }) => (
-              <li key={href}>
-                <Link
-                  href={href}
+            {links.map((link) => (
+              <li key={link.href}>
+                <NavLink
+                  link={link}
                   onClick={() => setMenuOpen(false)}
                   className={cn(
                     'flex items-center justify-center text-sm tracking-wide px-4 py-3.5 rounded-2xl transition-colors',
-                    pathname?.startsWith(href)
+                    !link.external && pathname?.startsWith(link.href)
                       ? 'bg-white/25 text-white'
                       : 'text-white/80 hover:bg-white/15 hover:text-white'
                   )}
-                >
-                  {label}
-                </Link>
+                />
               </li>
             ))}
           </ul>

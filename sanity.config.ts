@@ -18,9 +18,20 @@ import { schemaTypes } from './sanity/schemaTypes'
 const TRANSLATION_ACTIONS = [useDeleteTranslationAction, useDuplicateWithTranslationsAction] as DocumentActionComponent[]
 
 // Komentarze i wiadomości powstają tylko z formularzy na stronie.
-// Artykuł tworzymy z szablonu z językiem („Polski Artykuł” / „English Artykuł”) — bazowy
-// szablon `article` (bez języka) i techniczny `article-parameterized` są ukryte.
-const HIDDEN_TEMPLATES = ['comment', 'contactMessage', 'article', 'article-parameterized']
+// Artykuły i strony tworzymy z szablonu z językiem („Polski Artykuł”, „English Strona”…) — bazowe
+// szablony bez języka i techniczne `*-parameterized` są ukryte. Ustawienia i teksty interfejsu
+// to stałe dokumenty (po jednym na język), więc nie da się tworzyć nowych.
+const HIDDEN_TEMPLATES = [
+  'comment', 'contactMessage', 'siteSettings', 'uiStrings',
+  'article', 'article-parameterized', 'page', 'page-parameterized',
+]
+
+// Dokumenty pojedyncze: siteSettings-pl/en, uiStrings-pl/en
+const SINGLETON_TYPES = ['siteSettings', 'uiStrings']
+const LOCALES = [
+  { id: 'pl', title: 'PL' },
+  { id: 'en', title: 'EN' },
+]
 
 export default defineConfig({
   name: 'neoneon',
@@ -35,7 +46,8 @@ export default defineConfig({
       if (schemaType === 'contactMessage') return prev.filter(({ action }) => action === 'delete')
       // Komentarze i wiadomości zostają szkicami (niepubliczne) — bez „Publish”
       if (schemaType === 'comment') return prev.filter(({ action }) => action === 'delete')
-      if (schemaType === 'article') return [...prev, ...TRANSLATION_ACTIONS]
+      if (SINGLETON_TYPES.includes(schemaType)) return prev.filter(({ action }) => action !== 'duplicate' && action !== 'delete')
+      if (schemaType === 'article' || schemaType === 'page') return [...prev, ...TRANSLATION_ACTIONS]
       return prev
     },
   },
@@ -68,6 +80,20 @@ export default defineConfig({
                 .defaultOrdering([{ field: 'submittedAt', direction: 'desc' }])
             ),
             S.documentTypeListItem('contactMessage').title('Wiadomości kontaktowe'),
+            S.divider(),
+            ...LOCALES.map(({ id, title }) =>
+              S.listItem().title(`Strony ${title}`).child(
+                S.documentList().title(`Strony ${title}`).filter('_type == "page" && locale == $locale').params({ locale: id })
+              )
+            ),
+            ...SINGLETON_TYPES.flatMap((type) =>
+              LOCALES.map(({ id, title }) =>
+                S.listItem()
+                  .title(`${type === 'siteSettings' ? 'Ustawienia strony' : 'Teksty interfejsu'} ${title}`)
+                  .id(`${type}-${id}`)
+                  .child(S.document().schemaType(type).documentId(`${type}-${id}`).title(`${type === 'siteSettings' ? 'Ustawienia strony' : 'Teksty interfejsu'} ${title}`))
+              )
+            ),
           ]),
     }),
     // Podgląd strony z klikalną edycją. Strona działa pod tym samym adresem co Studio,
@@ -81,10 +107,12 @@ export default defineConfig({
       resolve: {
         // Który dokument edytować, gdy w podglądzie otwarta jest dana strona
         mainDocuments: defineDocuments([
+          { route: '/:locale', filter: '_type == "page" && isHome == true && locale == $locale' },
           {
             route: '/:locale/:category/:slug',
             filter: '_type == "article" && slug.current == $slug && locale == $locale',
           },
+          { route: '/:locale/:slug', filter: '_type == "page" && slug.current == $slug && locale == $locale' },
         ]),
         // Gdzie dany artykuł występuje na stronie (lista w edytorze artykułu)
         locations: {
@@ -100,6 +128,17 @@ export default defineConfig({
                   : [],
             }),
           }),
+          page: defineLocations({
+            select: { title: 'title', slug: 'slug.current', locale: 'locale', isHome: 'isHome' },
+            resolve: (doc) => ({
+              locations: doc?.locale
+                ? [{ title: doc.title || 'Strona', href: doc.isHome ? `/${doc.locale}` : `/${doc.locale}/${doc.slug ?? ''}` }]
+                : [],
+            }),
+          }),
+          // Ustawienia i teksty interfejsu dotyczą całej strony
+          siteSettings: defineLocations({ message: 'Widoczne na wszystkich stronach (nawigacja, stopka, SEO).', tone: 'positive' }),
+          uiStrings: defineLocations({ message: 'Widoczne w formularzach, wyszukiwarce i na stronach kategorii.', tone: 'positive' }),
         },
       },
     }),
@@ -110,7 +149,7 @@ export default defineConfig({
         { id: 'pl', title: 'Polski' },
         { id: 'en', title: 'English' },
       ],
-      schemaTypes: ['article'],
+      schemaTypes: ['article', 'page'],
       languageField: 'locale',
       apiVersion,
       metadataOmnisearchVisibility: false,
