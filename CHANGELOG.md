@@ -4,7 +4,7 @@
 
 ### Artykuły i tagi przeniesione z Supabase do Sanity
 
-**Zakres:** do Sanity (projekt `n81gbqh8`, dataset `production`) przeszły wyłącznie artykuły, tagi i obrazy. Komentarze, formularz kontaktowy (Resend) i logowanie do `/admin` zostają w Supabase bez zmian. Frontend Next.js, wygląd i adresy URL — bez zmian.
+**Zakres:** całe zaplecze przeszło do Sanity (projekt `n81gbqh8`, dataset `production`, prywatny): artykuły, tagi, obrazy, komentarze i wiadomości kontaktowe. Supabase nie jest już używany przez stronę. Frontend Next.js, wygląd i adresy URL — bez zmian. Maile z formularza kontaktowego dalej wysyła Resend.
 
 **Nowe pliki:**
 - `sanity.config.ts`, `sanity.cli.ts`, `sanity/env.ts`, `sanity/schemaTypes/*` — schematy `article`, `tag`, `blockContent`
@@ -12,7 +12,8 @@
 - `app/studio/[[...tool]]/page.tsx`, `app/studio/layout.tsx` — Sanity Studio pod `/studio`
 - `components/blog/PortableTextRenderer.tsx` — zastępuje `TiptapRenderer`, generuje ten sam HTML (style `.article-body` bez zmian)
 - `scripts/migrate-to-sanity.mjs` — migracja Supabase → Sanity (`--dry-run`, idempotentna)
-- `supabase/2026-10-28_sanity_comments_fk.sql` — usunięcie FK `comments → articles`
+- `supabase/2026-10-28_sanity_comments_fk.sql` — usunięcie FK `comments → articles` (etap przejściowy)
+- `sanity/schemaTypes/comment.ts`, `sanity/schemaTypes/contactMessage.ts`
 
 **Co zostało zmienione:**
 
@@ -22,7 +23,13 @@
 
 **Czas czytania:** liczony z czystego tekstu artykułu zamiast z surowego JSON-a Tiptap (który zawyżał wynik m.in. o kod embedów Instagrama). Zmienia wartość w 3 artykułach (np. Jazz kissa: 7 → 4–5 min).
 
-**Panel `/admin`:** usunięte edytor artykułów, zarządzanie tagami i upload obrazów (`ArticleForm`, `TiptapEditor`, `ImageUpload`, `TagsManager`, `/api/admin/articles`, `/api/admin/tags`) oraz zależności `@tiptap/*`. Linki prowadzą do Studio. Moderacja komentarzy i kontakty bez zmian.
+**Komentarze:** `/api/comments` zapisuje komentarz w Sanity jako szkic (token Contributor — może tworzyć tylko szkice). Zatwierdzenie = „Publish” w Studio (lista „Komentarze do moderacji”), odrzucenie = „Delete”. Na stronie widać tylko opublikowane, bez e-maila autora.
+
+**Formularz kontaktowy:** `/api/contact` wysyła mail przez Resend jak dotąd, a kopię zapisuje w Sanity jako szkic (lista „Wiadomości kontaktowe” w Studio). Dane w treści maila są teraz escapowane.
+
+**Dataset prywatny:** komentarze i wiadomości zawierają adresy e-mail, więc dataset nie jest publiczny. Strona czyta dane po stronie serwera tokenem Viewer.
+
+**Usunięte:** panel `/admin`, strona `/login`, kropka w stopce prowadząca do logowania, `lib/supabase`, edytor Tiptap i upload obrazów oraz zależności `@tiptap/*` i `@supabase/ssr`. `@supabase/supabase-js` zostaje tylko jako devDependency skryptu migracji.
 
 **Zależności:** React 18 → 19 (wymaganie Sanity), framer-motion 12, lucide-react 1.x. Skrypt `typecheck` wskazuje wprost TypeScript projektu (5.9), bo `@sanity/cli` instaluje własny `tsc` 6.
 

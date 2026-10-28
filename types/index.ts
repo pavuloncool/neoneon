@@ -1,3 +1,5 @@
+import type { PortableTextBlock } from '@portabletext/react'
+
 export interface Tag {
   id: string
   name: string
@@ -14,20 +16,12 @@ export interface Comment {
   created_at: string
 }
 
-export interface Contact {
-  id: string
-  name: string
-  email: string
-  message: string
-  created_at: string
-}
-
 export interface Article {
   id: string
   slug: string
   title: string
   excerpt?: string | null
-  content: any // Portable Text (Sanity)
+  content: PortableTextBlock[] | null // Portable Text (Sanity)
   category: 'content-writing' | 'ux-strategies' | 'data-visualisation'
   cover_image_url?: string | null
   cover_focal_x?: number | null
@@ -41,39 +35,4 @@ export interface Article {
   translation_id?: string | null
 }
 
-export type ArticleRow = Omit<Article, 'tags'>
-
-export interface Database {
-  public: {
-    Tables: {
-      articles: {
-        Row: ArticleRow
-        Insert: Omit<ArticleRow, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<ArticleRow, 'id' | 'created_at' | 'updated_at'>>
-      }
-      tags: {
-        Row: Tag
-        Insert: Omit<Tag, 'id'>
-        Update: Partial<Omit<Tag, 'id'>>
-      }
-      article_tags: {
-        Row: { article_id: string; tag_id: string }
-        Insert: { article_id: string; tag_id: string }
-        Update: { article_id?: string; tag_id?: string }
-      }
-      comments: {
-        Row: Comment
-        Insert: Omit<Comment, 'id' | 'created_at'>
-        Update: Partial<Omit<Comment, 'id' | 'created_at'>>
-      }
-      contacts: {
-        Row: Contact
-        Insert: Omit<Contact, 'id' | 'created_at'>
-        Update: Partial<Omit<Contact, 'id' | 'created_at'>>
-      }
-    }
-  }
-}
-
 export type Category = 'content-writing' | 'ux-strategies' | 'data-visualisation'
-export type ArticleStatus = 'draft' | 'published'

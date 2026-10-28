@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 // scripts/migrate-to-sanity.mjs
-// Migracja artykułów i tagów z Supabase do Sanity.
+// Migracja artykułów, tagów, komentarzy i wiadomości kontaktowych z Supabase do Sanity.
 //
 //   node scripts/migrate-to-sanity.mjs --dry-run [--out plik.json]   # tylko raport, nic nie zapisuje
 //   node scripts/migrate-to-sanity.mjs                               # zapis do Sanity
 //
 // Idempotentny (createOrReplace) — można uruchamiać wielokrotnie, np. tuż przed wdrożeniem.
-// _id artykułu = dawny UUID z Supabase, więc comments.article_id dalej pasuje.
+// _id artykułu = dawny UUID z Supabase. Komentarze zatwierdzone → opublikowane,
+// niezatwierdzone i wiadomości kontaktowe → szkice (drafts.*), tak jak zapisują je formularze.
 // Wymaga w .env.local: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SANITY_MIGRATION_TOKEN.
 
 import fs from 'node:fs'
@@ -41,7 +42,7 @@ const sanity = createSanity({
   useCdn: false,
 })
 
-const report = { articles: 0, drafts: 0, tags: 0, images: 0, unknownNodes: {}, unknownMarks: {} }
+const report = { articles: 0, drafts: 0, tags: 0, images: 0, comments: 0, contacts: 0, unknownNodes: {}, unknownMarks: {} }
 
 // ── obrazy ───────────────────────────────────────────────────
 const assetCache = new Map()
@@ -176,10 +177,12 @@ async function must(query) {
   return data
 }
 
-const [articles, tags, articleTags] = await Promise.all([
+const [articles, tags, articleTags, comments, contacts] = await Promise.all([
   must(supabase.from('articles').select('*').order('created_at')),
   must(supabase.from('tags').select('*').order('name')),
   must(supabase.from('article_tags').select('*')),
+  must(supabase.from('comments').select('*').order('created_at')),
+  must(supabase.from('contacts').select('*').order('created_at')),
 ])
 
 const docs = []
@@ -217,6 +220,31 @@ for (const a of articles) {
   docs.push(doc)
   report.articles++
   if (a.status === 'draft') report.drafts++
+}
+
+for (const c of comments) {
+  docs.push({
+    _id: c.approved ? `comment-${c.id}` : `drafts.comment-${c.id}`,
+    _type: 'comment',
+    article: { _type: 'reference', _ref: c.article_id, _weak: true },
+    authorName: c.author_name,
+    authorEmail: c.author_email,
+    body: c.body,
+    submittedAt: c.created_at,
+  })
+  report.comments++
+}
+
+for (const c of contacts) {
+  docs.push({
+    _id: `drafts.contact-${c.id}`,
+    _type: 'contactMessage',
+    name: c.name,
+    email: c.email,
+    message: c.message,
+    submittedAt: c.created_at,
+  })
+  report.contacts++
 }
 
 if (OUT) fs.writeFileSync(OUT, JSON.stringify(docs, null, 2))
