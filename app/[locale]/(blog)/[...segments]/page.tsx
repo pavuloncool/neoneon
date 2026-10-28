@@ -80,7 +80,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   return (
     <>
       {translation && (
-        <TranslationStore slug={translation.slug} category={translation.category} />
+        <TranslationStore path={`/${translation.category}/${translation.slug}`} />
       )}
       <article>
         <div className="max-w-5xl mx-auto px-6 py-12 md:py-16">

@@ -4,6 +4,8 @@
 import { Fragment } from 'react'
 import { ContactForm } from '@/components/blog/ContactForm'
 import { PortableTextRenderer } from '@/components/blog/PortableTextRenderer'
+import { TranslationStore } from '@/components/layout/TranslationStore'
+import { getPageTranslation } from '@/lib/queries'
 import { CategoryTiles } from './CategoryTiles'
 import { FeatureGrid } from './FeatureGrid'
 import { Hero } from './Hero'
@@ -41,9 +43,15 @@ function renderSection(section: Section, locale: 'pl' | 'en') {
   }
 }
 
-export function PageSections({ page, locale }: { page: Page; locale: 'pl' | 'en' }) {
+export async function PageSections({ page, locale }: { page: Page; locale: 'pl' | 'en' }) {
+  // Odpowiednik strony w drugim języku dla przełącznika języka (adresy mogą się różnić,
+  // np. /pl/o-mnie ↔ /en/about). Bez tłumaczenia — strona główna drugiego języka.
+  const translation = await getPageTranslation(page.id, locale === 'pl' ? 'en' : 'pl')
+  const translationPath = translation ? (translation.isHome ? '/' : `/${translation.slug ?? ''}`) : '/'
+
   return (
     <div className={page.width === 'wide' ? 'max-w-5xl mx-auto px-6 py-16' : 'max-w-3xl mx-auto px-6 py-16'}>
+      <TranslationStore path={translationPath} />
       {(page.sections ?? []).map((section) => (
         <Fragment key={section._key}>{renderSection(section, locale)}</Fragment>
       ))}

@@ -177,6 +177,17 @@ export const getPage = cache(async (locale: 'pl' | 'en', slug: string): Promise<
   )
 )
 
+// Wersja strony w drugim języku — powiązanie przez dokument translation.metadata
+export async function getPageTranslation(
+  pageId: string,
+  targetLocale: 'pl' | 'en'
+): Promise<{ slug: string | null; isHome: boolean | null } | null> {
+  return sanityFetch(
+    groq`*[_type == "page" && locale == $targetLocale && _id in *[_type == "translation.metadata" && references($pageId)].translations[].value._ref][0]{ "slug": slug.current, isHome }`,
+    { pageId: pageId.replace(/^drafts\./, ''), targetLocale }
+  )
+}
+
 // Teksty interfejsu — nakładane na messages/*.json w i18n/request.ts
 export const getUiStrings = cache(async (locale: string): Promise<Record<string, Record<string, string>> | null> =>
   sanityFetch<Record<string, Record<string, string>> | null>(

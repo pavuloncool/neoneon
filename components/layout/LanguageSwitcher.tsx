@@ -16,11 +16,10 @@ export function LanguageSwitcher({
   function switchTo(targetLocale: 'pl' | 'en') {
     if (targetLocale === locale) return
 
-    const translationSlug = sessionStorage.getItem('neoneon_translation_slug')
-    const translationCategory = sessionStorage.getItem('neoneon_translation_category')
-
-    if (translationSlug && translationCategory) {
-      router.push(`/${translationCategory}/${translationSlug}`, { locale: targetLocale })
+    // Odpowiednik strony w drugim języku (artykuł albo strona z page buildera) — patrz TranslationStore
+    const translationPath = sessionStorage.getItem('neoneon_translation_path')
+    if (translationPath) {
+      router.push(translationPath, { locale: targetLocale })
       return
     }
 

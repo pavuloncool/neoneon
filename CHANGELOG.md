@@ -2,6 +2,10 @@
 
 ## 2026-10-28
 
+### Przełącznik języka na stronach z page buildera
+
+Przełącznik języka zamieniał tylko prefiks języka, więc po zmianie adresu strony w jednym języku (np. `/pl/o-mnie` przy `/en/about`) prowadził do 404. Teraz strony — tak jak artykuły — podają adres odpowiednika z powiązania PL ↔ EN w Sanity (`getPageTranslation`, `TranslationStore` zapisuje gotową ścieżkę). Strona bez tłumaczenia przenosi na stronę główną drugiego języka.
+
 ### Page builder — cała treść strony edytowalna w Sanity Studio
 
 **Model treści (Sanity):**

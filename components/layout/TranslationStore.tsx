@@ -2,15 +2,15 @@
 
 import { useEffect } from 'react'
 
-export function TranslationStore({ slug, category }: { slug: string; category: string }) {
+// Zapamiętuje adres odpowiednika bieżącej strony w drugim języku (bez prefiksu języka,
+// np. '/about' albo '/ux-strategies/slug'). Czyta go LanguageSwitcher.
+export function TranslationStore({ path }: { path: string }) {
   useEffect(() => {
-    sessionStorage.setItem('neoneon_translation_slug', slug)
-    sessionStorage.setItem('neoneon_translation_category', category)
+    sessionStorage.setItem('neoneon_translation_path', path)
     return () => {
-      sessionStorage.removeItem('neoneon_translation_slug')
-      sessionStorage.removeItem('neoneon_translation_category')
+      sessionStorage.removeItem('neoneon_translation_path')
     }
-  }, [slug, category])
+  }, [path])
 
   return null
 }
