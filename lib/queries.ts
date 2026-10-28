@@ -4,7 +4,8 @@
 // dzięki czemu strony i komponenty nie wymagają zmian.
 
 import { groq } from 'next-sanity'
-import { client, draftsClient } from '@/sanity/lib/client'
+import { draftsClient } from '@/sanity/lib/client'
+import { sanityFetch } from '@/sanity/lib/fetch'
 import type { Article, Category, Tag, Comment } from '@/types'
 
 const TAG_PROJECTION = groq`{ "id": _id, name, "name_en": nameEn, "slug": slug.current }`
@@ -48,7 +49,7 @@ export async function getArticles(options?: {
   const slice = options?.limit ? `[0...${Math.floor(options.limit)}]` : ''
 
   try {
-    return await client.fetch<Article[]>(
+    return await sanityFetch<Article[]>(
       groq`*[${filters.join(' && ')}] | order(publishedAt desc) ${slice} ${ARTICLE_PROJECTION}`,
       params
     )
@@ -62,7 +63,7 @@ export async function getArticleBySlug(
   slug: string,
   locale: 'pl' | 'en' = 'pl'
 ): Promise<Article | null> {
-  return client.fetch<Article | null>(
+  return sanityFetch<Article | null>(
     groq`*[_type == "article" && slug.current == $slug && locale == $locale][0] ${ARTICLE_PROJECTION}`,
     { slug, locale }
   )
@@ -79,7 +80,7 @@ export async function searchArticles(
   const params = Object.fromEntries(terms.map((t, i) => [`t${i}`, t]))
 
   try {
-    return await client.fetch<Article[]>(
+    return await sanityFetch<Article[]>(
       groq`*[_type == "article" && locale == $locale && ${conditions}] | order(publishedAt desc) ${ARTICLE_PROJECTION}`,
       { locale, ...params }
     )
@@ -94,7 +95,7 @@ export async function getArticleTranslation(
   articleId: string,
   targetLocale: 'pl' | 'en'
 ): Promise<Article | null> {
-  return client.fetch<Article | null>(
+  return sanityFetch<Article | null>(
     groq`*[_type == "article" && locale == $targetLocale && _id in *[_type == "translation.metadata" && references($articleId)].translations[].value._ref][0] ${ARTICLE_PROJECTION}`,
     { articleId, targetLocale }
   )
@@ -103,11 +104,11 @@ export async function getArticleTranslation(
 // ── Tagi ─────────────────────────────────────────────────────
 
 export async function getAllTags(): Promise<Tag[]> {
-  return client.fetch<Tag[]>(groq`*[_type == "tag"] | order(name asc) ${TAG_PROJECTION}`)
+  return sanityFetch<Tag[]>(groq`*[_type == "tag"] | order(name asc) ${TAG_PROJECTION}`)
 }
 
 export async function getTagsByCategory(category: string): Promise<Tag[]> {
-  return client.fetch<Tag[]>(
+  return sanityFetch<Tag[]>(
     groq`*[_type == "tag" && count(*[_type == "article" && category == $category && references(^._id)]) > 0] | order(name asc) ${TAG_PROJECTION}`,
     { category }
   )

@@ -1,9 +1,12 @@
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
+import { draftMode } from 'next/headers'
+import { VisualEditing } from 'next-sanity/visual-editing'
 import { routing } from '@/i18n/routing'
 import { ThemeProvider } from '@/components/layout/ThemeProvider'
 import { cormorant, dmSans, dmMono } from '@/app/fonts'
+import { DraftModeBanner } from '@/components/layout/DraftModeBanner'
 
 export default async function LocaleLayout({
   children,
@@ -19,6 +22,7 @@ export default async function LocaleLayout({
   }
 
   const messages = await getMessages()
+  const isDraftMode = (await draftMode()).isEnabled
 
   return (
     <html
@@ -32,6 +36,13 @@ export default async function LocaleLayout({
             {children}
           </NextIntlClientProvider>
         </ThemeProvider>
+        {/* Podgląd szkiców z Presentation Tool w Studio — klikalna edycja treści */}
+        {isDraftMode && (
+          <>
+            <VisualEditing />
+            <DraftModeBanner />
+          </>
+        )}
       </body>
     </html>
   )

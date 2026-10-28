@@ -11,6 +11,7 @@ import { CommentForm } from '@/components/blog/CommentForm'
 import { FadeUp } from '@/components/ui/Motion'
 import { TranslationStore } from '@/components/layout/TranslationStore'
 import type { Metadata } from 'next'
+import { stegaClean } from 'next-sanity'
 import type { Category } from '@/types'
 
 interface ArticlePageProps {
@@ -27,12 +28,15 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   const { slug } = getRouteParams(segments)
   const article = await getArticleBySlug(slug, locale)
   if (!article) return {}
+  // W podglądzie tytuł i zajawka niosą znaczniki edycji (stega) — w metadanych są zbędne
+  const title = stegaClean(article.title)
+  const description = stegaClean(article.excerpt) ?? undefined
   return {
-    title: article.title,
-    description: article.excerpt ?? undefined,
+    title,
+    description,
     openGraph: {
-      title: article.title,
-      description: article.excerpt ?? undefined,
+      title,
+      description,
       images: article.cover_image_url ? [article.cover_image_url] : [],
     },
   }

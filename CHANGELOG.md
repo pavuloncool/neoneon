@@ -2,6 +2,16 @@
 
 ## 2026-10-28
 
+### Presentation Tool (podgląd z klikalną edycją) w Studio
+
+**Nowe pliki:**
+- `sanity/lib/fetch.ts` — `sanityFetch`: poza podglądem opublikowane treści z CDN (bez zmian); w podglądzie (Draft Mode) szkice + stega tylko w polach tekstowych (tytuł, zajawka, treść, nazwy tagów). Slugi, kategorie, języki, ID i daty bez znaczników.
+- `app/api/draft-mode/enable/route.ts` — `defineEnableDraftMode`; podgląd włącza tylko Studio (jednorazowy sekret weryfikowany w Sanity), bez niego 401.
+- `app/api/draft-mode/disable/route.ts` — wyłączenie podglądu.
+- `components/layout/DraftModeBanner.tsx` — „Podgląd szkiców · Wyłącz” poza Studio.
+
+**Co zostało zmienione:** `sanity.config.ts` — `presentationTool` („Podgląd”, start `/pl`, `shareAccess: false`, powiązanie stron `/:locale/:category/:slug` z artykułami); `app/[locale]/layout.tsx` — `<VisualEditing />` w trybie podglądu; `lib/queries.ts` — artykuły i tagi przez `sanityFetch`; metadane artykułu przez `stegaClean`. Token Viewer zostaje wyłącznie na serwerze (bez `defineLive`/`browserToken`, bo dałby przeglądarce dostęp do szkiców komentarzy z e-mailami).
+
 ### Porządki po migracji — usunięcie Supabase
 
 - Usunięte: `scripts/migrate-to-sanity.mjs` (migracja zakończona) i devDependency `@supabase/supabase-js`.

@@ -4,6 +4,7 @@
 
 import { defineConfig, type DocumentActionComponent } from 'sanity'
 import { structureTool } from 'sanity/structure'
+import { presentationTool, defineDocuments, defineLocations } from 'sanity/presentation'
 import { visionTool } from '@sanity/vision'
 import {
   documentInternationalization,
@@ -68,6 +69,39 @@ export default defineConfig({
             ),
             S.documentTypeListItem('contactMessage').title('Wiadomości kontaktowe'),
           ]),
+    }),
+    // Podgląd strony z klikalną edycją. Strona działa pod tym samym adresem co Studio,
+    // więc podgląd otwiera się na bieżącej domenie (neoneon.online, podgląd Vercel, localhost).
+    presentationTool({
+      title: 'Podgląd',
+      previewUrl: {
+        initial: '/pl',
+        previewMode: { enable: '/api/draft-mode/enable', shareAccess: false },
+      },
+      resolve: {
+        // Który dokument edytować, gdy w podglądzie otwarta jest dana strona
+        mainDocuments: defineDocuments([
+          {
+            route: '/:locale/:category/:slug',
+            filter: '_type == "article" && slug.current == $slug && locale == $locale',
+          },
+        ]),
+        // Gdzie dany artykuł występuje na stronie (lista w edytorze artykułu)
+        locations: {
+          article: defineLocations({
+            select: { title: 'title', slug: 'slug.current', locale: 'locale', category: 'category' },
+            resolve: (doc) => ({
+              locations:
+                doc?.slug && doc.locale && doc.category
+                  ? [
+                      { title: doc.title || 'Artykuł', href: `/${doc.locale}/${doc.category}/${doc.slug}` },
+                      { title: doc.locale === 'en' ? 'Strona główna (EN)' : 'Strona główna (PL)', href: `/${doc.locale}` },
+                    ]
+                  : [],
+            }),
+          }),
+        },
+      },
     }),
     // Oryginał → tłumaczenie: przycisk „Translations” w artykule tworzy wersję w drugim języku,
     // połączoną z oryginałem dokumentem translation.metadata
