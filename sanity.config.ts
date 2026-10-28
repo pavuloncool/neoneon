@@ -32,7 +32,8 @@ export default defineConfig({
     newDocumentOptions: (prev) => prev.filter((item) => !HIDDEN_TEMPLATES.includes(item.templateId)),
     actions: (prev, { schemaType }) => {
       if (schemaType === 'contactMessage') return prev.filter(({ action }) => action === 'delete')
-      if (schemaType === 'comment') return prev.filter(({ action }) => action === 'publish' || action === 'unpublish' || action === 'delete')
+      // Komentarze i wiadomości zostają szkicami (niepubliczne) — bez „Publish”
+      if (schemaType === 'comment') return prev.filter(({ action }) => action === 'delete')
       if (schemaType === 'article') return [...prev, ...TRANSLATION_ACTIONS]
       return prev
     },
@@ -55,14 +56,14 @@ export default defineConfig({
             S.divider(),
             S.listItem().title('Komentarze do moderacji').child(
               S.documentList()
-                .title('Do moderacji — Publish = zatwierdź, Delete = odrzuć')
-                .filter('_type == "comment" && _id in path("drafts.**")')
+                .title('Do moderacji — „Zatwierdzony” = pokaż, Delete = odrzuć')
+                .filter('_type == "comment" && approved != true')
                 .defaultOrdering([{ field: 'submittedAt', direction: 'asc' }])
             ),
-            S.listItem().title('Komentarze opublikowane').child(
+            S.listItem().title('Komentarze zatwierdzone').child(
               S.documentList()
-                .title('Komentarze opublikowane')
-                .filter('_type == "comment" && !(_id in path("drafts.**"))')
+                .title('Komentarze zatwierdzone')
+                .filter('_type == "comment" && approved == true')
                 .defaultOrdering([{ field: 'submittedAt', direction: 'desc' }])
             ),
             S.documentTypeListItem('contactMessage').title('Wiadomości kontaktowe'),

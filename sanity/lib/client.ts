@@ -1,5 +1,6 @@
 // sanity/lib/client.ts
-// Tylko po stronie serwera — dataset jest prywatny, więc każdy odczyt wymaga tokena.
+// Tylko po stronie serwera. Dataset jest publiczny (plan Free), ale komentarze i wiadomości
+// zostają szkicami (drafts.*), które bez tokena są niedostępne.
 import { createClient } from 'next-sanity'
 import { apiVersion, dataset, projectId } from '../env'
 
@@ -13,7 +14,10 @@ export const client = createClient({
   token: process.env.SANITY_API_READ_TOKEN,
 })
 
-// Zapis z formularzy — token Contributor może tworzyć wyłącznie szkice (drafts.*)
+// Szkice komentarzy (token Viewer) — tylko po stronie serwera, bez e-maili w projekcji
+export const draftsClient = client.withConfig({ perspective: 'raw' })
+
+// Zapis z formularzy (token Editor) — formularze tworzą wyłącznie szkice (drafts.*)
 export const writeClient = createClient({
   projectId,
   dataset,

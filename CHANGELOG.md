@@ -4,7 +4,7 @@
 
 ### Artykuły i tagi przeniesione z Supabase do Sanity
 
-**Zakres:** całe zaplecze przeszło do Sanity (projekt `n81gbqh8`, dataset `production`, prywatny): artykuły, tagi, obrazy, komentarze i wiadomości kontaktowe. Supabase nie jest już używany przez stronę. Frontend Next.js, wygląd i adresy URL — bez zmian. Maile z formularza kontaktowego dalej wysyła Resend.
+**Zakres:** całe zaplecze przeszło do Sanity (projekt `n81gbqh8`, dataset `production`, publiczny — plan Free): artykuły, tagi, obrazy, komentarze i wiadomości kontaktowe. Supabase nie jest już używany przez stronę. Frontend Next.js, wygląd i adresy URL — bez zmian. Maile z formularza kontaktowego dalej wysyła Resend.
 
 **Nowe pliki:**
 - `sanity.config.ts`, `sanity.cli.ts`, `sanity/env.ts`, `sanity/schemaTypes/*` — schematy `article`, `tag`, `blockContent`
@@ -23,13 +23,13 @@
 
 **Czas czytania:** liczony z czystego tekstu artykułu zamiast z surowego JSON-a Tiptap (który zawyżał wynik m.in. o kod embedów Instagrama). Zmienia wartość w 3 artykułach (np. Jazz kissa: 7 → 4–5 min).
 
-**Komentarze:** `/api/comments` zapisuje komentarz w Sanity jako szkic (token Contributor — może tworzyć tylko szkice). Zatwierdzenie = „Publish” w Studio (lista „Komentarze do moderacji”), odrzucenie = „Delete”. Na stronie widać tylko opublikowane, bez e-maila autora.
+**Komentarze:** `/api/comments` zapisuje komentarz w Sanity jako szkic (`drafts.*`) i taki zostaje na zawsze — szkice są niedostępne bez tokena, więc e-mail autora nigdy nie jest publiczny. Zatwierdzenie = pole „Zatwierdzony” w Studio (lista „Komentarze do moderacji”), odrzucenie = „Delete”. Strona czyta zatwierdzone komentarze tokenem Viewer, bez e-maila.
 
 **Formularz kontaktowy:** `/api/contact` wysyła mail przez Resend jak dotąd, a kopię zapisuje w Sanity jako szkic (lista „Wiadomości kontaktowe” w Studio). Dane w treści maila są teraz escapowane.
 
 **Tłumaczenia (oryginał → tłumaczenie):** wersje PL/EN łączy wtyczka `@sanity/document-internationalization` (dokumenty `translation.metadata`) zamiast ręcznie wpisywanego pola `translationId`. W Studio: przycisk tłumaczeń w artykule tworzy wersję w drugim języku połączoną z oryginałem; nowe artykuły zakłada się z szablonu z językiem („Polski Artykuł” / „English Artykuł”). Pole `locale` ustawia wtyczka (tylko do odczytu). Przełącznik języka na stronie korzysta z `translation.metadata` — 5 istniejących par przeniesione. Wymagane peer dependencies (`sanity-plugin-internationalized-array`, `@sanity/language-filter`) dodane jawnie, bo `.npmrc` ma `legacy-peer-deps=true`.
 
-**Dataset prywatny:** komentarze i wiadomości zawierają adresy e-mail, więc dataset nie jest publiczny. Strona czyta dane po stronie serwera tokenem Viewer.
+**Plan Free Sanity:** prywatne datasety i rola Contributor są tylko w płatnym planie Growth, dlatego dataset jest publiczny, a dane z e-mailami (komentarze, wiadomości) nigdy nie są publikowane. Token formularzy ma rolę Editor (dostępna na Free) i jest wyłącznie po stronie serwera.
 
 **Usunięte:** panel `/admin`, strona `/login`, kropka w stopce prowadząca do logowania, `lib/supabase`, edytor Tiptap i upload obrazów oraz zależności `@tiptap/*` i `@supabase/ssr`. `@supabase/supabase-js` zostaje tylko jako devDependency skryptu migracji.
 

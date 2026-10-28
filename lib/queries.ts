@@ -4,7 +4,7 @@
 // dzięki czemu strony i komponenty nie wymagają zmian.
 
 import { groq } from 'next-sanity'
-import { client } from '@/sanity/lib/client'
+import { client, draftsClient } from '@/sanity/lib/client'
 import type { Article, Category, Tag, Comment } from '@/types'
 
 const TAG_PROJECTION = groq`{ "id": _id, name, "name_en": nameEn, "slug": slug.current }`
@@ -115,10 +115,11 @@ export async function getTagsByCategory(category: string): Promise<Tag[]> {
 
 // ── Komentarze ───────────────────────────────────────────────
 
-// Tylko opublikowane (= zatwierdzone w Studio). E-mail autora nie trafia na stronę.
+// Tylko zatwierdzone w Studio. Komentarze są szkicami, więc czytamy je tokenem;
+// e-mail autora nie trafia do projekcji.
 export async function getCommentsByArticle(articleId: string): Promise<Comment[]> {
-  return client.fetch<Comment[]>(
-    groq`*[_type == "comment" && article._ref == $articleId] | order(submittedAt asc) {
+  return draftsClient.fetch<Comment[]>(
+    groq`*[_type == "comment" && article._ref == $articleId && approved == true] | order(submittedAt asc) {
       "id": _id,
       "article_id": article._ref,
       "author_name": authorName,

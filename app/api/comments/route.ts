@@ -1,5 +1,6 @@
 // app/api/comments/route.ts
-// Zapisuje komentarz w Sanity jako szkic — pojawi się na stronie po „Publish” w Studio.
+// Zapisuje komentarz w Sanity jako szkic (niepubliczny) — pojawi się na stronie
+// po zaznaczeniu „Zatwierdzony” w Studio.
 
 import { randomUUID } from 'node:crypto'
 import { NextResponse } from 'next/server'
@@ -30,6 +31,7 @@ export async function POST(request: Request) {
       await writeClient.create({
         _id: `drafts.${randomUUID()}`,
         _type: 'comment',
+        approved: false,
         article: { _type: 'reference', _ref: String(article_id), _weak: true },
         authorName: String(author_name).trim(),
         authorEmail: String(author_email).trim().toLowerCase(),

@@ -6,8 +6,8 @@
 //   node scripts/migrate-to-sanity.mjs                               # zapis do Sanity
 //
 // Idempotentny (createOrReplace) — można uruchamiać wielokrotnie, np. tuż przed wdrożeniem.
-// _id artykułu = dawny UUID z Supabase. Komentarze zatwierdzone → opublikowane,
-// niezatwierdzone i wiadomości kontaktowe → szkice (drafts.*), tak jak zapisują je formularze.
+// _id artykułu = dawny UUID z Supabase. Komentarze i wiadomości kontaktowe → szkice (drafts.*),
+// tak jak zapisują je formularze; zatwierdzenie komentarza = pole `approved`.
 // Wymaga w .env.local: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SANITY_MIGRATION_TOKEN.
 
 import fs from 'node:fs'
@@ -249,8 +249,9 @@ for (const [translationId, group] of groups) {
 
 for (const c of comments) {
   docs.push({
-    _id: c.approved ? `comment-${c.id}` : `drafts.comment-${c.id}`,
+    _id: `drafts.comment-${c.id}`,
     _type: 'comment',
+    approved: Boolean(c.approved),
     article: { _type: 'reference', _ref: c.article_id, _weak: true },
     authorName: c.author_name,
     authorEmail: c.author_email,
