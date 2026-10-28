@@ -1,6 +1,10 @@
 -- ============================================================
 -- SCHEMA: Blog (Content Writing + UX Strategies)
 -- Wkleić w Supabase → SQL Editor → Run
+--
+-- UWAGA (2026-10-28): artykuły i tagi są w Sanity. Tabele articles, tags
+-- i article_tags są historyczne (do usunięcia po akceptacji migracji).
+-- comments.article_id = _id artykułu w Sanity — patrz 2026-10-28_sanity_comments_fk.sql
 -- ============================================================
 
 -- ARTYKUŁY
@@ -35,7 +39,7 @@ create table article_tags (
 -- KOMENTARZE
 create table comments (
   id          uuid primary key default gen_random_uuid(),
-  article_id  uuid references articles(id) on delete cascade,
+  article_id  uuid,                           -- _id artykułu w Sanity
   author_name text not null,
   author_email text not null,
   body        text not null,

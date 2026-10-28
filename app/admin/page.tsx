@@ -33,7 +33,7 @@ export default async function AdminDashboard() {
       {/* Szybkie akcje */}
       <div className="flex gap-4 mb-12">
         <Link
-          href="/admin/articles/new"
+          href="/studio/intent/create/type=article"
           className="text-xs tracking-widest uppercase px-6 py-3 border border-ink text-ink hover:bg-ink hover:text-paper transition-colors duration-200"
         >
           New article
@@ -63,7 +63,7 @@ export default async function AdminDashboard() {
                   {article.status}
                 </span>
                 <Link
-                  href={`/admin/articles/${article.id}`}
+                  href={`/studio/intent/edit/id=${article.id.replace(/^drafts\./, '')};type=article`}
                   className="text-xs text-muted hover:text-ink transition-colors"
                 >
                   Edit →

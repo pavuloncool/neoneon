@@ -3,7 +3,7 @@
 // components/blog/EmbedActivator.tsx
 // Client Component odpowiedzialny wyłącznie za uruchamianie skryptów embedów
 // (Instagram, Twitter itp.) po załadowaniu strony po stronie klienta.
-// Oddzielony od TiptapRenderer, aby uniknąć błędu hydratacji.
+// Oddzielony od PortableTextRenderer, aby uniknąć błędu hydratacji.
 
 import { useEffect } from 'react'
 

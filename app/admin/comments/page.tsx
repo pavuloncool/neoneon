@@ -15,7 +15,7 @@ export default async function AdminCommentsPage() {
       ) : (
         <div className="flex flex-col divide-y divide-border">
           {comments.map((comment) => {
-            const article = (comment as any).articles
+            const article = comment.articles
             const articleUrl = article ? `/${article.category}/${article.slug}` : null
             return (
               <div key={comment.id} className="py-5">

@@ -32,9 +32,8 @@ export default async function AdminLayout({
           <nav className="flex flex-col p-4 gap-1">
             <p className="text-xs tracking-widest text-[#6b6b6b] uppercase px-2 mb-2 mt-2">Content</p>
             <Link href="/admin" className="text-sm px-2 py-2 text-[#6b6b6b] hover:text-[#0f0f0f] hover:bg-[#e5e5e0]/40 transition-colors rounded-sm">Dashboard</Link>
-            <Link href="/admin/articles" className="text-sm px-2 py-2 text-[#6b6b6b] hover:text-[#0f0f0f] hover:bg-[#e5e5e0]/40 transition-colors rounded-sm">Articles</Link>
-            <Link href="/admin/articles/new" className="text-sm px-2 py-2 text-[#6b6b6b] hover:text-[#0f0f0f] hover:bg-[#e5e5e0]/40 transition-colors rounded-sm">New Article</Link>
-            <Link href="/admin/tags" className="text-sm px-2 py-2 text-[#6b6b6b] hover:text-[#0f0f0f] hover:bg-[#e5e5e0]/40 transition-colors rounded-sm">Tags</Link>
+            {/* Artykuły i tagi edytujemy w Sanity Studio */}
+            <Link href="/studio" className="text-sm px-2 py-2 text-[#6b6b6b] hover:text-[#0f0f0f] hover:bg-[#e5e5e0]/40 transition-colors rounded-sm">Articles &amp; Tags (Studio) ↗</Link>
             <p className="text-xs tracking-widest text-[#6b6b6b] uppercase px-2 mb-2 mt-4">Moderation</p>
             <Link href="/admin/comments" className="text-sm px-2 py-2 text-[#6b6b6b] hover:text-[#0f0f0f] hover:bg-[#e5e5e0]/40 transition-colors rounded-sm">Comments</Link>
             <Link href="/admin/contacts" className="text-sm px-2 py-2 text-[#6b6b6b] hover:text-[#0f0f0f] hover:bg-[#e5e5e0]/40 transition-colors rounded-sm">Contacts</Link>

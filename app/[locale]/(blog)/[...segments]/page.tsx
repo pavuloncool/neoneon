@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { getArticleBySlug, getCommentsByArticle, getArticleTranslation } from '@/lib/queries'
 import { formatDate, readingTime } from '@/lib/utils'
-import { TiptapRenderer } from '@/components/blog/TiptapRenderer'
+import { PortableTextRenderer } from '@/components/blog/PortableTextRenderer'
 import { TagBadge } from '@/components/blog/TagBadge'
 import { CommentForm } from '@/components/blog/CommentForm'
 import { FadeUp } from '@/components/ui/Motion'
@@ -119,7 +119,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </FadeUp>
           <FadeUp delay={0.15}>
             <div className="max-w-3xl mx-auto">
-              {article.content && <TiptapRenderer content={article.content} />}
+              {article.content && <PortableTextRenderer content={article.content} />}
               <div className="mt-16 pt-8 border-t border-border" />
               <section className="mt-2 pb-8">
                 <h2 className="font-display text-3xl font-light mb-8">

@@ -27,7 +27,7 @@ export interface Article {
   slug: string
   title: string
   excerpt?: string | null
-  content: any
+  content: any // Portable Text (Sanity)
   category: 'content-writing' | 'ux-strategies' | 'data-visualisation'
   cover_image_url?: string | null
   cover_focal_x?: number | null
@@ -42,24 +42,6 @@ export interface Article {
 }
 
 export type ArticleRow = Omit<Article, 'tags'>
-
-export interface TiptapNode {
-  type: string
-  attrs?: Record<string, any>
-  content?: TiptapNode[]
-  marks?: TiptapMark[]
-  text?: string
-}
-
-export interface TiptapMark {
-  type: string
-  attrs?: Record<string, any>
-}
-
-export interface TiptapContent {
-  type: 'doc'
-  content: TiptapNode[]
-}
 
 export interface Database {
   public: {
