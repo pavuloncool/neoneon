@@ -55,7 +55,8 @@
     "sending": "Sending...",
     "error": "Something went wrong. Please try again.",
     "successTitle": "Thank you.",
-    "successBody": "Your message has been received. I will be in touch soon."
+    "successBody": "Your message has been received. I will be in touch soon.",
+    "captchaError": "We couldn't verify that you're not a bot. Please refresh the page and try again."
   },
   "comments": {
     "sectionZero": "Comments",
@@ -71,7 +72,8 @@
     "submit": "Submit",
     "submitting": "Sending...",
     "error": "Something went wrong. Please try again.",
-    "success": "Thank you — your comment is awaiting moderation."
+    "success": "Thank you — your comment is awaiting moderation.",
+    "captchaError": "We couldn't verify that you're not a bot. Please refresh the page and try again."
   },
   "search": {
     "heading": "Search",

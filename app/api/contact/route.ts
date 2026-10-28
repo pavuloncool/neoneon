@@ -1,27 +1,29 @@
 // app/api/contact/route.ts
 // Wiadomość trafia mailem (Resend) i jako szkic do Sanity (widoczna tylko w Studio).
+// Chronione przez Cloudflare Turnstile.
 
 import { randomUUID } from 'node:crypto'
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { writeClient } from '@/sanity/lib/client'
+import { clientIp, verifyTurnstile } from '@/lib/turnstile'
+import { escapeHtml } from '@/lib/utils'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-}
-
 export async function POST(request: Request) {
   try {
-    const { name, email, message } = await request.json()
+    const { name, email, message, turnstileToken } = await request.json()
+
+    if (!(await verifyTurnstile(turnstileToken, clientIp(request)))) {
+      return NextResponse.json({ error: 'captcha' }, { status: 403 })
+    }
+
     if (!name || !email || !message) {
       return NextResponse.json({ error: 'All fields required.' }, { status: 400 })
+    }
+    if (String(name).length > 100 || String(email).length > 200 || String(message).length > 5000) {
+      return NextResponse.json({ error: 'Too long.' }, { status: 400 })
     }
 
     // Kopia w Sanity — błąd zapisu nie blokuje wysyłki maila (jak wcześniej w Supabase)

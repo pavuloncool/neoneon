@@ -8,6 +8,16 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// Escapowanie danych od użytkownika wstawianych do HTML (np. treść maili)
+export function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 // Formatowanie daty: "12 stycznia 2025" / "12 January 2025"
 export function formatDate(dateString: string, locale: string = 'pl-PL'): string {
   return new Date(dateString).toLocaleDateString(locale, {

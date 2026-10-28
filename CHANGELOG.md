@@ -2,6 +2,24 @@
 
 ## 2026-10-28
 
+### Ochrona formularzy (Cloudflare Turnstile) i powiadomienia o komentarzach
+
+**Nowe pliki:**
+- `lib/turnstile.ts` — weryfikacja tokena po stronie serwera (Siteverify, timeout 10 s, jedna ponowna próba z tym samym `idempotency_key`)
+- `components/ui/Turnstile.tsx` — niewidoczny widget (`appearance: interaction-only`), pokazuje się tylko przy podejrzanym ruchu; dopóki niewidoczny, nie zajmuje miejsca w formularzu
+
+**Co zostało zmienione:**
+
+**Formularze komentarza i kontaktu:** przycisk „Wyślij” jest aktywny po otrzymaniu tokena Turnstile; token jest jednorazowy, więc widget resetuje się po każdej wysyłce. Przy odrzuceniu (403) komunikat `captchaError` (PL/EN).
+
+**`/api/comments` i `/api/contact`:** najpierw weryfikacja Turnstile (403 przy braku/odrzuceniu tokena), potem limity długości (imię 100, e-mail 200, treść 5000 znaków → 400), dopiero potem zapis do Sanity i Resend.
+
+**Powiadomienie o komentarzu:** po zapisaniu komentarza mail na `ask@neoneon.online` (tytuł artykułu, autor, e-mail, treść, link do komentarza w Studio). Błąd wysyłki maila nie blokuje komentarza.
+
+**`escapeHtml`** przeniesione do `lib/utils.ts` (używane w obu trasach).
+
+**Konfiguracja:** `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`. Lokalnie i na podglądach Vercel — oficjalne klucze testowe Cloudflare; na produkcji — klucze widgetu `neoneon`.
+
 ### Artykuły i tagi przeniesione z Supabase do Sanity
 
 **Zakres:** całe zaplecze przeszło do Sanity (projekt `n81gbqh8`, dataset `production`, publiczny — plan Free): artykuły, tagi, obrazy, komentarze i wiadomości kontaktowe. Supabase nie jest już używany przez stronę. Frontend Next.js, wygląd i adresy URL — bez zmian. Maile z formularza kontaktowego dalej wysyła Resend.

@@ -2,9 +2,10 @@
 
 // components/blog/CommentForm.tsx
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
+import { Turnstile, type TurnstileHandle } from '@/components/ui/Turnstile'
 
 interface CommentFormProps {
   articleId: string
@@ -12,8 +13,10 @@ interface CommentFormProps {
 
 export function CommentForm({ articleId }: CommentFormProps) {
   const t = useTranslations('comments')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'captcha'>('idle')
   const [form, setForm] = useState({ author_name: '', author_email: '', body: '' })
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const turnstile = useRef<TurnstileHandle>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -22,13 +25,20 @@ export function CommentForm({ articleId }: CommentFormProps) {
       const res = await fetch('/api/comments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, article_id: articleId }),
+        body: JSON.stringify({ ...form, article_id: articleId, turnstileToken }),
       })
+      if (res.status === 403) {
+        setStatus('captcha')
+        return
+      }
       if (!res.ok) throw new Error()
       setStatus('success')
       setForm({ author_name: '', author_email: '', body: '' })
     } catch {
       setStatus('error')
+    } finally {
+      // Token Turnstile jest jednorazowy
+      turnstile.current?.reset()
     }
   }
 
@@ -72,18 +82,25 @@ export function CommentForm({ articleId }: CommentFormProps) {
           {status === 'error' && (
             <p className="text-xs text-red-500">{t('error')}</p>
           )}
-          <button
-            type="submit"
-            disabled={status === 'loading'}
-            className={cn(
-              'self-start text-xs tracking-widest uppercase px-6 py-3 border transition-colors duration-200',
-              status === 'loading'
-                ? 'border-border text-muted cursor-not-allowed'
-                : 'border-ink text-ink hover:bg-ink hover:text-paper dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-ink'
-            )}
-          >
-            {status === 'loading' ? t('submitting') : t('submit')}
-          </button>
+          {status === 'captcha' && (
+            <p className="text-xs text-red-500">{t('captchaError')}</p>
+          )}
+          {/* Widget Turnstile i przycisk razem — pusty widget nie dokłada odstępu formularza */}
+          <div className="flex flex-col items-start">
+            <Turnstile ref={turnstile} onToken={setTurnstileToken} />
+            <button
+              type="submit"
+              disabled={status === 'loading' || !turnstileToken}
+              className={cn(
+                'self-start text-xs tracking-widest uppercase px-6 py-3 border transition-colors duration-200',
+                status === 'loading' || !turnstileToken
+                  ? 'border-border text-muted cursor-not-allowed'
+                  : 'border-ink text-ink hover:bg-ink hover:text-paper dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-ink'
+              )}
+            >
+              {status === 'loading' ? t('submitting') : t('submit')}
+            </button>
+          </div>
         </form>
       )}
     </div>

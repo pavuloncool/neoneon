@@ -55,7 +55,8 @@
     "sending": "Wysyłanie...",
     "error": "Coś poszło nie tak. Spróbuj ponownie.",
     "successTitle": "Dziękuję.",
-    "successBody": "Twoja wiadomość dotarła. Odezwę się wkrótce."
+    "successBody": "Twoja wiadomość dotarła. Odezwę się wkrótce.",
+    "captchaError": "Nie udało się potwierdzić, że nie jesteś botem. Odśwież stronę i spróbuj ponownie."
   },
   "comments": {
     "sectionZero": "Komentarze",
@@ -71,7 +72,8 @@
     "submit": "Wyślij",
     "submitting": "Wysyłanie...",
     "error": "Coś poszło nie tak. Spróbuj ponownie.",
-    "success": "Dziękuję — komentarz oczekuje na moderację."
+    "success": "Dziękuję — komentarz oczekuje na moderację.",
+    "captchaError": "Nie udało się potwierdzić, że nie jesteś botem. Odśwież stronę i spróbuj ponownie."
   },
   "search": {
     "heading": "Szukaj",
