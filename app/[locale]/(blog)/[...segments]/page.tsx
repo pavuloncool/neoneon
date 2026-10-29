@@ -5,7 +5,9 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { getArticleBySlug, getCommentsByArticle, getArticleTranslation, getPage } from '@/lib/queries'
 import { PageSections } from '@/components/sections/SectionRenderer'
-import { pageMetadata } from '@/lib/metadata'
+import { pageMetadata, seoMetadata } from '@/lib/metadata'
+import { SITE_NAME, SITE_URL, localeUrl, otherLocale } from '@/lib/site'
+import { JsonLd } from '@/components/seo/JsonLd'
 import { formatDate, readingTime } from '@/lib/utils'
 import { PortableTextRenderer } from '@/components/blog/PortableTextRenderer'
 import { TagBadge } from '@/components/blog/TagBadge'
@@ -29,22 +31,22 @@ function getRouteParams(segments: string[]) {
 
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const { locale, segments } = await params
-  if (segments.length === 1) return pageMetadata(await getPage(locale, segments[0]))
+  if (segments.length === 1) return pageMetadata(await getPage(locale, segments[0]), locale)
   const { slug } = getRouteParams(segments)
   const article = await getArticleBySlug(slug, locale)
   if (!article) return {}
+  const translation = await getArticleTranslation(article.id, otherLocale(locale))
   // W podglądzie tytuł i zajawka niosą znaczniki edycji (stega) — w metadanych są zbędne
   const title = stegaClean(article.title)
-  const description = stegaClean(article.excerpt) ?? undefined
-  return {
+  return seoMetadata({
+    locale,
+    path: `/${article.category}/${article.slug}`,
+    altPath: translation ? `/${translation.category}/${translation.slug}` : null,
     title,
-    description,
-    openGraph: {
-      title,
-      description,
-      images: article.cover_image_url ? [article.cover_image_url] : [],
-    },
-  }
+    description: stegaClean(article.excerpt),
+    image: article.cover_image_url ? { url: article.cover_image_url, alt: title } : null,
+    article: { publishedTime: article.published_at, modifiedTime: article.updated_at },
+  })
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
@@ -82,6 +84,22 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       {translation && (
         <TranslationStore path={`/${translation.category}/${translation.slug}`} />
       )}
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'BlogPosting',
+          headline: stegaClean(article.title),
+          description: stegaClean(article.excerpt) ?? undefined,
+          image: article.cover_image_url ?? undefined,
+          datePublished: article.published_at ?? undefined,
+          dateModified: article.updated_at ?? undefined,
+          inLanguage: locale,
+          url: localeUrl(locale, `/${article.category}/${article.slug}`),
+          mainEntityOfPage: localeUrl(locale, `/${article.category}/${article.slug}`),
+          author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+          publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+        }}
+      />
       <article>
         <div className="max-w-5xl mx-auto px-6 py-12 md:py-16">
           <FadeUp>

@@ -17,9 +17,9 @@ export const siteSettings = defineType({
   fields: [
     defineField({ name: 'locale', title: 'Język', type: 'string', readOnly: true, hidden: true }),
 
-    defineField({ name: 'siteTitle', title: 'Tytuł strony (domyślny)', description: 'Pokazywany w karcie przeglądarki, gdy podstrona nie ma własnego tytułu.', type: 'string', group: 'seo', validation: (r) => r.required() }),
+    defineField({ name: 'siteTitle', title: 'Tytuł strony (domyślny)', description: 'Pokazywany w karcie przeglądarki, gdy podstrona nie ma własnego tytułu.', type: 'string', group: 'seo', validation: (r) => [r.required(), r.max(60).warning('Google zwykle ucina tytuły dłuższe niż ok. 60 znaków.')] }),
     defineField({ name: 'titleTemplate', title: 'Szablon tytułu podstron', description: '%s zostanie zastąpione tytułem podstrony, np. „%s | neoneon”.', type: 'string', group: 'seo', validation: (r) => r.required() }),
-    defineField({ name: 'description', title: 'Opis strony (domyślny)', type: 'text', rows: 3, group: 'seo' }),
+    defineField({ name: 'description', title: 'Opis strony (domyślny)', description: 'Zalecane 120–160 znaków.', type: 'text', rows: 3, group: 'seo', validation: (r) => r.max(160).warning('Google zwykle ucina opisy dłuższe niż ok. 160 znaków.') }),
     defineField({ name: 'ogImage', title: 'Obrazek do udostępnień', description: 'Zalecany rozmiar 1200×630 px.', type: 'image', group: 'seo' }),
 
     defineField({ name: 'logoLight', title: 'Logo — motyw jasny', type: 'image', group: 'branding' }),

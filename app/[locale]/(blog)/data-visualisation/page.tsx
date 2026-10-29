@@ -3,12 +3,14 @@ import { ArticleCard } from '@/components/blog/ArticleCard'
 import { TagBadge } from '@/components/blog/TagBadge'
 import { FadeUp } from '@/components/ui/Motion'
 import { getTranslations } from 'next-intl/server'
+import { seoMetadata } from '@/lib/metadata'
 import type { Metadata } from 'next'
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: 'pl' | 'en' }> }): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'nav' })
-  return { title: t('dataVisualisation') }
+  // Filtr ?tag= nie tworzy osobnych adresów — canonical wskazuje stronę kategorii
+  return seoMetadata({ locale, path: '/data-visualisation', altPath: '/data-visualisation', title: t('dataVisualisation') })
 }
 
 interface PageProps {

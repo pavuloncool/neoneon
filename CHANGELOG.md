@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-29
+
+### SEO: canonical, hreflang, sitemapa, robots.txt i dane strukturalne
+
+- **Domena:** canonical, `og:url` i sitemapa wskazują `https://neoneon.online` (`lib/site.ts`, `metadataBase`) zamiast `neoneon.vercel.app`. Adres jest stały — podglądy Vercel i localhost też wskazują produkcję.
+- **Metadane:** `seoMetadata()` w `lib/metadata.ts` — canonical, hreflang PL ↔ EN (+ `x-default` → PL) i pełny `openGraph` (url, `og:locale`, obrazek z fallbackiem do ustawień strony) dla strony głównej, stron z page buildera, kategorii (canonical bez `?tag=`) i artykułów (`og:type=article`, daty publikacji i modyfikacji). Strona główna ma tytuł bez szablonu „| neoneon”; podstrona bez tytułu SEO dostaje swój tytuł. Wyszukiwarka: `noindex, follow`.
+- **`/sitemap.xml`** (`app/sitemap.ts`): opublikowane strony, artykuły i kategorie z artykułami, w obu językach, z powiązaniami tłumaczeń; odświeżana co godzinę. **`/robots.txt`** (`app/robots.ts`): blokuje `/studio` i `/api/`, wskazuje sitemapę.
+- **JSON-LD** (`components/seo/JsonLd.tsx`): `WebSite` na stronie głównej, `BlogPosting` w artykułach.
+- **Studio:** ostrzeżenia o długości tytułu (60 znaków) i opisu (160 znaków) w polach SEO stron i ustawień strony.
+
 ## 2026-10-28
 
 ### Przełącznik języka na stronach z page buildera

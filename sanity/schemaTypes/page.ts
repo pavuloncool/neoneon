@@ -83,8 +83,8 @@ export const page = defineType({
       type: 'object',
       group: 'seo',
       fields: [
-        defineField({ name: 'title', title: 'Tytuł w karcie przeglądarki', description: 'Puste = tytuł domyślny z ustawień strony.', type: 'string' }),
-        defineField({ name: 'description', title: 'Opis', type: 'text', rows: 3 }),
+        defineField({ name: 'title', title: 'Tytuł w karcie przeglądarki', description: 'Do 60 znaków. Puste = tytuł strony (na stronie głównej — tytuł domyślny z ustawień).', type: 'string', validation: (r) => r.max(60).warning('Google zwykle ucina tytuły dłuższe niż ok. 60 znaków.') }),
+        defineField({ name: 'description', title: 'Opis', description: 'Pokazywany w wynikach wyszukiwania i przy udostępnianiu. Zalecane 120–160 znaków.', type: 'text', rows: 3, validation: (r) => r.max(160).warning('Google zwykle ucina opisy dłuższe niż ok. 160 znaków.') }),
         defineField({ name: 'image', title: 'Obrazek do udostępnień', type: 'image' }),
       ],
     }),

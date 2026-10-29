@@ -5,7 +5,7 @@
 
 import { cache } from 'react'
 import { groq } from 'next-sanity'
-import { draftsClient } from '@/sanity/lib/client'
+import { client, draftsClient } from '@/sanity/lib/client'
 import { sanityFetch } from '@/sanity/lib/fetch'
 import { LINK_PROJECTION } from '@/lib/links'
 import type { Article, Category, Tag, Comment, Page, SiteSettings } from '@/types'
@@ -186,6 +186,21 @@ export async function getPageTranslation(
     groq`*[_type == "page" && locale == $targetLocale && _id in *[_type == "translation.metadata" && references($pageId)].translations[].value._ref][0]{ "slug": slug.current, isHome }`,
     { pageId: pageId.replace(/^drafts\./, ''), targetLocale }
   )
+}
+
+// Sitemapa — tylko opublikowane treści (bez podglądu szkiców), z powiązaniami tłumaczeń
+export interface SitemapData {
+  pages: { _id: string; locale: 'pl' | 'en'; isHome: boolean | null; slug: string | null; _updatedAt: string }[]
+  articles: { _id: string; locale: 'pl' | 'en'; category: Category; slug: string; _updatedAt: string }[]
+  translations: { refs: string[] | null }[]
+}
+
+export async function getSitemapData(): Promise<SitemapData> {
+  return client.fetch<SitemapData>(groq`{
+    "pages": *[_type == "page" && defined(locale)]{ _id, locale, isHome, "slug": slug.current, _updatedAt },
+    "articles": *[_type == "article" && defined(locale) && defined(slug.current)]{ _id, locale, category, "slug": slug.current, _updatedAt },
+    "translations": *[_type == "translation.metadata"]{ "refs": translations[].value._ref }
+  }`)
 }
 
 // Teksty interfejsu — nakładane na messages/*.json w i18n/request.ts

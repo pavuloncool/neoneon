@@ -12,7 +12,8 @@ interface SearchPageProps {
 export async function generateMetadata({ params }: { params: Promise<{ locale: 'pl' | 'en' }> }): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'search' })
-  return { title: t('heading') }
+  // Wyniki wyszukiwania poza indeksem — linki do artykułów nadal są śledzone
+  return { title: t('heading'), robots: { index: false, follow: true } }
 }
 
 export default async function SearchPage({ params, searchParams }: SearchPageProps) {
