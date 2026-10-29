@@ -2,6 +2,10 @@
 
 ## 2026-10-29
 
+### Przekierowania dawnych polskich adresów
+
+`/pl/about` → `/pl/o-mnie` i `/pl/contact` → `/pl/kontakt` (308, `next.config.ts`). Stare adresy są zaindeksowane w Google, a po zmianie slugów w page builderze zwracały 404.
+
 ### SEO: canonical, hreflang, sitemapa, robots.txt i dane strukturalne
 
 - **Domena:** canonical, `og:url` i sitemapa wskazują `https://neoneon.online` (`lib/site.ts`, `metadataBase`) zamiast `neoneon.vercel.app`. Adres jest stały — podglądy Vercel i localhost też wskazują produkcję.
