@@ -31,7 +31,13 @@ export interface Article {
   created_at: string
   updated_at: string
   tags?: Tag[]
+  faq?: FaqItem[] | null
   locale: 'pl' | 'en'
+}
+
+export interface FaqItem {
+  question: string
+  answer: string
 }
 
 export type Category = 'content-writing' | 'ux-strategies' | 'data-visualisation'

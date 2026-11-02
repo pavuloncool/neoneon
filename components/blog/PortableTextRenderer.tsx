@@ -3,11 +3,17 @@
 // Generuje ten sam HTML co dawny TiptapRenderer, więc style .article-body działają bez zmian.
 // Uruchamianie skryptów embedów (Instagram itp.) obsługuje EmbedActivator.
 
-import { PortableText, type PortableTextBlock, type PortableTextComponents } from '@portabletext/react'
+import { PortableText, toPlainText, type PortableTextBlock, type PortableTextComponents } from '@portabletext/react'
 import { EmbedActivator } from './EmbedActivator'
 import { urlFor } from '@/sanity/lib/image'
+import { slugify } from '@/lib/slugify'
 
 const components: PortableTextComponents = {
+  // H2 i H3 dostają id z treści — kotwice do linkowania (#tytul-sekcji) w tekście i z zewnątrz
+  block: {
+    h2: ({ children, value }) => <h2 id={slugify(toPlainText(value))}>{children}</h2>,
+    h3: ({ children, value }) => <h3 id={slugify(toPlainText(value))}>{children}</h3>,
+  },
   marks: {
     'strike-through': ({ children }) => <s>{children}</s>,
     link: ({ value, children }) => (

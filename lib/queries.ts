@@ -27,6 +27,7 @@ const ARTICLE_PROJECTION = groq`{
   "created_at": _createdAt,
   "updated_at": _updatedAt,
   "tags": tags[]->${TAG_PROJECTION},
+  "faq": faq[]{ question, answer },
   locale
 }`
 

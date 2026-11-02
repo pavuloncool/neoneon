@@ -4,6 +4,7 @@
 // Wersje PL/EN łączy dokument translation.metadata (wtyczka @sanity/document-internationalization).
 
 import { defineField, defineType } from 'sanity'
+import { faqField } from './faqField'
 
 export const CATEGORIES = [
   { title: 'Content Writing', value: 'content-writing' },
@@ -50,6 +51,7 @@ export const article = defineType({
     defineField({ name: 'tags', title: 'Tagi', type: 'array', of: [{ type: 'reference', to: [{ type: 'tag' }] }] }),
     defineField({ name: 'publishedAt', title: 'Data publikacji', type: 'datetime', initialValue: () => new Date().toISOString() }),
     defineField({ name: 'content', title: 'Treść', type: 'blockContent' }),
+    faqField,
   ],
   orderings: [{ title: 'Data publikacji', name: 'publishedAtDesc', by: [{ field: 'publishedAt', direction: 'desc' }] }],
   preview: {

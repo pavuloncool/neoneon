@@ -8,6 +8,7 @@ import { PageSections } from '@/components/sections/SectionRenderer'
 import { pageMetadata, seoMetadata } from '@/lib/metadata'
 import { SITE_NAME, SITE_URL, localeUrl, otherLocale } from '@/lib/site'
 import { JsonLd } from '@/components/seo/JsonLd'
+import { FaqJsonLd } from '@/components/seo/FaqJsonLd'
 import { formatDate, readingTime } from '@/lib/utils'
 import { PortableTextRenderer } from '@/components/blog/PortableTextRenderer'
 import { TagBadge } from '@/components/blog/TagBadge'
@@ -100,6 +101,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
         }}
       />
+      <FaqJsonLd faq={article.faq} />
       <article>
         <div className="max-w-5xl mx-auto px-6 py-12 md:py-16">
           <FadeUp>

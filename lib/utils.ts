@@ -34,24 +34,3 @@ export function readingTime(content: unknown, locale: string = 'pl'): string {
   const minutes = Math.ceil(words / 200)
   return locale === 'pl' ? `${minutes} min czytania` : `${minutes} min read`
 }
-
-// Slug z tytułu
-export function slugify(text: string): string {
-  const map: Record<string, string> = {
-    'ą': 'a', 'ć': 'c', 'ę': 'e', 'ł': 'l', 'ń': 'n',
-    'ó': 'o', 'ś': 's', 'ź': 'z', 'ż': 'z',
-    'Ą': 'A', 'Ć': 'C', 'Ę': 'E', 'Ł': 'L', 'Ń': 'N',
-    'Ó': 'O', 'Ś': 'S', 'Ź': 'Z', 'Ż': 'Z',
-  }
-  return text
-    .split('')
-    .map((char) => map[char] ?? char)
-    .join('')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_-]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-}

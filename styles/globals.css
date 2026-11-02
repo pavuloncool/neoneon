@@ -69,6 +69,12 @@
     margin-top: 1.25rem;
   }
 
+  /* Kotwice nie chowają się pod przyklejonym nagłówkiem (h-14 = 3.5rem) */
+  .article-body h2[id],
+  .article-body h3[id] {
+    scroll-margin-top: 5rem;
+  }
+
   .article-body .embed-container {
     margin: 2rem 0;
     overflow: hidden;
