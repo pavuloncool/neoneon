@@ -11,6 +11,7 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { FaqJsonLd } from '@/components/seo/FaqJsonLd'
 import { formatDate, readingTime } from '@/lib/utils'
 import { PortableTextRenderer } from '@/components/blog/PortableTextRenderer'
+import { FaqSection } from '@/components/blog/FaqSection'
 import { TagBadge } from '@/components/blog/TagBadge'
 import { CommentForm } from '@/components/blog/CommentForm'
 import { FadeUp } from '@/components/ui/Motion'
@@ -70,6 +71,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   const comments = await getCommentsByArticle(article.id)
   const t = await getTranslations('comments')
+  const tArticle = await getTranslations('article')
 
   const targetLocale = locale === 'pl' ? 'en' : 'pl'
   const translation = await getArticleTranslation(article.id, targetLocale)
@@ -154,6 +156,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           <FadeUp delay={0.15}>
             <div className="max-w-3xl mx-auto">
               {article.content && <PortableTextRenderer content={article.content} />}
+              <FaqSection faq={article.faq} heading={tArticle('faqHeading')} />
               <div className="mt-16 pt-8 border-t border-border" />
               <section className="mt-2 pb-8">
                 <h2 className="font-display text-3xl font-light mb-8">

@@ -14,7 +14,8 @@
   },
   "article": {
     "readMore": "Czytaj dalej",
-    "publishedAt": "Opublikowano"
+    "publishedAt": "Opublikowano",
+    "faqHeading": "Najczęściej zadawane pytania"
   },
   "footer": {
     "allRightsReserved": "Wszelkie prawa zastrzeżone."

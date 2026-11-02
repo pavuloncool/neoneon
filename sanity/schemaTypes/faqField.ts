@@ -2,11 +2,12 @@
 import { defineField, defineArrayMember } from 'sanity'
 
 // Pole `faq` w schemacie artykułu (article.ts).
-// Pytania i odpowiedzi wpisujesz raz w Studio; trafiają do JSON-LD,
-// a w treści artykułu możesz je powtórzyć jako widoczną sekcję.
+// Pytania i odpowiedzi wpisujesz raz w Studio; trafiają do JSON-LD (FaqJsonLd)
+// i do widocznej sekcji na końcu artykułu (FaqSection).
 export const faqField = defineField({
   name: 'faq',
-  title: 'FAQ (dane strukturalne)',
+  title: 'FAQ',
+  description: 'Wyświetla się na końcu artykułu jako sekcja „Najczęściej zadawane pytania” i trafia do danych strukturalnych dla wyszukiwarek. Nie powtarzaj tych pytań w treści.',
   type: 'array',
   of: [
     defineArrayMember({

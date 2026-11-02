@@ -27,6 +27,11 @@ export const UI_STRING_GROUPS: {
     ],
   },
   {
+    namespace: 'article',
+    title: 'Artykuł',
+    fields: [{ key: 'faqHeading', title: 'Nagłówek sekcji FAQ', description: 'Nad pytaniami z pola „FAQ” na końcu artykułu.' }],
+  },
+  {
     namespace: 'comments',
     title: 'Komentarze',
     fields: [
