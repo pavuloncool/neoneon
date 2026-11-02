@@ -1,12 +1,14 @@
 // components/blog/PortableTextRenderer.tsx
 // Server Component — renderuje treść artykułu z Sanity (Portable Text).
 // Generuje ten sam HTML co dawny TiptapRenderer, więc style .article-body działają bez zmian.
-// Uruchamianie skryptów embedów (Instagram itp.) obsługuje EmbedActivator.
+// Uruchamianie skryptów z bloków „Kod HTML” obsługuje EmbedActivator, a postów z linku — SocialEmbed.
 
 import { PortableText, toPlainText, type PortableTextBlock, type PortableTextComponents } from '@portabletext/react'
 import { EmbedActivator } from './EmbedActivator'
+import { SocialEmbed } from './SocialEmbed'
 import { urlFor } from '@/sanity/lib/image'
 import { slugify } from '@/lib/slugify'
+import { EMBED_PROVIDER_NAMES, parseEmbedUrl } from '@/lib/embeds'
 
 const components: PortableTextComponents = {
   // H2 i H3 dostają id z treści — kotwice do linkowania (#tytul-sekcji) w tekście i z zewnątrz
@@ -29,16 +31,38 @@ const components: PortableTextComponents = {
         <img src={urlFor(value).width(1600).fit('max').auto('format').url()} alt={value.alt ?? ''} loading="lazy" />
       ) : null,
     divider: () => <hr />,
-    youtube: ({ value }) => (
-      <div className="video-container">
-        <iframe
-          src={value.url}
-          frameBorder="0"
-          allowFullScreen
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        />
-      </div>
-    ),
+    mediaEmbed: ({ value }) => {
+      const parsed = parseEmbedUrl(value?.url)
+      if (!parsed) return null
+      const media =
+        parsed.kind === 'script' ? (
+          <SocialEmbed provider={parsed.provider} permalink={parsed.permalink} />
+        ) : (
+          <div
+            className={parsed.aspect ? 'video-container' : 'embed-container'}
+            style={{ aspectRatio: parsed.aspect, maxWidth: parsed.maxWidth, marginInline: parsed.maxWidth ? 'auto' : undefined }}
+          >
+            <iframe
+              src={parsed.src}
+              title={value.caption || EMBED_PROVIDER_NAMES[parsed.provider]}
+              width="100%"
+              height={parsed.height}
+              loading="lazy"
+              frameBorder="0"
+              allowFullScreen
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+            />
+          </div>
+        )
+      return value.caption ? (
+        <figure className="media-embed">
+          {media}
+          <figcaption>{value.caption}</figcaption>
+        </figure>
+      ) : (
+        media
+      )
+    },
     embed: ({ value }) => <div className="embed-container" dangerouslySetInnerHTML={{ __html: value.html ?? '' }} />,
     codeBlock: ({ value }) => (
       <pre>

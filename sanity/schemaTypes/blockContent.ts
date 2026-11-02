@@ -2,6 +2,12 @@
 // Treść artykułu (Portable Text). Odpowiada węzłom, które obsługiwał TiptapRenderer.
 
 import { defineArrayMember, defineField, defineType } from 'sanity'
+import { CodeIcon } from '@sanity/icons/Code'
+import { CodeBlockIcon } from '@sanity/icons/CodeBlock'
+import { ImageIcon } from '@sanity/icons/Image'
+import { PlayIcon } from '@sanity/icons/Play'
+import { RemoveIcon } from '@sanity/icons/Remove'
+import { EMBED_PROVIDER_NAMES, parseEmbedUrl } from '@/lib/embeds'
 
 export const blockContent = defineType({
   name: 'blockContent',
@@ -47,34 +53,62 @@ export const blockContent = defineType({
     }),
     defineArrayMember({
       type: 'image',
+      icon: ImageIcon,
       fields: [defineField({ name: 'alt', title: 'Tekst alternatywny', type: 'string' })],
     }),
     defineArrayMember({
       name: 'divider',
       title: 'Linia pozioma',
       type: 'object',
+      icon: RemoveIcon,
       fields: [defineField({ name: 'style', type: 'string', hidden: true, initialValue: 'line' })],
       preview: { prepare: () => ({ title: '— linia pozioma —' }) },
     }),
     defineArrayMember({
-      name: 'youtube',
-      title: 'YouTube',
+      name: 'mediaEmbed',
+      title: 'Media z linku (YouTube, Instagram…)',
       type: 'object',
-      fields: [defineField({ name: 'url', title: 'URL filmu (embed)', type: 'url', validation: (r) => r.required() })],
-      preview: { select: { title: 'url' }, prepare: ({ title }) => ({ title: 'YouTube', subtitle: title }) },
+      icon: PlayIcon,
+      fields: [
+        defineField({
+          name: 'url',
+          title: 'Link',
+          description: `Wklej zwykły link do filmu lub posta. Obsługiwane: ${Object.values(EMBED_PROVIDER_NAMES).join(', ')}.`,
+          type: 'url',
+          validation: (r) =>
+            r.required().custom((url) =>
+              !url || parseEmbedUrl(url)
+                ? true
+                : 'Nie rozpoznaję tego linku. Sprawdź, czy prowadzi do konkretnego filmu/posta — albo użyj bloku „Kod HTML (embed)”.'
+            ),
+        }),
+        defineField({ name: 'caption', title: 'Podpis (opcjonalnie)', type: 'string' }),
+      ],
+      preview: {
+        select: { url: 'url', caption: 'caption' },
+        prepare: ({ url, caption }) => {
+          const parsed = parseEmbedUrl(url)
+          return {
+            title: parsed ? EMBED_PROVIDER_NAMES[parsed.provider] : 'Media (nierozpoznany link)',
+            subtitle: caption || url,
+          }
+        },
+      },
     }),
     defineArrayMember({
       name: 'embed',
-      title: 'Embed (HTML)',
-      description: 'Kod osadzenia z Instagrama, X itp. — wklej cały fragment HTML.',
+      title: 'Kod HTML (embed)',
+      description: 'Dla serwisów spoza listy „Media z linku” — wklej cały kod osadzenia (iframe/blockquote).',
       type: 'object',
+      icon: CodeBlockIcon,
       fields: [defineField({ name: 'html', title: 'Kod HTML', type: 'text', rows: 6, validation: (r) => r.required() })],
-      preview: { select: { title: 'html' }, prepare: ({ title }) => ({ title: 'Embed', subtitle: title?.slice(0, 80) }) },
+      preview: { select: { title: 'html' }, prepare: ({ title }) => ({ title: 'Kod HTML (embed)', subtitle: title?.slice(0, 80) }) },
     }),
     defineArrayMember({
       name: 'codeBlock',
       title: 'Blok kodu',
       type: 'object',
+      icon: CodeIcon,
       fields: [
         defineField({ name: 'language', title: 'Język', type: 'string' }),
         defineField({ name: 'code', title: 'Kod', type: 'text', rows: 8 }),
@@ -82,4 +116,6 @@ export const blockContent = defineType({
       preview: { select: { title: 'language', subtitle: 'code' } },
     }),
   ],
+  // Menu „+ Wstaw” w pasku narzędzi edytora: ikony + opcjonalny widok siatki
+  options: { insertMenu: { showIcons: true, views: [{ name: 'list' }, { name: 'grid' }] } },
 })
