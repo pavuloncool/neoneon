@@ -3,14 +3,12 @@ import localFont from 'next/font/local'
 // Pliki w styles/fonts/ (Google Fonts przycięte do latin + latin-ext) — build nie pobiera fontów z sieci
 
 // Tylko używane warianty: 300 — tytuły (font-display font-light), 300 kursywa — druga linia nagłówka strony głównej,
-// 600 — nagłówki w treści (.article-body), 700 — pogrubienie w tych nagłówkach (<strong> w <h2>)
+// 600 — nagłówki w treści (.article-body; pogrubienie w nich nie zmienia grubości, patrz globals.css)
 export const cormorant = localFont({
   src: [
     { path: '../styles/fonts/cormorant-garamond-300.woff2', weight: '300', style: 'normal' },
     { path: '../styles/fonts/cormorant-garamond-300-italic.woff2', weight: '300', style: 'italic' },
-    { path: '../styles/fonts/cormorant-garamond-600.woff2', weight: '600', style: 'normal' },
-    { path: '../styles/fonts/cormorant-garamond-700.woff2', weight: '700', style: 'normal' },
-  ],
+    { path: '../styles/fonts/cormorant-garamond-600.woff2', weight: '600', style: 'normal' },  ],
   variable: '--font-cormorant',
   display: 'swap',
   adjustFontFallback: 'Times New Roman',

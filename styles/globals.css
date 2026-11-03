@@ -57,6 +57,9 @@
     margin-bottom: 0.75rem;
   }
 
+  /* Pogrubienie z edytora nie zmienia grubości nagłówka — wszystkie mają 600 */
+  .article-body :is(h1, h2, h3) strong { font-weight: inherit; }
+
   .article-body h1 { margin-top: 2.5rem; }
 
   .article-body h2 {
