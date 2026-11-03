@@ -2,13 +2,14 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { draftMode } from 'next/headers'
+import Script from 'next/script'
 import { VisualEditing } from 'next-sanity/visual-editing'
 import { routing } from '@/i18n/routing'
 import { ThemeProvider } from '@/components/layout/ThemeProvider'
 import { cormorant, dmSans, dmMono } from '@/app/fonts'
 import { DraftModeBanner } from '@/components/layout/DraftModeBanner'
 import { getSiteSettings } from '@/lib/queries'
-import { OG_LOCALE, SITE_NAME, localeUrl } from '@/lib/site'
+import { OG_LOCALE, SITE_NAME, SITE_URL, localeUrl } from '@/lib/site'
 import type { Metadata } from 'next'
 
 // Domyślne SEO z ustawień strony w Sanity; brakujące pola uzupełnia app/layout.tsx
@@ -42,6 +43,7 @@ export default async function LocaleLayout({
 
   const messages = await getMessages()
   const isDraftMode = (await draftMode()).isEnabled
+  const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID
 
   return (
     <html
@@ -61,6 +63,16 @@ export default async function LocaleLayout({
             <VisualEditing />
             <DraftModeBanner />
           </>
+        )}
+        {/* Umami — analityka bez cookies; data-domains pomija podglądy Vercel i localhost */}
+        {!isDraftMode && umamiWebsiteId && (
+          <Script
+            src="/stats/script.js"
+            data-website-id={umamiWebsiteId}
+            data-host-url="/stats"
+            data-domains={new URL(SITE_URL).hostname}
+            strategy="afterInteractive"
+          />
         )}
       </body>
     </html>

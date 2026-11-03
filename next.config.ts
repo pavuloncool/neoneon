@@ -11,6 +11,13 @@ const nextConfig: NextConfig = {
       { source: '/pl/contact', destination: '/pl/kontakt', permanent: true },
     ]
   },
+  // Umami (analityka bez cookies) serwowana z własnej domeny — mniej blokowana przez adblockery
+  async rewrites() {
+    return [
+      { source: '/stats/script.js', destination: 'https://cloud.umami.is/script.js' },
+      { source: '/stats/api/send', destination: 'https://cloud.umami.is/api/send' },
+    ]
+  },
   images: {
     remotePatterns: [
       {
