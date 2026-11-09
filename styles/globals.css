@@ -251,6 +251,75 @@
   }
 }
 
+/* ── Hero: zapłon neonu (components/sections/HeroNeon.tsx) ── */
+/* Kursywa: w dzień złoty tusz, w nocy neon. Na jasnym tle ciemniejsze złoto — accent #c8a96e ma
+   kontrast 2.15:1, #9a7a3e ma 3.84:1 (SC 1.4.3, duży tekst ≥ 3:1). */
+.hero-emph {
+  --glow: 1;
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+  color: #9a7a3e;
+}
+
+.dark .hero-emph {
+  color: #f3e2b8;
+}
+
+/* Poświata: pseudo-element z tym samym tekstem (bez duplikatu w DOM), statyczny blur,
+   animowana wyłącznie opacity (przez --glow). Tylko w ciemnym motywie. */
+.hero-emph::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: none;
+  color: #c8a96e;
+  filter: blur(14px);
+  opacity: var(--glow);
+  pointer-events: none;
+  user-select: none;
+}
+
+.dark .hero-emph::after {
+  display: block;
+}
+
+/* Rotujące słowo: maska + komórka siatki z niewidocznymi słowami (szerokość najdłuższego) */
+.hero-word-mask {
+  display: inline-grid;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+  font-style: italic;
+  color: #9a7a3e;
+}
+
+.dark .hero-word-mask {
+  color: #c8a96e;
+}
+
+.hero-word-mask > * {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+}
+
+.hero-word {
+  display: inline-block;
+}
+
+/* Stan startowy (tylko z JS i bez prośby o ograniczenie ruchu): zgaszona rurka, poświata wyłączona */
+@media (prefers-reduced-motion: no-preference) {
+  html.js [data-hero-root]:not([data-hero-done]) :is([data-hero='heading'], [data-hero='emphasis']) {
+    opacity: 0.15;
+  }
+
+  html.js [data-hero-root]:not([data-hero-done]) .hero-emph {
+    --glow: 0;
+  }
+}
+
 /* ── SC 2.3.3 — prefers-reduced-motion ────────────────────── */
 /* Użytkownicy z preferencją ograniczonego ruchu (epilepsja, wrażliwość na animacje) */
 @media (prefers-reduced-motion: reduce) {

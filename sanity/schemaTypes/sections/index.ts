@@ -48,6 +48,23 @@ export const hero = defineType({
     defineField({ name: 'eyebrow', title: 'Etykieta nad tytułem', type: 'string' }),
     defineField({ name: 'heading', title: 'Tytuł', type: 'string', validation: (r) => r.required() }),
     defineField({ name: 'headingEmphasis', title: 'Druga linia tytułu (kursywa)', type: 'string', hidden: ({ parent }) => parent?.variant !== 'large' }),
+    // Linia z rotującym słowem pod tytułem (strona główna). Opcjonalna — puste pola = brak linii.
+    defineField({
+      name: 'rotatingPrefix',
+      title: 'Linia pod tytułem — stały początek',
+      description: 'Np. „Piszę o”. Po nim zmieniają się kolejne słowa z listy poniżej.',
+      type: 'string',
+      hidden: ({ parent }) => parent?.variant !== 'large',
+    }),
+    defineField({
+      name: 'rotatingWords',
+      title: 'Linia pod tytułem — zmieniające się słowa',
+      description: 'Co najmniej 2. Animacja robi 3 cykle i zatrzymuje się na ostatnim słowie.',
+      type: 'array',
+      of: [defineArrayMember({ type: 'string' })],
+      hidden: ({ parent }) => parent?.variant !== 'large',
+      validation: (r) => r.custom((v) => (!v || v.length === 0 || v.length >= 2 ? true : 'Podaj co najmniej 2 słowa albo zostaw puste.')),
+    }),
   ],
   preview: { select: { title: 'heading', subtitle: 'eyebrow' }, prepare: ({ title, subtitle }) => ({ title: `Nagłówek: ${title ?? ''}`, subtitle }) },
 })

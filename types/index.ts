@@ -83,6 +83,19 @@ export interface SiteSettings {
 
 export type Section = { _type: string; _key: string } & Record<string, any>
 
+// Sekcja „Nagłówek strony” (sanity/schemaTypes/sections — hero)
+export interface HeroSection {
+  _type: 'hero'
+  _key: string
+  variant?: 'large' | 'page' | null
+  eyebrow?: string | null
+  heading: string
+  headingEmphasis?: string | null
+  // Linia z rotującym słowem pod tytułem (tylko wariant `large`); brak pól = brak linii
+  rotatingPrefix?: string | null
+  rotatingWords?: string[] | null
+}
+
 export interface Page {
   id: string
   title: string
