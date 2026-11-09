@@ -150,16 +150,31 @@ export function Nav({ links, logo, labels }: NavProps) {
     if (menuOpen) setMenuOpen(false)
   }
 
-  // Kurtyna od dołu (od pilla) + linie linków wjeżdżające z maski; zamknięcie = odwrotna timeline
+  // Kurtyna od dołu (od pilla) + linie linków wjeżdżające z maski; zamknięcie = odwrotna timeline.
+  // Budowana w czasie bezczynności po załadowaniu, nie przy hydracji: GSAP czyta style elementów
+  // (wymuszone przeliczenie stylu — na długim artykule ~17 ms w długim tasku → TBT). Gdyby menu otwarto
+  // wcześniej, timeline powstaje na żądanie (buildMenu.current).
+  const buildMenu = useRef<(() => void) | null>(null)
   useGSAP(
-    () => {
+    (_, contextSafe) => {
       const d = dialogRef.current
-      if (!d) return
-      timeline.current = gsap
-        .timeline({ paused: true })
-        .fromTo(d, { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.55, ease: 'power3.inOut' })
-        .fromTo(d.querySelectorAll('[data-menu-line]'), { yPercent: 110 }, { yPercent: 0, duration: 0.5, ease: 'power3.out', stagger: 0.06 }, '-=0.2')
-        .fromTo(d.querySelectorAll('[data-menu-fade]'), { opacity: 0 }, { opacity: 1, duration: 0.3 }, '<0.1')
+      if (!d || !contextSafe) return
+      const build = contextSafe(() => {
+        if (timeline.current) return
+        timeline.current = gsap
+          .timeline({ paused: true })
+          .fromTo(d, { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.55, ease: 'power3.inOut' })
+          .fromTo(d.querySelectorAll('[data-menu-line]'), { yPercent: 110 }, { yPercent: 0, duration: 0.5, ease: 'power3.out', stagger: 0.06 }, '-=0.2')
+          .fromTo(d.querySelectorAll('[data-menu-fade]'), { opacity: 0 }, { opacity: 1, duration: 0.3 }, '<0.1')
+      })
+      buildMenu.current = build
+      const idle = typeof window.requestIdleCallback === 'function'
+        ? window.requestIdleCallback(() => build(), { timeout: 3000 })
+        : window.setTimeout(build, 1500)
+      return () => {
+        if (typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idle)
+        else window.clearTimeout(idle)
+      }
     },
     { scope: dialogRef },
   )
@@ -167,9 +182,11 @@ export function Nav({ links, logo, labels }: NavProps) {
   // Otwieranie/zamykanie: animacja, inert dla wszystkiego poza dialogiem, blokada scrolla, fokus, Esc
   useEffect(() => {
     const d = dialogRef.current
-    const tl = timeline.current
-    if (!d || !tl) return
+    if (!d) return
     if (!menuOpen && !wasOpen.current) return // stan początkowy — nic do cofania
+    if (!timeline.current) buildMenu.current?.()
+    const tl = timeline.current
+    if (!tl) return
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     // Rodzeństwo dialogu (skip link, header, pill, main, footer) — inert na czas otwarcia
     const outside = Array.from(d.parentElement?.children ?? []).filter((el) => el !== d && el.tagName !== 'SCRIPT') as HTMLElement[]
