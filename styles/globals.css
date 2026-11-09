@@ -223,6 +223,67 @@
   }
 }
 
+/* ── Nawigacja (components/layout/Nav.tsx) ── */
+/* Menu mobilne: zamknięte niewidoczne i schowane za dolną krawędzią (kurtyna od pilla);
+   GSAP przy otwarciu ustawia visibility: visible i animuje clip-path do inset(0). */
+.menu-dialog {
+  visibility: hidden;
+  clip-path: inset(100% 0% 0% 0%);
+  /* Bez CSS transition — inaczej reguła reduced motion (transition-duration: 0.01ms na *) robi z visibility
+     przejście i dialog jest jeszcze hidden w chwili ustawiania fokusu */
+  transition-property: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* universalna reguła niżej daje transition-duration wszystkim elementom (transition-property: all),
+     więc visibility linków też „przechodzi” — w menu wyłączamy to całkowicie */
+  .menu-dialog * {
+    transition-property: none !important;
+  }
+}
+
+/* Desktop: rolling text + złote podkreślenie (hover / focus-visible) */
+.nav-roll-link {
+  position: relative;
+}
+
+.nav-roll-link::after {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.15rem;
+  height: 1px;
+  background: #c8a96e;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-roll {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  /* wysokość jednej linii — druga kopia czeka pod spodem */
+  height: 1lh;
+}
+
+.nav-roll-track {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-roll-link:hover .nav-roll-track,
+.nav-roll-link:focus-visible .nav-roll-track {
+  transform: translateY(-50%);
+}
+
+.nav-roll-link:hover::after,
+.nav-roll-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
 /* ── Motion: stany startowe animacji wejścia (components/ui/Motion.tsx) ── */
 /* Tylko z JS (html.js ustawiane inline przed hydracją) i bez prośby o ograniczenie ruchu.
    data-motion-done = animacja zakończona → reguła przestaje działać. */
