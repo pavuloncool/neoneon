@@ -232,6 +232,15 @@
     transform: translateY(20px);
   }
 
+  /* Elementy LCP: widoczne od pierwszego renderu (LCP nie czeka na hydrację) */
+  html.js [data-motion='fade-up'][data-motion-lcp='dim']:not([data-motion-done]) {
+    opacity: 0.15;
+  }
+
+  html.js [data-motion='fade-up'][data-motion-lcp='solid']:not([data-motion-done]) {
+    opacity: 1;
+  }
+
   html.js [data-motion='fade-in']:not([data-motion-done]) {
     opacity: 0;
   }

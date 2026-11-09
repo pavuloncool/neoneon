@@ -55,20 +55,25 @@ function useEnter(
   )
 }
 
-// Fade in + slide up — dla nagłówków i bloków tekstu
+// Fade in + slide up — dla nagłówków i bloków tekstu.
+// `lcp` — element LCP strony (nie może startować z opacity 0, bo LCP czekałby na hydrację):
+//   'dim'   — start z opacity 0.15 (zgaszona rurka neonu, hero),
+//   'solid' — start z opacity 1, animowany tylko transform (nagłówek kategorii, okładka artykułu).
 export function FadeUp({
   children,
   delay = 0,
   className,
+  lcp,
 }: {
   children: React.ReactNode
   delay?: number
   className?: string
+  lcp?: 'dim' | 'solid'
 }) {
   const ref = useRef<HTMLDivElement>(null)
   useEnter(ref, () => (ref.current ? [ref.current] : []), { opacity: 1, y: 0, duration: 0.5, delay, ease: EASE })
   return (
-    <div ref={ref} data-motion="fade-up" className={className}>
+    <div ref={ref} data-motion="fade-up" data-motion-lcp={lcp} className={className}>
       {children}
     </div>
   )

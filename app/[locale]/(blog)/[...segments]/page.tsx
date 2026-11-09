@@ -106,7 +106,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       <FaqJsonLd faq={article.faq} />
       <article>
         <div className="max-w-5xl mx-auto px-6 py-12 md:py-16">
-          <FadeUp>
+          <FadeUp lcp="solid">
             <header className="mb-10 md:mb-14">
               {article.cover_image_url ? (
                 <div className="grid grid-cols-1 md:grid-cols-[1fr_1.1fr] gap-8 md:gap-12 items-start">

@@ -12,7 +12,7 @@ export function Hero({ section }: { section: Section }) {
     return (
       /* SC 1.3.6 — aria-labelledby wskazuje na h1 wewnątrz sekcji */
       <section aria-labelledby={id} className="mb-20">
-        <FadeUp>
+        <FadeUp lcp="dim">
           <h1 id={id} className="font-display text-7xl md:text-8xl font-light leading-none mb-6">
             {heading}
             {headingEmphasis && (
