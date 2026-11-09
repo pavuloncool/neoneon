@@ -12,6 +12,9 @@ import { getSiteSettings } from '@/lib/queries'
 import { OG_LOCALE, SITE_NAME, SITE_URL, localeUrl } from '@/lib/site'
 import type { Metadata } from 'next'
 
+const MOTION_BOOTSTRAP =
+  "(function(){var d=document.documentElement;d.classList.add('js');setTimeout(function(){if(window.__motionReady!==true)d.classList.remove('js')},3000)})()"
+
 // Domyślne SEO z ustawień strony w Sanity; brakujące pola uzupełnia app/layout.tsx
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params
@@ -51,6 +54,11 @@ export default async function LocaleLayout({
       suppressHydrationWarning
       className={`${cormorant.variable} ${dmSans.variable} ${dmMono.variable}`}
     >
+      <head>
+        {/* Znacznik JS przed hydracją — CSS ustawia stany startowe animacji tylko pod html.js.
+            Siatka bezpieczeństwa: jeśli GSAP nie wystartował w 3 s, zdejmujemy znacznik i treść jest widoczna. */}
+        <script dangerouslySetInnerHTML={{ __html: MOTION_BOOTSTRAP }} />
+      </head>
       <body className="bg-paper text-ink antialiased transition-colors duration-300">
         <ThemeProvider>
           <NextIntlClientProvider messages={messages}>

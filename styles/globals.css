@@ -223,6 +223,25 @@
   }
 }
 
+/* ── Motion: stany startowe animacji wejścia (components/ui/Motion.tsx) ── */
+/* Tylko z JS (html.js ustawiane inline przed hydracją) i bez prośby o ograniczenie ruchu.
+   data-motion-done = animacja zakończona → reguła przestaje działać. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js [data-motion='fade-up']:not([data-motion-done]) {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  html.js [data-motion='fade-in']:not([data-motion-done]) {
+    opacity: 0;
+  }
+
+  html.js [data-motion='stagger-item']:not([data-motion-done]) {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
 /* ── SC 2.3.3 — prefers-reduced-motion ────────────────────── */
 /* Użytkownicy z preferencją ograniczonego ruchu (epilepsja, wrażliwość na animacje) */
 @media (prefers-reduced-motion: reduce) {

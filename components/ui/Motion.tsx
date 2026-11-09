@@ -1,9 +1,59 @@
 'use client'
 
 // components/ui/Motion.tsx
-// Reużywalne wrappery animacji Framer Motion
+// Reużywalne wrappery animacji wejścia (GSAP). API bez zmian względem wersji z Framer Motion.
+//
+// Stan startowy (opacity/transform) ustawia CSS — styles/globals.css, sekcja „Motion” — tylko gdy
+// <html> ma klasę `js` i użytkownik nie prosi o ograniczenie ruchu. Dzięki temu treść nie miga
+// przed animacją, a bez JS albo z prefers-reduced-motion jest widoczna od razu.
+// Po zakończeniu animacji element dostaje data-motion-done, co wyłącza regułę CSS stanu startowego.
 
-import { motion } from 'framer-motion'
+import { useRef } from 'react'
+import { gsap, useGSAP, motionEnabled, markMotionReady, FULL_MOTION, REDUCED_MOTION } from '@/lib/gsap'
+
+const EASE = 'power1.out' // zbliżone do cubic-bezier(0.25, 0.1, 0.25, 1) z poprzedniej wersji
+
+function done(el: Element) {
+  el.setAttribute('data-motion-done', '')
+}
+
+// Animacja wejścia jednego elementu albo listy elementów (stagger)
+function useEnter(
+  scope: React.RefObject<HTMLDivElement | null>,
+  targets: () => Element[],
+  vars: gsap.TweenVars,
+) {
+  useGSAP(
+    () => {
+      const els = targets()
+      if (els.length === 0) return
+      // Siatka bezpieczeństwa już zadziałała — CSS niczego nie ukrywa, nie animujemy
+      if (!motionEnabled()) {
+        els.forEach(done)
+        return
+      }
+      const mm = gsap.matchMedia()
+      mm.add(FULL_MOTION, () => {
+        gsap.to(els, {
+          ...vars,
+          // transform: none po animacji — bez stałego stacking contextu / containing blocka
+          onComplete: () => {
+            els.forEach((el) => {
+              done(el)
+              gsap.set(el, { clearProps: 'transform' })
+            })
+          },
+        })
+        markMotionReady()
+      })
+      mm.add(REDUCED_MOTION, () => {
+        els.forEach(done)
+        markMotionReady()
+      })
+    },
+    { scope },
+  )
+}
 
 // Fade in + slide up — dla nagłówków i bloków tekstu
 export function FadeUp({
@@ -15,15 +65,12 @@ export function FadeUp({
   delay?: number
   className?: string
 }) {
+  const ref = useRef<HTMLDivElement>(null)
+  useEnter(ref, () => (ref.current ? [ref.current] : []), { opacity: 1, y: 0, duration: 0.5, delay, ease: EASE })
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay, ease: [0.25, 0.1, 0.25, 1] }}
-      className={className}
-    >
+    <div ref={ref} data-motion="fade-up" className={className}>
       {children}
-    </motion.div>
+    </div>
   )
 }
 
@@ -37,19 +84,16 @@ export function FadeIn({
   delay?: number
   className?: string
 }) {
+  const ref = useRef<HTMLDivElement>(null)
+  useEnter(ref, () => (ref.current ? [ref.current] : []), { opacity: 1, duration: 0.6, delay, ease: 'power2.out' })
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.6, delay, ease: 'easeOut' }}
-      className={className}
-    >
+    <div ref={ref} data-motion="fade-in" className={className}>
       {children}
-    </motion.div>
+    </div>
   )
 }
 
-// Stagger container — dzieci animują się kolejno
+// Stagger container — dzieci (StaggerItem) animują się kolejno
 export function StaggerList({
   children,
   className,
@@ -57,22 +101,20 @@ export function StaggerList({
   children: React.ReactNode
   className?: string
 }) {
+  const ref = useRef<HTMLDivElement>(null)
+  useEnter(
+    ref,
+    () => (ref.current ? Array.from(ref.current.querySelectorAll(':scope > [data-motion="stagger-item"]')) : []),
+    { opacity: 1, y: 0, duration: 0.4, ease: EASE, stagger: 0.08 },
+  )
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={{
-        hidden: {},
-        visible: { transition: { staggerChildren: 0.08 } },
-      }}
-      className={className}
-    >
+    <div ref={ref} className={className}>
       {children}
-    </motion.div>
+    </div>
   )
 }
 
-// Element w stagger liście
+// Element w stagger liście — animuje go StaggerList
 export function StaggerItem({
   children,
   className,
@@ -81,14 +123,8 @@ export function StaggerItem({
   className?: string
 }) {
   return (
-    <motion.div
-      variants={{
-        hidden: { opacity: 0, y: 16 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } },
-      }}
-      className={className}
-    >
+    <div data-motion="stagger-item" className={className}>
       {children}
-    </motion.div>
+    </div>
   )
 }
