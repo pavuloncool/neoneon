@@ -1,6 +1,6 @@
 'use client'
 // components/blog/ArticleCard.tsx
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { formatDate, readingTime } from '@/lib/utils'

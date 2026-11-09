@@ -1,6 +1,6 @@
 // components/blog/TagBadge.tsx
 'use client'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { useLocale } from 'next-intl'
 import { cn } from '@/lib/utils'
 import type { Tag } from '@/types'
