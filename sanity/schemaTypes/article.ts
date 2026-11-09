@@ -23,7 +23,11 @@ export const article = defineType({
       title: 'Slug',
       type: 'slug',
       options: { source: 'title', maxLength: 96 },
-      validation: (r) => r.required(),
+      // Wielkie litery w URL-u tworzą duplikaty w Google; proxy.ts i tak przekierowuje na małe litery
+      validation: (r) =>
+        r.required().custom((slug) =>
+          !slug?.current || slug.current === slug.current.toLowerCase() ? true : 'Slug tylko małymi literami'
+        ),
     }),
     defineField({
       // Ustawiane przez wtyczkę document-internationalization (languageField: 'locale')
