@@ -3,6 +3,7 @@
 import { useLocale } from 'next-intl'
 import { usePathname, useRouter } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
+import { setHeroLanguageFlag } from '@/lib/hero-language-flag'
 
 export function LanguageSwitcher({
   dark = false,
@@ -18,12 +19,12 @@ export function LanguageSwitcher({
 
     // Odpowiednik strony w drugim języku (artykuł albo strona z page buildera) — patrz TranslationStore
     const translationPath = sessionStorage.getItem('neoneon_translation_path')
-    if (translationPath) {
-      router.push(translationPath, { locale: targetLocale })
-      return
-    }
+    const target = translationPath || pathname
 
-    router.push(pathname, { locale: targetLocale })
+    // Strona z hero: w nowym języku tytuł zrobi scramble zamiast skokowej podmiany (HeroNeon)
+    if (document.querySelector('[data-hero]')) setHeroLanguageFlag(targetLocale, target)
+
+    router.push(target, { locale: targetLocale })
   }
 
   return (

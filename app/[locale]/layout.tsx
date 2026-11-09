@@ -12,7 +12,7 @@ import { OG_LOCALE, SITE_NAME, SITE_URL, localeUrl } from '@/lib/site'
 import type { Metadata } from 'next'
 
 const MOTION_BOOTSTRAP =
-  "(function(){var d=document.documentElement;d.classList.add('js');setTimeout(function(){if(window.__motionReady!==true)d.classList.remove('js')},3000)})()"
+  "(function(){var d=document.documentElement;d.classList.add('js');setTimeout(function(){if(window.__motionReady!==true){d.classList.remove('js');window.__motionFallback=true}},3000)})()"
 
 // Domyślne SEO z ustawień strony w Sanity; brakujące pola uzupełnia app/layout.tsx
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {

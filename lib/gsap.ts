@@ -13,13 +13,21 @@ gsap.registerPlugin(useGSAP)
 declare global {
   interface Window {
     __motionReady?: boolean
+    __motionFallback?: boolean
   }
 }
 
-// Znacznik JS na <html> (ustawiany inline w app/[locale]/layout.tsx). Jeśli siatka bezpieczeństwa
-// zdjęła go po 3000 ms, CSS już nie ukrywa elementów — animację wejścia pomijamy.
+// Znacznik JS na <html> (ustawiany inline w app/[locale]/layout.tsx).
+// - Siatka bezpieczeństwa zdjęła go po 3000 ms (__motionFallback) → CSS nie ukrywa elementów,
+//   animację wejścia pomijamy.
+// - React nadpisuje className <html> przy zmianie języka (nowe params layoutu [locale]) i znacznik
+//   znika, choć siatka nie zadziałała → przywracamy go. Wywołania są w layout effect (useGSAP),
+//   więc przed malowaniem — bez mignięcia.
 export function motionEnabled(): boolean {
-  return document.documentElement.classList.contains('js')
+  if (window.__motionFallback) return false
+  const html = document.documentElement
+  if (!html.classList.contains('js')) html.classList.add('js')
+  return true
 }
 
 // Wywoływane po faktycznym starcie pierwszej animacji — wyłącza siatkę bezpieczeństwa.

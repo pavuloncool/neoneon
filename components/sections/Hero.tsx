@@ -22,7 +22,9 @@ export async function Hero({ section }: { section: Section }) {
     const { rotatingPrefix, rotatingWords } = section as HeroSection
     const demo = process.env.NEXT_PUBLIC_HERO_ROTATING_DEMO === '1' && !rotatingWords?.length ? ROTATING_DEMO[locale] : null
     return (
+      // key={locale}: przy zmianie języka nowy montaż (sekwencja scramble), a nie tylko podmiana propsów
       <HeroNeon
+        key={locale}
         id={`hero-${_key}`}
         heading={heading}
         headingEmphasis={headingEmphasis}

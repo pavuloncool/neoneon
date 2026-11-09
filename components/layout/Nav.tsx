@@ -36,9 +36,40 @@ function ThemeToggle({ className, label }: { className?: string; label: string }
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
   const isDark = mounted && resolvedTheme === 'dark'
+
+  // Zmiana motywu przez View Transitions: nowy motyw „rozlewa się” kołem od przycisku
+  // (CSS: ::view-transition-new(root) w globals.css). W callbacku najpierw synchroniczna zmiana klasy
+  // na <html> (to łapie snapshot „new”), setTheme() tylko zapisuje preferencję next-themes.
+  // Fallback (brak API albo prefers-reduced-motion) = natychmiastowa zmiana.
+  function toggle(e: React.MouseEvent<HTMLButtonElement>) {
+    if (!mounted) return
+    const next = isDark ? 'light' : 'dark'
+    const root = document.documentElement
+    const apply = () => {
+      root.classList.toggle('dark', next === 'dark')
+      root.style.colorScheme = next
+      setTheme(next)
+    }
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (typeof document.startViewTransition !== 'function' || reduce) {
+      apply()
+      return
+    }
+    const r = e.currentTarget.getBoundingClientRect()
+    const x = r.left + r.width / 2
+    const y = r.top + r.height / 2
+    root.style.setProperty('--vt-x', `${x}px`)
+    root.style.setProperty('--vt-y', `${y}px`)
+    root.style.setProperty('--vt-r', `${Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y))}px`)
+    // Bez transition-colors na czas przejścia — snapshot „new” nie może być w połowie zmiany kolorów
+    root.classList.add('theme-vt')
+    const vt = document.startViewTransition(apply)
+    vt.finished.finally(() => root.classList.remove('theme-vt'))
+  }
+
   return (
     <button
-      onClick={() => mounted && setTheme(isDark ? 'light' : 'dark')}
+      onClick={toggle}
       aria-label={label}
       className={cn('flex items-center justify-center', className)}
     >

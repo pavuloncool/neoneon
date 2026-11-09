@@ -14,6 +14,7 @@ import { Fragment, useRef, useState } from 'react'
 import { Pause, Play } from 'lucide-react'
 import { gsap, useGSAP, motionEnabled, markMotionReady, FULL_MOTION, REDUCED_MOTION } from '@/lib/gsap'
 import { SplitText, scrambleChars } from '@/lib/gsap-text'
+import { consumeHeroLanguageFlag } from '@/lib/hero-language-flag'
 
 const ROTATION_CYCLES = 3
 const WORD_HOLD = 1.8 // s — jak długo słowo stoi przed zmianą
@@ -63,6 +64,8 @@ export function HeroNeon({ id, heading, headingEmphasis, rotatingPrefix, rotatin
       const emph = el.querySelector<HTMLElement>('[data-hero="emphasis"]')
       const word = el.querySelector<HTMLElement>('[data-hero="word"]')
       const finish = () => el.setAttribute('data-hero-done', '')
+      // Zmiana języka na stronie z hero (flaga z LanguageSwitcher) — zawsze czyszczona przy montażu
+      const languageSwitch = consumeHeroLanguageFlag(window.location.pathname)
 
       // Siatka bezpieczeństwa już zdjęła html.js — stan końcowy bez animacji
       if (!motionEnabled()) {
@@ -151,6 +154,17 @@ export function HeroNeon({ id, heading, headingEmphasis, rotatingPrefix, rotatin
           })
         })
 
+        // Scramble osobno na każdym słowie — spacje i łamanie wierszy zostają (inaczej na mobile
+        // cały tytuł staje się jednym „słowem” i wychodzi poza ekran). Szerokość słowa zablokowana
+        // na czas scramble — losowe znaki nie przestawiają wierszy.
+        const scrambleWords = (tl: gsap.core.Timeline, container: HTMLElement, at: number, duration: number) =>
+          container.querySelectorAll<HTMLElement>('[data-hero-word]').forEach((w) => {
+            const text = w.dataset.heroWord!
+            gsap.set(w, { display: 'inline-block', width: w.getBoundingClientRect().width, whiteSpace: 'nowrap' })
+            tl.to(w, { duration, ease: 'none', scrambleText: { text, chars: scrambleChars(text), revealDelay: 0.3, speed: 0.5 } }, at)
+              .set(w, { clearProps: 'display,width,whiteSpace' })
+          })
+
         // Start po załadowaniu fontów — wysokość h1 mierzona w docelowym kroju (bez skoków CLS)
         const start = ctx.add('start', () => {
           if (!motionEnabled()) {
@@ -158,30 +172,75 @@ export function HeroNeon({ id, heading, headingEmphasis, rotatingPrefix, rotatin
             return
           }
           gsap.set(h1, { height: h1.offsetHeight })
+          if (languageSwitch) {
+            // Po zmianie języka: krótki scramble z losowych znaków do nowego tytułu, bez fazy
+            // zgaszonej rurki i bez migotania
+            const tl = gsap.timeline({ onComplete: () => done() })
+            scrambleWords(tl, head, 0, 0.6)
+            if (emph) scrambleWords(tl, emph, 0.1, 0.6)
+            return
+          }
           const tl = gsap.timeline({ onComplete: () => ignite() })
-          // Scramble osobno na każdym słowie — spacje i łamanie wierszy zostają (inaczej na mobile
-          // cały tytuł staje się jednym „słowem” i wychodzi poza ekran)
-          // Szerokość każdego słowa zablokowana na czas scramble — losowe znaki nie przestawiają wierszy.
-          const scrambleWords = (container: HTMLElement, at: number, duration: number) =>
-            container.querySelectorAll<HTMLElement>('[data-hero-word]').forEach((w) => {
-              const text = w.dataset.heroWord!
-              gsap.set(w, { display: 'inline-block', width: w.getBoundingClientRect().width, whiteSpace: 'nowrap' })
-              tl.to(w, { duration, ease: 'none', scrambleText: { text, chars: scrambleChars(text), revealDelay: 0.3, speed: 0.5 } }, at)
-                .set(w, { clearProps: 'display,width,whiteSpace' })
-            })
-          scrambleWords(head, 0, 1.3)
+          scrambleWords(tl, head, 0, 1.3)
           tl.to(head, { opacity: 1, duration: 1.3, ease: 'power1.in' }, 0)
           if (emph) {
-            scrambleWords(emph, 0.25, 1.1)
+            scrambleWords(tl, emph, 0.25, 1.1)
             tl.to(emph, { opacity: 0.3, duration: 1.1 }, 0.25)
           }
         })
 
+        // Ponowny zapłon kursywy po przejściu na ciemny motyw (tylko opacity, bez scramble),
+        // jeśli hero jest w widoku i sekwencja startowa się zakończyła
+        const reignite = ctx.add('reignite', () => {
+          if (!emph || !emphWrap || !el.hasAttribute('data-hero-done')) return
+          const r = h1.getBoundingClientRect()
+          if (r.bottom <= 0 || r.top >= window.innerHeight) return
+          gsap.timeline()
+            .fromTo(emph, { opacity: 0.25 }, { keyframes: [
+              { opacity: 0.9, duration: 0.08 }, { opacity: 0.35, duration: 0.1 },
+              { opacity: 1, duration: 0.1 }, { opacity: 0.6, duration: 0.06 }, { opacity: 1, duration: 0.25 },
+            ] }, 0)
+            .fromTo(emphWrap, { '--glow': 0 }, { keyframes: [
+              { '--glow': 0.6, duration: 0.1 }, { '--glow': 0.15, duration: 0.12 },
+              { '--glow': 0.85, duration: 0.12 }, { '--glow': 0.3, duration: 0.08 }, { '--glow': 1, duration: 0.35 },
+            ] }, 0)
+        })
+        const html = document.documentElement
+        let wasDark = html.classList.contains('dark')
+        const themeObserver = new MutationObserver(() => {
+          const isDark = html.classList.contains('dark')
+          if (isDark && !wasDark) reignite()
+          wasDark = isDark
+        })
+        themeObserver.observe(html, { attributes: true, attributeFilter: ['class'] })
+
+        if (languageSwitch) {
+          // Nowy tytuł od razu w pełnym świetle (bez stanu 0.15) — scramble zaczyna od losowych znaków
+          gsap.set([head, emph].filter(Boolean), { opacity: 1 })
+          if (emphWrap) gsap.set(emphWrap, { '--glow': 1 })
+          // Przed pierwszym malowaniem słowa wypełnione losowymi znakami — nowy tytuł nie mignie
+          // gotowy, zanim ruszy scramble (start jest po malowaniu). Revert kontekstu przywraca tekst.
+          el.querySelectorAll<HTMLElement>('[data-hero-word]').forEach((w) => {
+            const text = w.dataset.heroWord!
+            const pool = scrambleChars(text)
+            const noise = Array.from(text, () => pool[Math.floor(Math.random() * pool.length)]).join('')
+            // szerokość docelowego słowa zablokowana przed podmianą (scrambleWords zdejmie blokadę na końcu)
+            gsap.set(w, { display: 'inline-block', width: w.getBoundingClientRect().width, whiteSpace: 'nowrap' })
+            w.textContent = noise
+          })
+        }
+
         let started = false
         const once = () => { if (!started) { started = true; start() } }
-        document.fonts.ready.then(once)
+        // Start dopiero po pierwszym malowaniu (rAF + setTimeout) — pomiary słów i style nie wydłużają
+        // interakcji, która wyrenderowała hero (np. zmiana języka → INP)
+        const afterPaint = () => requestAnimationFrame(() => window.setTimeout(once, 0))
+        document.fonts.ready.then(afterPaint)
         const fallback = window.setTimeout(once, 1000)
-        return () => window.clearTimeout(fallback)
+        return () => {
+          window.clearTimeout(fallback)
+          themeObserver.disconnect()
+        }
       })
     },
     { scope: root },
