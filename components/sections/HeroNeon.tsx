@@ -126,13 +126,23 @@ export function HeroNeon({ id, heading, headingEmphasis, rotatingPrefix, rotatin
                   done()
                 },
               })
-              // Jeden przebieg: litery zapalają się raz, w losowej kolejności (od stanu „zgaszonego” 0.3,
-              // w którym kursywa kończy scramble — bez skoku); poświata rośnie razem z nimi, bez przygaśnięć.
-              const pass = 0.12 + 0.045 * Math.max(chars.length - 1, 0)
+              // Jeden przebieg błysku od lewej do prawej: każda litera (od „zgaszonego” 0.3, w którym kursywa
+              // kończy scramble) rozbłyska, krótko przygasa i zostaje w pełnym świetle — raz. Błysk obejmuje
+              // naraz 1–2 litery (mały obszar, jeden błysk na literę — SC 2.3.1).
+              const EACH = 0.09
+              const letter = 0.1 + 0.09 + 0.22 // rozbłysk + przygaśnięcie + pełne światło
+              const pass = letter + EACH * Math.max(chars.length - 1, 0)
               tl.set(emph, { opacity: 1 })
-                .fromTo(chars, { opacity: 0.3 }, { opacity: 1, duration: 0.12, ease: 'power1.out', stagger: { each: 0.045, from: 'random' } }, 0)
-                // poświata (tylko dark; w light pseudo-element ma display: none)
-                .fromTo(emphWrap, { '--glow': 0 }, { '--glow': 1, duration: pass, ease: 'power1.inOut' }, 0)
+                .fromTo(chars, { opacity: 0.3 }, {
+                  keyframes: [
+                    { opacity: 1, duration: 0.1, ease: 'power2.out' },
+                    { opacity: 0.4, duration: 0.09, ease: 'power1.in' },
+                    { opacity: 1, duration: 0.22, ease: 'power1.out' },
+                  ],
+                  stagger: { each: EACH, from: 'start' },
+                }, 0)
+                // poświata (tylko dark; w light pseudo-element ma display: none) narasta razem z przebiegiem
+                .fromTo(emphWrap, { '--glow': 0 }, { '--glow': 1, duration: pass, ease: 'power1.in' }, 0)
               return tl
             },
           })
