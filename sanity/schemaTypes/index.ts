@@ -1,5 +1,6 @@
 import { article } from './article'
 import { blockContent } from './blockContent'
+import { category } from './category'
 import { comment } from './comment'
 import { contactMessage } from './contactMessage'
 import { link, navItem } from './link'
@@ -11,6 +12,7 @@ import { uiStrings } from './uiStrings'
 
 export const schemaTypes = [
   article,
+  category,
   tag,
   page,
   siteSettings,
