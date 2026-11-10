@@ -9,8 +9,13 @@ import { cormorant, dmSans, dmMono } from '@/app/fonts'
 import { DraftTools } from '@/components/layout/DraftTools'
 import { HtmlClassGuard } from '@/components/layout/HtmlClassGuard'
 import { getSiteSettings } from '@/lib/queries'
-import { OG_LOCALE, SITE_NAME, SITE_URL, localeUrl } from '@/lib/site'
+import { IS_PRODUCTION, OG_LOCALE, SITE_NAME, SITE_URL, localeUrl } from '@/lib/site'
 import type { Metadata } from 'next'
+
+// Umami działa tylko z NEXT_PUBLIC_UMAMI_WEBSITE_ID; brak na produkcji = statystyki wyłączone (ostrzeżenie raz na proces)
+if (IS_PRODUCTION && !process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID) {
+  console.warn('Umami: brak NEXT_PUBLIC_UMAMI_WEBSITE_ID — statystyki wyłączone')
+}
 
 const MOTION_BOOTSTRAP =
   "(function(){var d=document.documentElement;d.classList.add('js');setTimeout(function(){if(window.__motionReady!==true){d.classList.remove('js');window.__motionFallback=true}},3000)})()"
