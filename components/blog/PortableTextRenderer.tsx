@@ -4,8 +4,7 @@
 // Uruchamianie skryptów z bloków „Kod HTML” obsługuje EmbedActivator, a postów z linku — SocialEmbed.
 
 import { PortableText, toPlainText, type PortableTextBlock, type PortableTextComponents } from '@portabletext/react'
-import { EmbedActivator } from './EmbedActivator'
-import { SocialEmbed } from './SocialEmbed'
+import { EmbedActivator, SocialEmbed } from './lazy'
 import { urlFor } from '@/sanity/lib/image'
 import { slugify } from '@/lib/slugify'
 import { EMBED_PROVIDER_NAMES, parseEmbedUrl } from '@/lib/embeds'

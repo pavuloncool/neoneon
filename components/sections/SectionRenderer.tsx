@@ -2,7 +2,7 @@
 // Renderuje sekcje strony z page buildera (dokument `page` w Sanity) w zadanej kolejności.
 
 import { Fragment } from 'react'
-import { ContactForm } from '@/components/blog/ContactForm'
+import { ContactForm } from '@/components/blog/lazy'
 import { PortableTextRenderer } from '@/components/blog/PortableTextRenderer'
 import { TranslationStore } from '@/components/layout/TranslationStore'
 import { getPageTranslation } from '@/lib/queries'
