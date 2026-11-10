@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-11-10
+
+### Porządki techniczne — etap 1: bez `legacy-peer-deps`
+
+- `eslint` `^8` → `^9` (9.39.5): jedyny konflikt peerów — `eslint-config-next@16` wymaga `eslint >=9`. `eslint.config.mjs` był już w formacie flat, bez zmian.
+- Usunięty `.npmrc` (zawierał tylko `legacy-peer-deps=true`). `npm install` przechodzi bez flagi i bez `overrides`.
+- Zostaje jedno ostrzeżenie: opcjonalny peer `typescript ^6 || ^7` w `@sanity/workflow-blueprint` (narzędzie CLI Sanity, nie trafia do strony) przy naszym `typescript` 5.9. Nie blokuje instalacji.
+- Jedna kopia `react`, `react-dom`, `@sanity/ui`, `styled-components`, `next-sanity`. Build, lista tras i JS stron publicznych bez zmian.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
