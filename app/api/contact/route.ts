@@ -8,6 +8,7 @@ import { Resend } from 'resend'
 import { writeClient } from '@/sanity/lib/client'
 import { clientIp, verifyTurnstile } from '@/lib/turnstile'
 import { escapeHtml } from '@/lib/utils'
+import { CONTACT_EMAIL, FORM_FROM_EMAIL } from '@/lib/site'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -41,8 +42,8 @@ export async function POST(request: Request) {
     }
 
     const { data, error } = await resend.emails.send({
-      from: 'formularz@neoneon.online',
-      to: 'ask@neoneon.online',
+      from: FORM_FROM_EMAIL,
+      to: CONTACT_EMAIL,
       subject: `Nowa wiadomość od ${name}`,
       html: `
         <p><strong>Imię:</strong> ${escapeHtml(String(name))}</p>

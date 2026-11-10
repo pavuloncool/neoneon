@@ -1,9 +1,19 @@
 // lib/site.ts
 // Adres produkcyjny i nazwa witryny — źródło dla canonical, hreflang, Open Graph, sitemapy i JSON-LD.
 
-// Stały adres, niezależny od środowiska — podglądy Vercel i localhost też wskazują produkcję jako canonical
-export const SITE_URL = 'https://neoneon.online'
+const DEFAULT_SITE_URL = 'https://neoneon.online'
+
+// Adres z NEXT_PUBLIC_SITE_URL (na Vercel: Production i Preview = https://neoneon.online, więc podglądy
+// też wskazują produkcję jako canonical). Brak zmiennej = adres domyślny + ostrzeżenie w logu serwera.
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL).replace(/\/+$/, '')
+if (!process.env.NEXT_PUBLIC_SITE_URL && typeof window === 'undefined') {
+  console.warn(`NEXT_PUBLIC_SITE_URL: brak zmiennej — używam ${DEFAULT_SITE_URL}`)
+}
 export const SITE_NAME = 'neoneon'
+
+// Adresy e-mail formularzy (Resend): nadawca musi być w domenie zweryfikowanej w Resend
+export const FORM_FROM_EMAIL = 'formularz@neoneon.online'
+export const CONTACT_EMAIL = 'ask@neoneon.online'
 
 export type Locale = 'pl' | 'en'
 
