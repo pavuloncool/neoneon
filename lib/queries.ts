@@ -8,10 +8,14 @@ import { groq } from 'next-sanity'
 import { client, draftsClient } from '@/sanity/lib/client'
 import { sanityFetch } from '@/sanity/lib/fetch'
 import { LINK_PROJECTION } from '@/lib/links'
-import type { Article, Category, Tag, Comment, Page, SiteSettings } from '@/types'
+import type { Article, Category, CategoryDoc, Tag, Comment, Page, SiteSettings } from '@/types'
 import { DEFAULT_LOCALE, type Locale } from '@/lib/locales'
 
 const TAG_PROJECTION = groq`{ "id": _id, name, "name_en": nameEn, "slug": slug.current }`
+
+// Okres przejściowy (etap 4): kategoria artykułu z dokumentu `category`, a gdy referencji brak —
+// z dotychczasowego pola tekstowego `category`
+const ARTICLE_CATEGORY = groq`coalesce(categoryRef->slug.current, category)`
 
 const ARTICLE_PROJECTION = groq`{
   "id": _id,
@@ -21,7 +25,8 @@ const ARTICLE_PROJECTION = groq`{
   "seo_title": seoTitle,
   "seo_description": seoDescription,
   content,
-  category,
+  "category": ${ARTICLE_CATEGORY},
+  "category_title": categoryRef->title,
   "cover_image_url": coverImage.asset->url,
   "cover_focal_x": coverImage.hotspot.x,
   "cover_focal_y": coverImage.hotspot.y,
@@ -37,7 +42,7 @@ const ARTICLE_PROJECTION = groq`{
 // ── Artykuły ────────────────────────────────────────────────
 
 export async function getArticles(options?: {
-  category?: Category
+  category?: string
   tag?: string
   limit?: number
   locale?: Locale
@@ -45,7 +50,7 @@ export async function getArticles(options?: {
   const filters = ['_type == "article"', 'locale == $locale']
   const params: Record<string, string> = { locale: options?.locale ?? DEFAULT_LOCALE }
   if (options?.category) {
-    filters.push('category == $category')
+    filters.push(`${ARTICLE_CATEGORY} == $category`)
     params.category = options.category
   }
   if (options?.tag) {
@@ -119,6 +124,29 @@ export async function getTagsByCategory(category: string): Promise<Tag[]> {
     { category }
   )
 }
+
+// ── Kategorie ────────────────────────────────────────────────
+
+const CATEGORY_PROJECTION = groq`{
+  "id": _id, title, "slug": slug.current, description,
+  "seo_title": seoTitle, "seo_description": seoDescription
+}`
+
+// cache(): metadane i strona w jednym żądaniu dzielą jedno zapytanie
+export const getCategory = cache(async (locale: Locale, slug: string): Promise<CategoryDoc | null> =>
+  sanityFetch<CategoryDoc | null>(
+    groq`*[_type == "category" && slug.current == $slug && locale == $locale][0]${CATEGORY_PROJECTION}`,
+    { locale, slug }
+  )
+)
+
+// Wersja kategorii w drugim języku — powiązanie przez dokument translation.metadata
+export const getCategoryTranslation = cache(async (categoryId: string, targetLocale: Locale): Promise<{ slug: string | null } | null> =>
+  sanityFetch<{ slug: string | null } | null>(
+    groq`*[_type == "category" && locale == $targetLocale && _id in *[_type == "translation.metadata" && references($categoryId)].translations[].value._ref][0]{ "slug": slug.current }`,
+    { categoryId: categoryId.replace(/^drafts\./, ''), targetLocale }
+  )
+)
 
 // ── Komentarze ───────────────────────────────────────────────
 
@@ -202,7 +230,7 @@ export interface SitemapData {
 export async function getSitemapData(): Promise<SitemapData> {
   return client.fetch<SitemapData>(groq`{
     "pages": *[_type == "page" && defined(locale)]{ _id, locale, isHome, "slug": slug.current, _updatedAt },
-    "articles": *[_type == "article" && defined(locale) && defined(slug.current)]{ _id, locale, category, "slug": slug.current, _updatedAt },
+    "articles": *[_type == "article" && defined(locale) && defined(slug.current)]{ _id, locale, "category": ${ARTICLE_CATEGORY}, "slug": slug.current, _updatedAt },
     "translations": *[_type == "translation.metadata"]{ "refs": translations[].value._ref }
   }`)
 }

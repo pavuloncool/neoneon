@@ -27,6 +27,15 @@
 - Korzystają z niego: routing next-intl, oba layouty, `i18n/request.ts`, strony, sekcje, `ArticleCard`, `LanguageSwitcher`, `lib/queries.ts`, `lib/metadata.ts`, sitemap, typy oraz Studio (`sanity.config.ts`: listy artykułów, stron i ustawień, Presentation, wtyczka tłumaczeń; schematy `page` i `link`). Zniknęły ręcznie wpisane `'pl' | 'en'`, mapowania `pl-PL`/`en-GB` i dwa `as any` — `npm run lint` czysty.
 - Zachowanie bez zmian (porównanie 38 adresów).
 
+### Porządki techniczne — etap 4a: kategorie jako dokumenty Sanity (kod obsługujący oba formaty)
+
+- **Model:** nowy typ `category` (nazwa, slug, opis, kolejność, Tytuł SEO / Opis SEO jak w artykule; tłumaczenia PL ↔ EN przez wtyczkę), listy „Kategorie PL / EN” w Studio, Presentation. W artykule pole `categoryRef` obok dotychczasowego `category` (stare zostaje do etapu 4c).
+- **Zapytania:** kategoria artykułu = `coalesce(categoryRef->slug.current, category)` (projekcja, filtr kategorii, sitemapa). Etykieta nad artykułem: nazwa z dokumentu, bez niego — dotychczasowa z kodu.
+- **Trasa:** `/{locale}/{slug}` rozwiązuje `[...segments]` w kolejności: dokument `category` → dotychczasowa lista z kodu (`lib/categories.ts`) → strona z page buildera → 404. Usunięte statyczne trasy `content-writing/`, `ux-strategies/`, `data-visualisation/` (wspólny komponent `CategoryPage`, markup 1:1).
+- **Kolizje slugów:** walidacja w Studio — strona i kategoria nie mogą mieć tego samego slugu w jednym języku (także szkice); kategoria nie może zająć `search`, `studio`, `api`, `home`.
+- **JS:** formularze (komentarz, kontakt), embedy z linku i `ArticleScroll` ładowane przez `next/dynamic` z SSR (`components/blog/lazy.tsx`) — strona kategorii we wspólnej trasie nie pobiera ich kodu. HTML bez zmian.
+- Porównanie 38 adresów + 12 przypadków brzegowych względem produkcji: zero różnic. Lighthouse mobile (mediana z 5) w progach względem `814c4f7`.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów

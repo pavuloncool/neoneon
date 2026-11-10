@@ -24,7 +24,7 @@ const TRANSLATION_ACTIONS = [useDeleteTranslationAction, useDuplicateWithTransla
 // to stałe dokumenty (po jednym na język), więc nie da się tworzyć nowych.
 const HIDDEN_TEMPLATES = [
   'comment', 'contactMessage', 'siteSettings', 'uiStrings',
-  'article', 'article-parameterized', 'page', 'page-parameterized',
+  'article', 'article-parameterized', 'page', 'page-parameterized', 'category', 'category-parameterized',
 ]
 
 // Dokumenty pojedyncze: siteSettings-pl/en, uiStrings-pl/en
@@ -46,7 +46,7 @@ export default defineConfig({
       // Komentarze i wiadomości zostają szkicami (niepubliczne) — bez „Publish”
       if (schemaType === 'comment') return prev.filter(({ action }) => action === 'delete')
       if (SINGLETON_TYPES.includes(schemaType)) return prev.filter(({ action }) => action !== 'duplicate' && action !== 'delete')
-      if (schemaType === 'article' || schemaType === 'page') return [...prev, ...TRANSLATION_ACTIONS]
+      if (schemaType === 'article' || schemaType === 'page' || schemaType === 'category') return [...prev, ...TRANSLATION_ACTIONS]
       return prev
     },
   },
@@ -63,6 +63,11 @@ export default defineConfig({
             ),
             S.divider(),
             S.documentTypeListItem('article').title('Wszystkie artykuły'),
+            ...LOCALES.map(({ id, title }) =>
+              S.listItem().title(`Kategorie ${title}`).child(
+                S.documentList().title(`Kategorie ${title}`).filter('_type == "category" && locale == $locale').params({ locale: id }).defaultOrdering([{ field: 'order', direction: 'asc' }, { field: 'title', direction: 'asc' }])
+              )
+            ),
             S.documentTypeListItem('tag').title('Tagi'),
             S.divider(),
             S.listItem().title('Komentarze do moderacji').child(
@@ -110,17 +115,18 @@ export default defineConfig({
             route: '/:locale/:category/:slug',
             filter: '_type == "article" && slug.current == $slug && locale == $locale',
           },
-          { route: '/:locale/:slug', filter: '_type == "page" && slug.current == $slug && locale == $locale' },
+          // Pierwszy poziom: kategoria albo strona (walidacja nie pozwala na ten sam slug w jednym języku)
+          { route: '/:locale/:slug', filter: '_type in ["category", "page"] && slug.current == $slug && locale == $locale' },
         ]),
         // Gdzie dany artykuł występuje na stronie (lista w edytorze artykułu)
         locations: {
           article: defineLocations({
-            select: { title: 'title', slug: 'slug.current', locale: 'locale', category: 'category' },
+            select: { title: 'title', slug: 'slug.current', locale: 'locale', category: 'category', categorySlug: 'categoryRef.slug.current' },
             resolve: (doc) => ({
               locations:
-                doc?.slug && doc.locale && doc.category
+                doc?.slug && doc.locale && (doc.categorySlug || doc.category)
                   ? [
-                      { title: doc.title || 'Artykuł', href: `/${doc.locale}/${doc.category}/${doc.slug}` },
+                      { title: doc.title || 'Artykuł', href: `/${doc.locale}/${doc.categorySlug || doc.category}/${doc.slug}` },
                       { title: `Strona główna (${LOCALE_LABELS[toLocale(doc.locale)].short})`, href: `/${doc.locale}` },
                     ]
                   : [],
@@ -134,6 +140,12 @@ export default defineConfig({
                 : [],
             }),
           }),
+          category: defineLocations({
+            select: { title: 'title', slug: 'slug.current', locale: 'locale' },
+            resolve: (doc) => ({
+              locations: doc?.locale && doc.slug ? [{ title: doc.title || 'Kategoria', href: `/${doc.locale}/${doc.slug}` }] : [],
+            }),
+          }),
           // Ustawienia i teksty interfejsu dotyczą całej strony
           siteSettings: defineLocations({ message: 'Widoczne na wszystkich stronach (nawigacja, stopka, SEO).', tone: 'positive' }),
           uiStrings: defineLocations({ message: 'Widoczne w formularzach, wyszukiwarce i na stronach kategorii.', tone: 'positive' }),
@@ -144,7 +156,7 @@ export default defineConfig({
     // połączoną z oryginałem dokumentem translation.metadata
     documentInternationalization({
       supportedLanguages: LOCALES_DEFAULT_FIRST.map((id) => ({ id, title: LOCALE_LABELS[id].name })),
-      schemaTypes: ['article', 'page'],
+      schemaTypes: ['article', 'page', 'category'],
       languageField: 'locale',
       apiVersion,
       metadataOmnisearchVisibility: false,

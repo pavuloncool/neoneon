@@ -5,6 +5,9 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { getArticleBySlug, getCommentsByArticle, getArticleTranslation, getPage } from '@/lib/queries'
 import { PageSections } from '@/components/sections/SectionRenderer'
+import { CategoryPage } from '@/components/blog/CategoryPage'
+import { resolveCategory } from '@/lib/categoryRoute'
+import { legacyCategory } from '@/lib/categories'
 import { pageMetadata, seoMetadata } from '@/lib/metadata'
 import { SITE_NAME, SITE_URL, localeUrl } from '@/lib/site'
 import { DATE_LOCALE, otherLocale, type Locale } from '@/lib/locales'
@@ -12,21 +15,22 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { FaqJsonLd } from '@/components/seo/FaqJsonLd'
 import { formatDate, readingTime } from '@/lib/utils'
 import { PortableTextRenderer } from '@/components/blog/PortableTextRenderer'
-import { ArticleScroll } from '@/components/blog/ArticleScroll'
 import { FaqSection } from '@/components/blog/FaqSection'
 import { TagBadge } from '@/components/blog/TagBadge'
-import { CommentForm } from '@/components/blog/CommentForm'
+import { ArticleScroll, CommentForm } from '@/components/blog/lazy'
 import { FadeUp } from '@/components/ui/Motion'
 import { TranslationStore } from '@/components/layout/TranslationStore'
 import type { Metadata } from 'next'
 import { stegaClean } from 'next-sanity'
-import type { Category } from '@/types'
 
 interface ArticlePageProps {
   params: Promise<{ locale: Locale; segments: string[] }>
+  searchParams: Promise<{ tag?: string }>
 }
 
-// /{locale}/{slug} = strona z page buildera („O mnie”, „Kontakt”, nowe strony);
+// /{locale}/{slug} = kategoria (dokument `category`, w okresie przejściowym też lista z kodu),
+//   a gdy to nie kategoria — strona z page buildera („O mnie”, „Kontakt”, nowe strony); inaczej 404.
+//   Walidacja w Studio nie pozwala, by kategoria i strona miały ten sam slug w jednym języku.
 // /{locale}/{kategoria}/{slug} = artykuł
 function getRouteParams(segments: string[]) {
   if (segments.length !== 2) notFound()
@@ -35,7 +39,20 @@ function getRouteParams(segments: string[]) {
 
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const { locale, segments } = await params
-  if (segments.length === 1) return pageMetadata(await getPage(locale, segments[0]), locale)
+  if (segments.length === 1) {
+    const category = await resolveCategory(locale, segments[0])
+    if (category) {
+      // Filtr ?tag= nie tworzy osobnych adresów — canonical wskazuje stronę kategorii
+      return seoMetadata({
+        locale,
+        path: `/${category.slug}`,
+        altPath: category.altSlug !== null ? `/${category.altSlug}` : null,
+        title: category.seoTitle,
+        description: category.seoDescription,
+      })
+    }
+    return pageMetadata(await getPage(locale, segments[0]), locale)
+  }
   const { slug } = getRouteParams(segments)
   const article = await getArticleBySlug(slug, locale)
   if (!article) return {}
@@ -54,19 +71,18 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   })
 }
 
-export default async function ArticlePage({ params }: ArticlePageProps) {
+export default async function ArticlePage({ params, searchParams }: ArticlePageProps) {
   const { locale, segments } = await params
 
   if (segments.length === 1) {
+    const category = await resolveCategory(locale, segments[0])
+    if (category) return <CategoryPage category={category} locale={locale} tag={(await searchParams).tag} />
     const page = await getPage(locale, segments[0])
     if (!page) notFound()
     return <PageSections page={page} locale={locale} />
   }
 
   const { category, slug } = getRouteParams(segments)
-
-  const validCategories: Category[] = ['content-writing', 'ux-strategies', 'data-visualisation']
-  if (!validCategories.includes(category as Category)) notFound()
 
   const article = await getArticleBySlug(slug, locale)
   if (!article) notFound()
@@ -79,9 +95,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const targetLocale = otherLocale(locale)
   const translation = await getArticleTranslation(article.id, targetLocale)
 
-  const categoryLabel =
-    article.category === 'content-writing' ? 'Content Writing' :
-    article.category === 'ux-strategies' ? 'UX Strategies' : 'Data Visualisation'
+  // Nazwa z dokumentu `category`; bez referencji — dotychczasowa nazwa z kodu
+  const categoryLabel = article.category_title ?? legacyCategory(article.category)?.title ?? article.category
 
   const dateLocale = DATE_LOCALE[locale]
 

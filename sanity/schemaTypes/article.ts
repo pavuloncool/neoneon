@@ -5,12 +5,11 @@
 
 import { defineField, defineType } from 'sanity'
 import { faqField } from './faqField'
+import { LEGACY_CATEGORIES } from '../../lib/categories'
+import { DEFAULT_LOCALE } from '../../lib/locales'
 
-export const CATEGORIES = [
-  { title: 'Content Writing', value: 'content-writing' },
-  { title: 'UX Strategies', value: 'ux-strategies' },
-  { title: 'Data Visualisation', value: 'data-visualisation' },
-]
+// Dotychczasowa lista kategorii (pole „Kategoria”, linki, kafelki) — do usunięcia w etapie 4c
+export const CATEGORIES = LEGACY_CATEGORIES.map(({ title, value }) => ({ title, value }))
 
 export const article = defineType({
   name: 'article',
@@ -44,6 +43,19 @@ export const article = defineType({
       options: { list: CATEGORIES, layout: 'radio' },
       validation: (r) => r.required(),
     }),
+    // Okres przejściowy: kategoria jako dokument obok dotychczasowego pola. Strona czyta najpierw to pole,
+    // a gdy jest puste — „Kategoria” powyżej. Po przeniesieniu danych zastąpi stare pole.
+    defineField({
+      name: 'categoryRef',
+      title: 'Kategoria (dokument)',
+      description: 'Kategoria z listy „Kategorie” w tym samym języku.',
+      type: 'reference',
+      to: [{ type: 'category' }],
+      options: {
+        disableNew: true,
+        filter: ({ document }) => ({ filter: 'locale == $locale', params: { locale: document?.locale ?? DEFAULT_LOCALE } }),
+      },
+    }),
     defineField({ name: 'excerpt', title: 'Zajawka', type: 'text', rows: 3 }),
     // Nieobowiązkowe: puste = w wynikach wyszukiwania i udostępnieniach idzie Tytuł / Zajawka
     defineField({
@@ -75,7 +87,7 @@ export const article = defineType({
   ],
   orderings: [{ title: 'Data publikacji', name: 'publishedAtDesc', by: [{ field: 'publishedAt', direction: 'desc' }] }],
   preview: {
-    select: { title: 'title', locale: 'locale', category: 'category', media: 'coverImage' },
-    prepare: ({ title, locale, category, media }) => ({ title, subtitle: `${locale?.toUpperCase() ?? '?'} · ${category ?? ''}`, media }),
+    select: { title: 'title', locale: 'locale', category: 'category', categorySlug: 'categoryRef.slug.current', media: 'coverImage' },
+    prepare: ({ title, locale, category, categorySlug, media }) => ({ title, subtitle: `${locale?.toUpperCase() ?? '?'} · ${categorySlug ?? category ?? ''}`, media }),
   },
 })

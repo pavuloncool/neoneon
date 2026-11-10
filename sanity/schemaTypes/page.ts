@@ -6,9 +6,11 @@ import { defineArrayMember, defineField, defineType, type SlugValidationContext 
 import { CATEGORIES } from './article'
 import { SECTION_TYPES } from './sections'
 import { DEFAULT_LOCALE } from '../../lib/locales'
+import { APP_RESERVED_SLUGS } from '../../lib/categories'
+import { slugTaken } from '../slugConflicts'
 
-// Adresy zajęte przez kategorie i trasy aplikacji
-export const RESERVED_SLUGS = [...CATEGORIES.map((c) => c.value), 'search', 'studio', 'api', 'home']
+// Adresy zajęte przez trasy aplikacji i (do etapu 4c) dotychczasowe kategorie z kodu
+export const RESERVED_SLUGS = [...CATEGORIES.map((c) => c.value), ...APP_RESERVED_SLUGS]
 
 // Slug unikalny w obrębie języka — /pl/about i /en/about mogą istnieć jednocześnie
 async function isUniqueInLocale(slug: string, context: SlugValidationContext) {
@@ -55,10 +57,12 @@ export const page = defineType({
       hidden: ({ document }) => Boolean(document?.isHome),
       options: { source: 'title', maxLength: 64, isUnique: isUniqueInLocale },
       validation: (r) =>
-        r.custom((value, ctx) => {
+        r.custom(async (value, ctx) => {
           if ((ctx.document as { isHome?: boolean })?.isHome) return true
           if (!value?.current) return 'Podaj adres strony'
           if (RESERVED_SLUGS.includes(value.current)) return `Adres „${value.current}” jest zajęty przez kategorię lub funkcję strony`
+          const locale = String(ctx.document?.locale ?? DEFAULT_LOCALE)
+          if (await slugTaken(ctx.getClient, 'category', value.current, locale, undefined)) return `Adres „${value.current}” ma już kategoria w tym języku`
           return true
         }),
     }),
