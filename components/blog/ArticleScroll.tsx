@@ -27,7 +27,7 @@ export function ArticleScroll() {
     let cleanup: (() => void) | null = null
 
     const setup = async () => {
-      const [{ gsap, motionEnabled }, { ScrollTrigger }, { SplitText }] = await Promise.all([
+      const [{ gsap, motionEnabled }, { ScrollTrigger }, { SplitText, SCRAMBLE_LOWER, SCRAMBLE_UPPER }] = await Promise.all([
         import('@/lib/gsap'),
         import('@/lib/gsap-scroll'),
         import('@/lib/gsap-text'),
@@ -44,25 +44,50 @@ export function ArticleScroll() {
       })
 
       if (motionEnabled() && !window.matchMedia(REDUCED_MOTION).matches) {
+        // Efekt tablicy odjazdów (split-flap): każda litera kilka razy „przeskakuje” przez losowe znaki
+        // (obrót w osi X jak klapka), litery ustalają się od lewej do prawej. Szerokość każdej litery
+        // zablokowana na czas animacji — linie nie przeskakują. Czytniki ekranu dostają pełny tekst z aria-label.
+        const LOWER = SCRAMBLE_LOWER, UPPER = SCRAMBLE_UPPER, DIGITS = '0123456789'
+        const pool = (c: string) =>
+          /\d/.test(c) ? DIGITS : c !== c.toLowerCase() ? UPPER : c !== c.toUpperCase() ? LOWER : null
         const reveal = (h: HTMLElement) =>
           ctx.add(() => {
+            h.setAttribute('aria-label', h.textContent ?? '')
             SplitText.create(h, {
-              type: 'lines',
-              mask: 'lines',
-              autoSplit: true, // podział linii po załadowaniu fontu i przy resize
+              type: 'words,chars',
+              autoSplit: true, // podział po załadowaniu fontu i przy resize
               onSplit(self) {
+                const chars = self.chars as HTMLElement[]
+                const widths = chars.map((c) => c.getBoundingClientRect().width)
+                chars.forEach((c, i) => {
+                  c.setAttribute('aria-hidden', 'true')
+                  gsap.set(c, { display: 'inline-block', width: widths[i], textAlign: 'center', transformPerspective: 400 })
+                })
                 gsap.set(h, { opacity: 1 })
-                return gsap.from(self.lines, {
-                  yPercent: 100,
-                  duration: 0.6,
-                  ease: 'power3.out',
-                  stagger: 0.06,
+                const tl = gsap.timeline({
                   onComplete: () => {
-                    // revert() cofa też tę animację — stan końcowy = oryginał, DOM wraca do czystego h2
                     self.revert()
+                    h.removeAttribute('aria-label')
                     gsap.set(h, { clearProps: 'opacity' })
                   },
                 })
+                chars.forEach((c, i) => {
+                  const final = c.textContent ?? ''
+                  const set = pool(final)
+                  if (!set) return
+                  const flips = 2 + Math.floor(Math.random() * 3)
+                  const at = i * 0.012
+                  for (let f = 0; f <= flips; f++) {
+                    const ch = f === flips ? final : set[Math.floor(Math.random() * set.length)]
+                    tl.fromTo(
+                      c,
+                      { rotationX: -80 },
+                      { rotationX: 0, duration: 0.06, ease: 'power1.out', onStart: () => { c.textContent = ch } },
+                      at + f * 0.06,
+                    )
+                  }
+                })
+                return tl
               },
             })
           })
