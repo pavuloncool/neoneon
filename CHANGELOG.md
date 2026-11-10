@@ -10,6 +10,16 @@
 - Jedna kopia `react`, `react-dom`, `@sanity/ui`, `styled-components`, `next-sanity`. Build, lista tras i JS stron publicznych bez zmian.
 - Lint: typ `Section` jako unia sekcji page buildera (zamiast `Record<string, any>`), komponenty sekcji dostają swoje typy; wtyczka typography importowana jako ESM; nazwany eksport w `eslint.config.mjs`. W `Nav.tsx` dwa `setMounted(true)` w efekcie zostają (zabezpieczenie hydracji, komponent po pomiarach TBT/INP) z wyłączeniem reguły `react-hooks/set-state-in-effect` i komentarzem. Dwa `any` przy sprawdzaniu języka — w etapie 3.
 
+### Porządki techniczne — etap 2: adres strony i integracje w zmiennych środowiskowych
+
+- **Adres strony:** `SITE_URL` w `lib/site.ts` czyta `NEXT_PUBLIC_SITE_URL` (brak = `https://neoneon.online` + ostrzeżenie w logu). Link do Studio w mailu o komentarzu używa `SITE_URL`. Adresy `formularz@` / `ask@neoneon.online` jako stałe `FORM_FROM_EMAIL` / `CONTACT_EMAIL` w `lib/site.ts`.
+- **Poza produkcją** (`VERCEL_ENV !== 'production'`: podglądy Vercel, lokalne buildy): `robots.txt` = `Disallow: /`, każda odpowiedź z nagłówkiem `X-Robots-Tag: noindex, nofollow`. Canonical na podglądach dalej wskazuje produkcję.
+- **Resend** (`lib/email.ts`): klient tworzony przy pierwszym użyciu. Wcześniej brak klucza wywracał całe trasy `/api/contact` i `/api/comments`; teraz wyłącza tylko maile, wpisy trafiają do Sanity.
+- **Turnstile:** brak kluczy na produkcji = formularz wyłączony z komunikatem „Formularz chwilowo niedostępny” (`messages: form.unavailable`, trasy zwracają 503); poza produkcją = weryfikacja pominięta z ostrzeżeniem w logu.
+- **Umami:** brak `NEXT_PUBLIC_UMAMI_WEBSITE_ID` na produkcji = ostrzeżenie w logu (skrypt jak dotąd się nie ładuje).
+- `.env.local.example`: dopisane `NEXT_PUBLIC_SITE_URL`, `RESEND_API_KEY`, `NEXT_PUBLIC_UMAMI_WEBSITE_ID`, `VERCEL_BYPASS` i opis zmiennych ustawianych przez Vercel.
+- Canonical, hreflang, `og:*`, JSON-LD, sitemap i robots.txt na produkcji — bez zmian (porównanie 38 adresów).
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
