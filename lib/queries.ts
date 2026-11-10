@@ -7,7 +7,7 @@ import { cache } from 'react'
 import { groq } from 'next-sanity'
 import { client, draftsClient } from '@/sanity/lib/client'
 import { sanityFetch } from '@/sanity/lib/fetch'
-import { LINK_PROJECTION } from '@/lib/links'
+import { CATEGORY_SLUG, LINK_PROJECTION } from '@/lib/links'
 import type { Article, Category, CategoryDoc, Tag, Comment, Page, SiteSettings } from '@/types'
 import { DEFAULT_LOCALE, type Locale } from '@/lib/locales'
 
@@ -198,7 +198,8 @@ const PAGE_PROJECTION = groq`{
   "seo": seo{ title, description, "image": image${IMAGE_PROJECTION} },
   "sections": sections[]{
     ...,
-    _type == "textImage" => { "image": image${IMAGE_PROJECTION}, "ctaLink": ctaLink${LINK_PROJECTION} }
+    _type == "textImage" => { "image": image${IMAGE_PROJECTION}, "ctaLink": ctaLink${LINK_PROJECTION} },
+    _type == "categoryTiles" => { "tiles": tiles[]{ _key, title, "category": ${CATEGORY_SLUG} } }
   }
 }`
 

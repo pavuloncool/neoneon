@@ -50,6 +50,12 @@
 - Strony z page buildera (`page`) bez zmian: `lastmod` = `_updatedAt`.
 - Na stronie: daty modyfikacji 15 artykułów wracają do dat publikacji (po 4b-1 pokazywały 2026-11-10).
 
+### Porządki techniczne — etap 4b-2 (kod): kategorie w linkach i kafelkach jako referencje
+
+- Link (menu, stopka, przycisk w sekcji „Tekst ze zdjęciem”) i kafelek w sekcji „Kafelki kategorii”: nowe pole „Kategoria (dokument)” (`categoryRef`, tylko kategorie w języku dokumentu) obok dotychczasowego, przemianowanego na „Kategoria (dotychczasowa)”. Walidacja: wymagane jedno z nich.
+- Zapytania: slug kategorii = `coalesce(categoryRef->slug.current, category)` (`CATEGORY_SLUG` w `lib/links.ts`) — w projekcji linku i kafelków.
+- Bez zmian na stronie, dopóki dane nie zostaną przeniesione (porównanie 38 + 12 adresów).
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
