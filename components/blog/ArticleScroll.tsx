@@ -1,67 +1,108 @@
 'use client'
 
 // components/blog/ArticleScroll.tsx
-// Stonowany ruch w artykule (ScrollTrigger):
-//  - złoty pasek postępu czytania (scrub, scaleX) — dekoracja, aria-hidden;
+// Stonowany ruch w artykule:
+//  - złoty pasek postępu czytania (ScrollTrigger scrub, scaleX) — dekoracja, aria-hidden;
 //  - nagłówki h2 w treści odsłaniane linia po linii z maski przy wejściu w widok (raz).
-// Bez scramble i migotania w treści. Reduced motion: pasek zostaje (to wskaźnik sterowany scrollem,
-// nie animacja), nagłówki od razu w stanie końcowym.
+// Bez scramble i migotania w treści.
+//
+// Wydajność (artykuł to długi DOM): GSAP, ScrollTrigger i SplitText ładowane dynamicznie w czasie
+// bezczynności — nie konkurują z okładką (LCP) i nie wydłużają taska hydracji (TBT). Nagłówki obserwuje
+// IntersectionObserver (bez wymuszania układu), SplitText dzieli dopiero nagłówek, który wchodzi w widok.
+// Ukrywane są tylko nagłówki poniżej ekranu i dopiero z JS — bez JS / przy błędzie wszystko jest widoczne.
+// Reduced motion: pasek zostaje (sterowany scrollem, nie animacja), nagłówki bez efektu.
 
-import { useRef } from 'react'
-import { gsap, useGSAP, motionEnabled, FULL_MOTION, REDUCED_MOTION } from '@/lib/gsap'
-import { ScrollTrigger } from '@/lib/gsap-scroll'
-import { SplitText } from '@/lib/gsap-text'
+import { useEffect, useRef } from 'react'
+
+const REDUCED_MOTION = '(prefers-reduced-motion: reduce)'
 
 export function ArticleScroll() {
   const bar = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
+  useEffect(() => {
     const body = document.querySelector<HTMLElement>('[data-article-body]')
-    if (!body || !bar.current) return
+    const el = bar.current
+    if (!body || !el) return
+    let cancelled = false
+    let cleanup: (() => void) | null = null
 
-    gsap.to(bar.current, {
-      scaleX: 1,
-      ease: 'none',
-      scrollTrigger: { trigger: body, start: 'top top+=57', end: 'bottom bottom', scrub: 0.3 },
-    })
+    const setup = async () => {
+      const [{ gsap, motionEnabled }, { ScrollTrigger }, { SplitText }] = await Promise.all([
+        import('@/lib/gsap'),
+        import('@/lib/gsap-scroll'),
+        import('@/lib/gsap-text'),
+      ])
+      if (cancelled) return
+      let io: IntersectionObserver | null = null
 
-    const headings = Array.from(body.querySelectorAll<HTMLElement>('h2[data-reveal]'))
-    const done = (h: HTMLElement) => h.setAttribute('data-reveal-done', '')
-    if (!motionEnabled()) {
-      headings.forEach(done)
-      return
-    }
-
-    const mm = gsap.matchMedia()
-    mm.add(REDUCED_MOTION, () => headings.forEach(done))
-    mm.add(FULL_MOTION, () => {
-      headings.forEach((h) => {
-        SplitText.create(h, {
-          type: 'lines',
-          mask: 'lines',
-          autoSplit: true, // podział linii po załadowaniu fontu i przy resize
-          onSplit(self) {
-            gsap.set(h, { opacity: 1 })
-            return gsap.from(self.lines, {
-              yPercent: 100,
-              duration: 0.7,
-              ease: 'power3.out',
-              stagger: 0.08,
-              scrollTrigger: { trigger: h, start: 'top 88%', once: true },
-              onComplete: () => {
-                // revert() cofa też tę animację — stan końcowy jest identyczny z oryginałem, więc DOM wraca
-                // do czystego h2 (kopiowanie, wyszukiwanie w stronie)
-                self.revert()
-                done(h)
-              },
-            })
-          },
+      const ctx = gsap.context(() => {
+        gsap.to(el, {
+          scaleX: 1,
+          ease: 'none',
+          scrollTrigger: { trigger: body, start: 'top top+=57', end: 'bottom bottom', scrub: 0.3 },
         })
       })
-      // Linie mogły zmienić wysokości po podziale — przelicz pozycje triggerów
-      ScrollTrigger.refresh()
-    })
-  })
+
+      if (motionEnabled() && !window.matchMedia(REDUCED_MOTION).matches) {
+        const reveal = (h: HTMLElement) =>
+          ctx.add(() => {
+            SplitText.create(h, {
+              type: 'lines',
+              mask: 'lines',
+              autoSplit: true, // podział linii po załadowaniu fontu i przy resize
+              onSplit(self) {
+                gsap.set(h, { opacity: 1 })
+                return gsap.from(self.lines, {
+                  yPercent: 100,
+                  duration: 0.7,
+                  ease: 'power3.out',
+                  stagger: 0.08,
+                  onComplete: () => {
+                    // revert() cofa też tę animację — stan końcowy = oryginał, DOM wraca do czystego h2
+                    self.revert()
+                    gsap.set(h, { clearProps: 'opacity' })
+                  },
+                })
+              },
+            })
+          })
+
+        // Tylko nagłówki w całości poniżej ekranu (nikt ich jeszcze nie widział — ukrycie nie miga)
+        const below = Array.from(body.querySelectorAll<HTMLElement>('h2[data-reveal]')).filter(
+          (h) => h.getBoundingClientRect().top > window.innerHeight,
+        )
+        gsap.set(below, { opacity: 0 })
+        io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (!e.isIntersecting) continue
+              io?.unobserve(e.target)
+              reveal(e.target as HTMLElement)
+            }
+          },
+          { rootMargin: '0px 0px -12% 0px' },
+        )
+        below.forEach((h) => io!.observe(h))
+      }
+
+      cleanup = () => {
+        io?.disconnect()
+        ctx.revert()
+        ScrollTrigger.refresh()
+      }
+    }
+
+    const idle = typeof window.requestIdleCallback === 'function'
+      ? window.requestIdleCallback(() => { setup() }, { timeout: 2000 })
+      : window.setTimeout(() => { setup() }, 800)
+
+    return () => {
+      cancelled = true
+      if (typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idle)
+      else window.clearTimeout(idle)
+      cleanup?.()
+    }
+  }, [])
 
   return (
     <div

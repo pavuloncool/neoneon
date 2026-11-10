@@ -291,13 +291,7 @@
   pointer-events: none;
 }
 
-/* Tylko h2 w treści artykułu (PortableTextRenderer działa też na stronach page buildera — tam bez efektu);
-   tylko ekran (wydruk pokazuje wszystko) */
-@media screen and (prefers-reduced-motion: no-preference) {
-  html.js [data-article-body] h2[data-reveal]:not([data-reveal-done]) {
-    opacity: 0;
-  }
-}
+/* Nagłówki h2 artykułu: bez stanu startowego w CSS — ArticleScroll ukrywa z JS tylko te poniżej ekranu */
 
 /* ── Motion: stany startowe animacji wejścia (components/ui/Motion.tsx) ── */
 /* Tylko z JS (html.js ustawiane inline przed hydracją) i bez prośby o ograniczenie ruchu.
