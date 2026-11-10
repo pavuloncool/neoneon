@@ -80,7 +80,10 @@ export function ArticleScroll() {
               reveal(e.target as HTMLElement)
             }
           },
-          { rootMargin: '0px 0px -12% 0px' },
+          // Górny margines ogromny: nagłówek „przecina się” z obszarem, gdy jest gdziekolwiek powyżej linii
+          // 88% wysokości ekranu — także gdy został przeskoczony (kotwica, skok na koniec strony).
+          // Bez tego zostałby z opacity 0 nad ekranem.
+          { rootMargin: '100000px 0px -12% 0px' },
         )
         below.forEach((h) => io!.observe(h))
       }

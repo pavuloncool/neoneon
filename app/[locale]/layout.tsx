@@ -7,6 +7,7 @@ import { routing } from '@/i18n/routing'
 import { ThemeProvider } from '@/components/layout/ThemeProvider'
 import { cormorant, dmSans, dmMono } from '@/app/fonts'
 import { DraftTools } from '@/components/layout/DraftTools'
+import { HtmlClassGuard } from '@/components/layout/HtmlClassGuard'
 import { getSiteSettings } from '@/lib/queries'
 import { OG_LOCALE, SITE_NAME, SITE_URL, localeUrl } from '@/lib/site'
 import type { Metadata } from 'next'
@@ -59,6 +60,8 @@ export default async function LocaleLayout({
         <script dangerouslySetInnerHTML={{ __html: MOTION_BOOTSTRAP }} />
       </head>
       <body className="bg-paper text-ink antialiased transition-colors duration-300">
+        {/* Przywraca klasy js / dark|light na <html> po zmianie języka (przed malowaniem) */}
+        <HtmlClassGuard />
         <ThemeProvider>
           <NextIntlClientProvider messages={messages}>
             {children}
