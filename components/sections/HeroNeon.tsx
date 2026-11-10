@@ -4,7 +4,7 @@
 // Hero strony głównej: „zapłon neonu”.
 //  1) ScrambleText osobno na zwykłej części tytułu i na kursywie (nigdy na całym h1 — nie nadpisuje <em>),
 //     zwykła część rozjaśnia się 0.15 → 1, kursywa zostaje „zgaszona”;
-//  2) po scramble SplitText dzieli kursywę na znaki → nieregularne migotanie i pełne światło
+//  2) po scramble SplitText dzieli kursywę na znaki → jeden przebieg zapłonu (litery w losowej kolejności)
 //     (w ciemnym motywie razem z poświatą — pseudo-element ::after, animowana tylko jego opacity przez --glow);
 //  3) potem linia z rotującym słowem (3 cykle, przycisk pauzy — SC 2.2.2).
 // Dostępność: h1 ma aria-label z pełnym tekstem, animowane span-y są aria-hidden.
@@ -126,29 +126,13 @@ export function HeroNeon({ id, heading, headingEmphasis, rotatingPrefix, rotatin
                   done()
                 },
               })
+              // Jeden przebieg: litery zapalają się raz, w losowej kolejności (od stanu „zgaszonego” 0.3,
+              // w którym kursywa kończy scramble — bez skoku); poświata rośnie razem z nimi, bez przygaśnięć.
+              const pass = 0.12 + 0.045 * Math.max(chars.length - 1, 0)
               tl.set(emph, { opacity: 1 })
-                // rurka zapala się znak po znaku, w losowej kolejności
-                .fromTo(chars, { opacity: 0.25 }, { opacity: 1, duration: 0.08, stagger: { each: 0.035, from: 'random' } })
-                // dwa krótkie przygaśnięcia w ~1 s — poniżej 3 błysków/s (SC 2.3.1)
-                .to(chars, { opacity: 0.4, duration: 0.06, stagger: { each: 0.015, from: 'random' } }, '+=0.15')
-                .to(chars, { opacity: 1, duration: 0.1, stagger: { each: 0.015, from: 'random' } })
-                .to(chars, { opacity: 0.55, duration: 0.05 }, '+=0.3')
-                .to(chars, { opacity: 1, duration: 0.2 })
-                // poświata (tylko dark; w light pseudo-element ma display: none) — ta sama nieregularność
-                .fromTo(
-                  emphWrap,
-                  { '--glow': 0 },
-                  {
-                    keyframes: [
-                      { '--glow': 0.6, duration: 0.1 },
-                      { '--glow': 0.15, duration: 0.12 },
-                      { '--glow': 0.85, duration: 0.12 },
-                      { '--glow': 0.3, duration: 0.08 },
-                      { '--glow': 1, duration: 0.35 },
-                    ],
-                  },
-                  0,
-                )
+                .fromTo(chars, { opacity: 0.3 }, { opacity: 1, duration: 0.12, ease: 'power1.out', stagger: { each: 0.045, from: 'random' } }, 0)
+                // poświata (tylko dark; w light pseudo-element ma display: none)
+                .fromTo(emphWrap, { '--glow': 0 }, { '--glow': 1, duration: pass, ease: 'power1.inOut' }, 0)
               return tl
             },
           })
@@ -195,15 +179,10 @@ export function HeroNeon({ id, heading, headingEmphasis, rotatingPrefix, rotatin
           if (!emph || !emphWrap || !el.hasAttribute('data-hero-done')) return
           const r = h1.getBoundingClientRect()
           if (r.bottom <= 0 || r.top >= window.innerHeight) return
+          // Jeden przebieg, bez przygaśnięć: kursywa i poświata zapalają się płynnie
           gsap.timeline()
-            .fromTo(emph, { opacity: 0.25 }, { keyframes: [
-              { opacity: 0.9, duration: 0.08 }, { opacity: 0.35, duration: 0.1 },
-              { opacity: 1, duration: 0.1 }, { opacity: 0.6, duration: 0.06 }, { opacity: 1, duration: 0.25 },
-            ] }, 0)
-            .fromTo(emphWrap, { '--glow': 0 }, { keyframes: [
-              { '--glow': 0.6, duration: 0.1 }, { '--glow': 0.15, duration: 0.12 },
-              { '--glow': 0.85, duration: 0.12 }, { '--glow': 0.3, duration: 0.08 }, { '--glow': 1, duration: 0.35 },
-            ] }, 0)
+            .fromTo(emph, { opacity: 0.3 }, { opacity: 1, duration: 0.6, ease: 'power1.out' }, 0)
+            .fromTo(emphWrap, { '--glow': 0 }, { '--glow': 1, duration: 0.6, ease: 'power1.inOut' }, 0)
         })
         const html = document.documentElement
         let wasDark = html.classList.contains('dark')

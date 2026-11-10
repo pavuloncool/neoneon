@@ -330,6 +330,10 @@
   display: inline-block;
   isolation: isolate;
   color: #9a7a3e;
+  /* SplitText dzieli kursywę na osobne elementy liter, co wyłącza kerning i ligatury; po revert() wracały
+     i litery „zbiegały się” na końcu animacji. Wyłączone na stałe — odstępy identyczne przed, w trakcie i po. */
+  font-kerning: none;
+  font-variant-ligatures: none;
 }
 
 .dark .hero-emph {
