@@ -4,13 +4,11 @@
 
 import { randomUUID } from 'node:crypto'
 import { NextResponse } from 'next/server'
-import { Resend } from 'resend'
 import { writeClient } from '@/sanity/lib/client'
 import { clientIp, verifyTurnstile } from '@/lib/turnstile'
 import { escapeHtml } from '@/lib/utils'
 import { CONTACT_EMAIL, FORM_FROM_EMAIL } from '@/lib/site'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+import { getResend } from '@/lib/email'
 
 export async function POST(request: Request) {
   try {
@@ -28,6 +26,7 @@ export async function POST(request: Request) {
     }
 
     // Kopia w Sanity — błąd zapisu nie blokuje wysyłki maila (jak wcześniej w Supabase)
+    let saved = false
     try {
       await writeClient.create({
         _id: `drafts.${randomUUID()}`,
@@ -37,8 +36,15 @@ export async function POST(request: Request) {
         message: String(message),
         submittedAt: new Date().toISOString(),
       })
+      saved = true
     } catch (e) {
       console.error('Contact save error:', e)
+    }
+
+    // Bez klucza Resend (ostrzeżenie w logu) wiadomość zostaje tylko w Sanity
+    const resend = getResend()
+    if (!resend) {
+      return saved ? NextResponse.json({ success: true }) : NextResponse.json({ error: 'Failed to save message.' }, { status: 500 })
     }
 
     const { data, error } = await resend.emails.send({
