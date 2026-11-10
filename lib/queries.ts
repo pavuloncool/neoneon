@@ -17,6 +17,10 @@ const TAG_PROJECTION = groq`{ "id": _id, name, "name_en": nameEn, "slug": slug.c
 // z dotychczasowego pola tekstowego `category`
 const ARTICLE_CATEGORY = groq`coalesce(categoryRef->slug.current, category)`
 
+// Data modyfikacji artykułu (og, JSON-LD, sitemapa): ręcznie ustawiana „Data aktualizacji treści”,
+// a bez niej data publikacji. Nie _updatedAt — ten zmienia każda edycja i migracja, także techniczna.
+const ARTICLE_MODIFIED = groq`coalesce(contentUpdatedAt, publishedAt)`
+
 const ARTICLE_PROJECTION = groq`{
   "id": _id,
   "slug": slug.current,
@@ -33,7 +37,7 @@ const ARTICLE_PROJECTION = groq`{
   "status": select(_id in path("drafts.**") => "draft", "published"),
   "published_at": publishedAt,
   "created_at": _createdAt,
-  "updated_at": _updatedAt,
+  "updated_at": ${ARTICLE_MODIFIED},
   "tags": tags[]->${TAG_PROJECTION},
   "faq": faq[]{ question, answer },
   locale
@@ -222,15 +226,16 @@ export async function getPageTranslation(
 
 // Sitemapa — tylko opublikowane treści (bez podglądu szkiców), z powiązaniami tłumaczeń
 export interface SitemapData {
-  pages: { _id: string; locale: Locale; isHome: boolean | null; slug: string | null; _updatedAt: string }[]
-  articles: { _id: string; locale: Locale; category: Category; slug: string; _updatedAt: string }[]
+  // modifiedAt: strony = _updatedAt, artykuły = ARTICLE_MODIFIED (null = brak daty)
+  pages: { _id: string; locale: Locale; isHome: boolean | null; slug: string | null; modifiedAt: string }[]
+  articles: { _id: string; locale: Locale; category: Category; slug: string; modifiedAt: string | null }[]
   translations: { refs: string[] | null }[]
 }
 
 export async function getSitemapData(): Promise<SitemapData> {
   return client.fetch<SitemapData>(groq`{
-    "pages": *[_type == "page" && defined(locale)]{ _id, locale, isHome, "slug": slug.current, _updatedAt },
-    "articles": *[_type == "article" && defined(locale) && defined(slug.current)]{ _id, locale, "category": ${ARTICLE_CATEGORY}, "slug": slug.current, _updatedAt },
+    "pages": *[_type == "page" && defined(locale)]{ _id, locale, isHome, "slug": slug.current, "modifiedAt": _updatedAt },
+    "articles": *[_type == "article" && defined(locale) && defined(slug.current)]{ _id, locale, "category": ${ARTICLE_CATEGORY}, "slug": slug.current, "modifiedAt": ${ARTICLE_MODIFIED} },
     "translations": *[_type == "translation.metadata"]{ "refs": translations[].value._ref }
   }`)
 }

@@ -42,6 +42,14 @@
 - Migracja `migrations/kategorie-4b-1` (jedna transakcja): 4 dokumenty `category` (Tworzenie treści / Content Writing, Strategie UX / UX Strategies), 2 powiązania tłumaczeń PL ↔ EN, `categoryRef` w 15 artykułach. Pole `category` bez zmian. Wycofanie: `migrations/kategorie-4b-1-wycofanie`.
 - Na stronie: etykieta nad 8 artykułami PL ma polską nazwę („Tworzenie treści”, „Strategie UX”) zamiast angielskiej. Skutek uboczny: `_updatedAt` 15 artykułów = czas migracji, więc `article:modified_time`, `dateModified` w JSON-LD i `lastmod` w sitemapie pokazują 2026-11-10.
 
+### Porządki techniczne — data modyfikacji artykułów niezależna od `_updatedAt`
+
+- Nowe nieobowiązkowe pole artykułu „Data aktualizacji treści” (`contentUpdatedAt`), ustawiane ręcznie tylko po istotnej zmianie treści.
+- Data modyfikacji artykułu (`article:modified_time`, `dateModified` w JSON-LD, `lastmod` w sitemapie) = `coalesce(contentUpdatedAt, publishedAt)`. `_updatedAt` zmienia każda edycja i migracja, także techniczna — dla artykułów nie jest już używany.
+- Strony kategorii w sitemapie dostają `lastmod` (wcześniej bez niego): najnowsza data modyfikacji artykułu tej kategorii w danym języku.
+- Strony z page buildera (`page`) bez zmian: `lastmod` = `_updatedAt`.
+- Na stronie: daty modyfikacji 15 artykułów wracają do dat publikacji (po 4b-1 pokazywały 2026-11-10).
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów

@@ -82,6 +82,12 @@ export const article = defineType({
     }),
     defineField({ name: 'tags', title: 'Tagi', type: 'array', of: [{ type: 'reference', to: [{ type: 'tag' }] }] }),
     defineField({ name: 'publishedAt', title: 'Data publikacji', type: 'datetime', initialValue: () => new Date().toISOString() }),
+    defineField({
+      name: 'contentUpdatedAt',
+      title: 'Data aktualizacji treści',
+      description: 'Ustaw tylko po istotnej zmianie treści. Puste = data publikacji.',
+      type: 'datetime',
+    }),
     defineField({ name: 'content', title: 'Treść', type: 'blockContent' }),
     faqField,
   ],
