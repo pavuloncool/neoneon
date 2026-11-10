@@ -1,4 +1,6 @@
 import type { PortableTextBlock } from '@portabletext/react'
+import type { SanityLink } from '@/lib/links'
+import type { Locale } from '@/lib/locales'
 
 export interface Tag {
   id: string
@@ -34,7 +36,7 @@ export interface Article {
   updated_at: string
   tags?: Tag[]
   faq?: FaqItem[] | null
-  locale: 'pl' | 'en'
+  locale: Locale
 }
 
 export interface FaqItem {
@@ -83,7 +85,58 @@ export interface SiteSettings {
   } | null
 }
 
-export type Section = { _type: string; _key: string } & Record<string, any>
+// Sekcje page buildera (sanity/schemaTypes/sections) w kształcie z PAGE_PROJECTION w lib/queries.ts
+export type Section =
+  | HeroSection
+  | CategoryTilesSection
+  | RecentArticlesSection
+  | TextImageSection
+  | FeatureGridSection
+  | ContactFormSection
+  | RichTextSection
+
+export interface CategoryTilesSection {
+  _type: 'categoryTiles'
+  _key: string
+  ariaLabel?: string | null
+  eyebrow?: string | null
+  tiles?: { _key: string; category: string; title: string }[] | null
+}
+
+export interface RecentArticlesSection {
+  _type: 'recentArticles'
+  _key: string
+  heading?: string | null
+  limit?: number | null
+}
+
+export interface TextImageSection {
+  _type: 'textImage'
+  _key: string
+  image?: SanityImage | null
+  body?: PortableTextBlock[] | null
+  ctaLabel?: string | null
+  ctaLink?: SanityLink | null
+}
+
+export interface FeatureGridSection {
+  _type: 'featureGrid'
+  _key: string
+  label?: string | null
+  items?: { _key: string; title: string; description?: string | null }[] | null
+}
+
+export interface ContactFormSection {
+  _type: 'contactForm'
+  _key: string
+  intro?: PortableTextBlock[] | null
+}
+
+export interface RichTextSection {
+  _type: 'richText'
+  _key: string
+  body?: PortableTextBlock[] | null
+}
 
 // Sekcja „Nagłówek strony” (sanity/schemaTypes/sections — hero)
 export interface HeroSection {

@@ -90,5 +90,8 @@
     "tryDifferent": "Spróbuj innego zapytania lub przeglądaj po tagach.",
     "enterTerm": "Wpisz zapytanie lub wybierz tag powyżej.",
     "taggedWith": "z tagiem \"{tag}\""
+  },
+  "form": {
+    "unavailable": "Formularz chwilowo niedostępny. Spróbuj ponownie później."
   }
 }

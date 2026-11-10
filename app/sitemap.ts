@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { getSitemapData } from '@/lib/queries'
-import { localeUrl, type Locale } from '@/lib/site'
+import { localeUrl } from '@/lib/site'
+import type { Locale } from '@/lib/locales'
 
 // Odświeżana co godzinę — nowe artykuły trafiają do sitemapy bez ponownego wdrożenia
 export const revalidate = 3600

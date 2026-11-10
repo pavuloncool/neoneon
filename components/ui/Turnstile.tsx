@@ -8,7 +8,8 @@
 
 import Script from 'next/script'
 import { useEffect, useImperativeHandle, useRef, useState } from 'react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
+import { IS_PRODUCTION } from '@/lib/site'
 
 interface TurnstileApi {
   render: (container: HTMLElement, options: Record<string, unknown>) => string
@@ -32,6 +33,8 @@ interface TurnstileProps {
 }
 
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
+// Brak klucza poza produkcją: formularz dostaje umowny token, a serwer bez sekretu pomija weryfikację
+const SKIP_TOKEN = 'turnstile-skipped'
 
 export function Turnstile({ onToken, ref }: TurnstileProps) {
   const locale = useLocale()
@@ -40,17 +43,25 @@ export function Turnstile({ onToken, ref }: TurnstileProps) {
   const onTokenRef = useRef(onToken)
   const [ready, setReady] = useState(false)
   const [interactive, setInteractive] = useState(false)
+  const t = useTranslations('form')
 
   useEffect(() => {
     onTokenRef.current = onToken
   }, [onToken])
 
   useEffect(() => {
-    if (!ready || !container.current || !window.turnstile) return
-    if (!SITE_KEY) {
-      console.error('Turnstile: brak NEXT_PUBLIC_TURNSTILE_SITE_KEY')
+    if (SITE_KEY) return
+    if (IS_PRODUCTION) {
+      console.error('Turnstile: brak NEXT_PUBLIC_TURNSTILE_SITE_KEY — formularz wyłączony')
       return
     }
+    console.warn('Turnstile: brak NEXT_PUBLIC_TURNSTILE_SITE_KEY — weryfikacja pominięta (poza produkcją)')
+    onTokenRef.current(SKIP_TOKEN)
+  }, [])
+
+  useEffect(() => {
+    if (!ready || !container.current || !window.turnstile) return
+    if (!SITE_KEY) return
     const api = window.turnstile
     const id = api.render(container.current, {
       sitekey: SITE_KEY,
@@ -72,10 +83,15 @@ export function Turnstile({ onToken, ref }: TurnstileProps) {
 
   useImperativeHandle(ref, () => ({
     reset: () => {
-      onTokenRef.current(null)
+      onTokenRef.current(SITE_KEY || IS_PRODUCTION ? null : SKIP_TOKEN)
       if (widgetId.current) window.turnstile?.reset(widgetId.current)
     },
   }), [])
+
+  if (!SITE_KEY) {
+    // Na produkcji przycisk zostaje nieaktywny (brak tokena) i formularz mówi dlaczego
+    return IS_PRODUCTION ? <p className="text-xs text-red-500 mb-4">{t('unavailable')}</p> : null
+  }
 
   return (
     <>

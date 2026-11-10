@@ -35,6 +35,9 @@ const glass: React.CSSProperties = {
 function ThemeToggle({ className, label }: { className?: string; label: string }) {
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  // Zabezpieczenie hydracji: motyw znamy dopiero w przeglądarce, więc pierwszy render (serwer i hydracja)
+  // musi być identyczny. Refaktor wzorca montowania — osobne zadanie (wymaga ponownych pomiarów TBT/INP).
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), [])
   const isDark = mounted && resolvedTheme === 'dark'
 
@@ -85,6 +88,9 @@ function ThemeToggle({ className, label }: { className?: string; label: string }
 function Logo({ logo }: { logo: NavProps['logo'] }) {
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  // Zabezpieczenie hydracji: motyw znamy dopiero w przeglądarce, więc pierwszy render (serwer i hydracja)
+  // musi być identyczny. Refaktor wzorca montowania — osobne zadanie (wymaga ponownych pomiarów TBT/INP).
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), [])
   if (!mounted) return <div className="h-8 w-28" />
   return (

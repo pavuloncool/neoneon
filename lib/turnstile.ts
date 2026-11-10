@@ -3,6 +3,7 @@
 // Token jest jednorazowy i ważny 5 minut — formularz resetuje widget po każdej wysyłce.
 
 import { randomUUID } from 'node:crypto'
+import { IS_PRODUCTION } from '@/lib/site'
 
 const SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
 const TIMEOUT_MS = 10_000
@@ -12,11 +13,20 @@ export function clientIp(request: Request): string | undefined {
   return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || undefined
 }
 
+// Brak TURNSTILE_SECRET_KEY: na produkcji formularze są wyłączone (trasa zwraca 503),
+// poza produkcją (VERCEL_ENV !== 'production') weryfikacja jest pomijana z ostrzeżeniem.
+export function turnstileUnavailable(): boolean {
+  if (process.env.TURNSTILE_SECRET_KEY || !IS_PRODUCTION) return false
+  console.error('Turnstile: brak TURNSTILE_SECRET_KEY — formularze wyłączone')
+  return true
+}
+
 export async function verifyTurnstile(token: unknown, remoteip?: string): Promise<boolean> {
   const secret = process.env.TURNSTILE_SECRET_KEY
   if (!secret) {
-    console.error('Turnstile: brak TURNSTILE_SECRET_KEY')
-    return false
+    if (IS_PRODUCTION) return false
+    console.warn('Turnstile: brak TURNSTILE_SECRET_KEY — weryfikacja pominięta (poza produkcją)')
+    return true
   }
   if (typeof token !== 'string' || token.length === 0 || token.length > 2048) return false
 

@@ -1,5 +1,32 @@
 # Changelog
 
+## 2026-11-10
+
+### Porządki techniczne — etap 1: bez `legacy-peer-deps`
+
+- `eslint` `^8` → `^9` (9.39.5): jedyny konflikt peerów — `eslint-config-next@16` wymaga `eslint >=9`. `eslint.config.mjs` był już w formacie flat, bez zmian.
+- Usunięty `.npmrc` (zawierał tylko `legacy-peer-deps=true`). `npm install` przechodzi bez flagi i bez `overrides`.
+- Zostaje jedno ostrzeżenie: opcjonalny peer `typescript ^6 || ^7` w `@sanity/workflow-blueprint` (narzędzie CLI Sanity, nie trafia do strony) przy naszym `typescript` 5.9. Nie blokuje instalacji.
+- Jedna kopia `react`, `react-dom`, `@sanity/ui`, `styled-components`, `next-sanity`. Build, lista tras i JS stron publicznych bez zmian.
+- Lint: typ `Section` jako unia sekcji page buildera (zamiast `Record<string, any>`), komponenty sekcji dostają swoje typy; wtyczka typography importowana jako ESM; nazwany eksport w `eslint.config.mjs`. W `Nav.tsx` dwa `setMounted(true)` w efekcie zostają (zabezpieczenie hydracji, komponent po pomiarach TBT/INP) z wyłączeniem reguły `react-hooks/set-state-in-effect` i komentarzem. Dwa `any` przy sprawdzaniu języka — w etapie 3.
+
+### Porządki techniczne — etap 2: adres strony i integracje w zmiennych środowiskowych
+
+- **Adres strony:** `SITE_URL` w `lib/site.ts` czyta `NEXT_PUBLIC_SITE_URL` (brak = `https://neoneon.online` + ostrzeżenie w logu). Link do Studio w mailu o komentarzu używa `SITE_URL`. Adresy `formularz@` / `ask@neoneon.online` jako stałe `FORM_FROM_EMAIL` / `CONTACT_EMAIL` w `lib/site.ts`.
+- **Poza produkcją** (`VERCEL_ENV !== 'production'`: podglądy Vercel, lokalne buildy): `robots.txt` = `Disallow: /`, każda odpowiedź z nagłówkiem `X-Robots-Tag: noindex, nofollow`. Canonical na podglądach dalej wskazuje produkcję.
+- **Resend** (`lib/email.ts`): klient tworzony przy pierwszym użyciu. Wcześniej brak klucza wywracał całe trasy `/api/contact` i `/api/comments`; teraz wyłącza tylko maile, wpisy trafiają do Sanity.
+- **Turnstile:** brak kluczy na produkcji = formularz wyłączony z komunikatem „Formularz chwilowo niedostępny” (`messages: form.unavailable`, trasy zwracają 503); poza produkcją = weryfikacja pominięta z ostrzeżeniem w logu.
+- **Umami:** brak `NEXT_PUBLIC_UMAMI_WEBSITE_ID` na produkcji = ostrzeżenie w logu (skrypt jak dotąd się nie ładuje).
+- **Zabezpieczenie przy buildzie** (`next.config.ts`): na produkcji `NEXT_PUBLIC_SITE_URL` bez `https://` albo w domenie `*.vercel.app` przerywa build czytelnym błędem. Powód: w Vercel zmienna miała wartość `https://neoneon.vercel.app` (poprawiona na `https://neoneon.online` we wszystkich środowiskach przed wdrożeniem).
+- `.env.local.example`: dopisane `NEXT_PUBLIC_SITE_URL`, `RESEND_API_KEY`, `NEXT_PUBLIC_UMAMI_WEBSITE_ID`, `VERCEL_BYPASS` i opis zmiennych ustawianych przez Vercel; usunięty nieużywany `SANITY_MIGRATION_TOKEN`.
+- Canonical, hreflang, `og:*`, JSON-LD, sitemap i robots.txt na produkcji — bez zmian (porównanie 38 adresów).
+
+### Porządki techniczne — etap 3: jedna lista języków
+
+- `lib/locales.ts`: `LOCALES` (kolejność routingu `['en', 'pl']`), `DEFAULT_LOCALE`, typ `Locale`, `OG_LOCALE`, `DATE_LOCALE`, nazwy dla Studio, `isLocale`, `toLocale`, `otherLocale`.
+- Korzystają z niego: routing next-intl, oba layouty, `i18n/request.ts`, strony, sekcje, `ArticleCard`, `LanguageSwitcher`, `lib/queries.ts`, `lib/metadata.ts`, sitemap, typy oraz Studio (`sanity.config.ts`: listy artykułów, stron i ustawień, Presentation, wtyczka tłumaczeń; schematy `page` i `link`). Zniknęły ręcznie wpisane `'pl' | 'en'`, mapowania `pl-PL`/`en-GB` i dwa `as any` — `npm run lint` czysty.
+- Zachowanie bez zmian (porównanie 38 adresów).
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów

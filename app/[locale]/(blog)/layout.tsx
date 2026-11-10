@@ -3,6 +3,7 @@ import { Footer } from '@/components/layout/Footer'
 import { getSiteSettings } from '@/lib/queries'
 import { resolveHref } from '@/lib/links'
 import type { NavItem } from '@/types'
+import { toLocale } from '@/lib/locales'
 
 // Pozycje menu z Sanity → { href, label }; pomija linki bez celu (np. usunięta strona)
 function toLinks(items?: NavItem[] | null) {
@@ -20,7 +21,7 @@ export default async function BlogLayout({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params
-  const settings = await getSiteSettings(locale === 'en' ? 'en' : 'pl')
+  const settings = await getSiteSettings(toLocale(locale))
   const a11y = settings?.a11y ?? {}
 
   return (

@@ -11,7 +11,8 @@ import { Turnstile, type TurnstileHandle } from '@/components/ui/Turnstile'
 
 export function ContactForm({ children }: { children?: React.ReactNode }) {
   const t = useTranslations('contact')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'captcha'>('idle')
+  const tForm = useTranslations('form')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'captcha' | 'unavailable'>('idle')
   const [form, setForm] = useState({ name: '', email: '', message: '' })
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const turnstile = useRef<TurnstileHandle>(null)
@@ -25,6 +26,10 @@ export function ContactForm({ children }: { children?: React.ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, turnstileToken }),
       })
+      if (res.status === 503) {
+        setStatus('unavailable')
+        return
+      }
       if (res.status === 403) {
         setStatus('captcha')
         // Odrzucony token → nowy do ponownej próby
@@ -78,6 +83,9 @@ export function ContactForm({ children }: { children?: React.ReactNode }) {
           </div>
           {status === 'error' && (
             <p className="text-xs text-red-500">{t('error')}</p>
+          )}
+          {status === 'unavailable' && (
+            <p className="text-xs text-red-500">{tForm('unavailable')}</p>
           )}
           {status === 'captcha' && (
             <p className="text-xs text-red-500">{t('captchaError')}</p>

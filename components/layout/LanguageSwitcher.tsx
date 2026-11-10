@@ -4,6 +4,7 @@ import { useLocale } from 'next-intl'
 import { usePathname, useRouter } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 import { setHeroLanguageFlag } from '@/lib/hero-language-flag'
+import type { Locale } from '@/lib/locales'
 
 export function LanguageSwitcher({
   dark = false,
@@ -14,7 +15,7 @@ export function LanguageSwitcher({
   const pathname = usePathname()
   const router = useRouter()
 
-  function switchTo(targetLocale: 'pl' | 'en') {
+  function switchTo(targetLocale: Locale) {
     if (targetLocale === locale) return
 
     // Odpowiednik strony w drugim języku (artykuł albo strona z page buildera) — patrz TranslationStore

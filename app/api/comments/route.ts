@@ -5,17 +5,19 @@
 
 import { randomUUID } from 'node:crypto'
 import { NextResponse } from 'next/server'
-import { Resend } from 'resend'
 import { client, writeClient } from '@/sanity/lib/client'
-import { clientIp, verifyTurnstile } from '@/lib/turnstile'
+import { clientIp, turnstileUnavailable, verifyTurnstile } from '@/lib/turnstile'
 import { escapeHtml } from '@/lib/utils'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+import { CONTACT_EMAIL, FORM_FROM_EMAIL, SITE_URL } from '@/lib/site'
+import { getResend } from '@/lib/email'
 
 export async function POST(request: Request) {
   try {
     const { article_id, author_name, author_email, body, turnstileToken } = await request.json()
 
+    if (turnstileUnavailable()) {
+      return NextResponse.json({ error: 'unavailable' }, { status: 503 })
+    }
     if (!(await verifyTurnstile(turnstileToken, clientIp(request)))) {
       return NextResponse.json({ error: 'captcha' }, { status: 403 })
     }
@@ -65,11 +67,12 @@ export async function POST(request: Request) {
     }
 
     // Powiadomienie — komentarz jest już zapisany, więc błąd maila tylko logujemy
-    const studioUrl = `https://neoneon.online/studio/intent/edit/id=${commentId};type=comment`
-    try {
+    const studioUrl = `${SITE_URL}/studio/intent/edit/id=${commentId};type=comment`
+    const resend = getResend()
+    if (resend) try {
       const { error } = await resend.emails.send({
-        from: 'formularz@neoneon.online',
-        to: 'ask@neoneon.online',
+        from: FORM_FROM_EMAIL,
+        to: CONTACT_EMAIL,
         subject: `Nowy komentarz: ${articleTitle}`,
         html: `
           <p><strong>Artykuł:</strong> ${escapeHtml(articleTitle)}</p>

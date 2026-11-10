@@ -6,7 +6,8 @@ import Image from 'next/image'
 import { getArticleBySlug, getCommentsByArticle, getArticleTranslation, getPage } from '@/lib/queries'
 import { PageSections } from '@/components/sections/SectionRenderer'
 import { pageMetadata, seoMetadata } from '@/lib/metadata'
-import { SITE_NAME, SITE_URL, localeUrl, otherLocale } from '@/lib/site'
+import { SITE_NAME, SITE_URL, localeUrl } from '@/lib/site'
+import { DATE_LOCALE, otherLocale, type Locale } from '@/lib/locales'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { FaqJsonLd } from '@/components/seo/FaqJsonLd'
 import { formatDate, readingTime } from '@/lib/utils'
@@ -22,7 +23,7 @@ import { stegaClean } from 'next-sanity'
 import type { Category } from '@/types'
 
 interface ArticlePageProps {
-  params: Promise<{ locale: 'pl' | 'en'; segments: string[] }>
+  params: Promise<{ locale: Locale; segments: string[] }>
 }
 
 // /{locale}/{slug} = strona z page buildera („O mnie”, „Kontakt”, nowe strony);
@@ -75,14 +76,14 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const t = await getTranslations('comments')
   const tArticle = await getTranslations('article')
 
-  const targetLocale = locale === 'pl' ? 'en' : 'pl'
+  const targetLocale = otherLocale(locale)
   const translation = await getArticleTranslation(article.id, targetLocale)
 
   const categoryLabel =
     article.category === 'content-writing' ? 'Content Writing' :
     article.category === 'ux-strategies' ? 'UX Strategies' : 'Data Visualisation'
 
-  const dateLocale = locale === 'pl' ? 'pl-PL' : 'en-GB'
+  const dateLocale = DATE_LOCALE[locale]
 
   return (
     <>

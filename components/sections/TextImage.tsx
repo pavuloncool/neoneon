@@ -5,9 +5,9 @@ import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
 import { resolveHref } from '@/lib/links'
 import { SimpleText } from './SimpleText'
-import type { Section, SanityImage } from '@/types'
+import type { TextImageSection, SanityImage } from '@/types'
 
-export function TextImage({ section }: { section: Section }) {
+export function TextImage({ section }: { section: TextImageSection }) {
   const image: SanityImage | null = section.image?.url ? section.image : null
   const cta = resolveHref(section.ctaLink)
 

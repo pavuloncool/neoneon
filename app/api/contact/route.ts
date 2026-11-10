@@ -4,17 +4,19 @@
 
 import { randomUUID } from 'node:crypto'
 import { NextResponse } from 'next/server'
-import { Resend } from 'resend'
 import { writeClient } from '@/sanity/lib/client'
-import { clientIp, verifyTurnstile } from '@/lib/turnstile'
+import { clientIp, turnstileUnavailable, verifyTurnstile } from '@/lib/turnstile'
 import { escapeHtml } from '@/lib/utils'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+import { CONTACT_EMAIL, FORM_FROM_EMAIL } from '@/lib/site'
+import { getResend } from '@/lib/email'
 
 export async function POST(request: Request) {
   try {
     const { name, email, message, turnstileToken } = await request.json()
 
+    if (turnstileUnavailable()) {
+      return NextResponse.json({ error: 'unavailable' }, { status: 503 })
+    }
     if (!(await verifyTurnstile(turnstileToken, clientIp(request)))) {
       return NextResponse.json({ error: 'captcha' }, { status: 403 })
     }
@@ -27,6 +29,7 @@ export async function POST(request: Request) {
     }
 
     // Kopia w Sanity — błąd zapisu nie blokuje wysyłki maila (jak wcześniej w Supabase)
+    let saved = false
     try {
       await writeClient.create({
         _id: `drafts.${randomUUID()}`,
@@ -36,13 +39,20 @@ export async function POST(request: Request) {
         message: String(message),
         submittedAt: new Date().toISOString(),
       })
+      saved = true
     } catch (e) {
       console.error('Contact save error:', e)
     }
 
+    // Bez klucza Resend (ostrzeżenie w logu) wiadomość zostaje tylko w Sanity
+    const resend = getResend()
+    if (!resend) {
+      return saved ? NextResponse.json({ success: true }) : NextResponse.json({ error: 'Failed to save message.' }, { status: 500 })
+    }
+
     const { data, error } = await resend.emails.send({
-      from: 'formularz@neoneon.online',
-      to: 'ask@neoneon.online',
+      from: FORM_FROM_EMAIL,
+      to: CONTACT_EMAIL,
       subject: `Nowa wiadomość od ${name}`,
       html: `
         <p><strong>Imię:</strong> ${escapeHtml(String(name))}</p>

@@ -13,8 +13,9 @@ import { RecentArticles } from './RecentArticles'
 import { SimpleText } from './SimpleText'
 import { TextImage } from './TextImage'
 import type { Page, Section } from '@/types'
+import { otherLocale, type Locale } from '@/lib/locales'
 
-function renderSection(section: Section, locale: 'pl' | 'en') {
+function renderSection(section: Section, locale: Locale) {
   switch (section._type) {
     case 'hero':
       return <Hero section={section} />
@@ -43,10 +44,10 @@ function renderSection(section: Section, locale: 'pl' | 'en') {
   }
 }
 
-export async function PageSections({ page, locale }: { page: Page; locale: 'pl' | 'en' }) {
+export async function PageSections({ page, locale }: { page: Page; locale: Locale }) {
   // Odpowiednik strony w drugim języku dla przełącznika języka (adresy mogą się różnić,
   // np. /pl/o-mnie ↔ /en/about). Bez tłumaczenia — strona główna drugiego języka.
-  const translation = await getPageTranslation(page.id, locale === 'pl' ? 'en' : 'pl')
+  const translation = await getPageTranslation(page.id, otherLocale(locale))
   const translationPath = translation ? (translation.isHome ? '/' : `/${translation.slug ?? ''}`) : '/'
 
   return (
