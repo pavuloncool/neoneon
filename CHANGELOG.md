@@ -8,6 +8,7 @@
 - Usunięty `.npmrc` (zawierał tylko `legacy-peer-deps=true`). `npm install` przechodzi bez flagi i bez `overrides`.
 - Zostaje jedno ostrzeżenie: opcjonalny peer `typescript ^6 || ^7` w `@sanity/workflow-blueprint` (narzędzie CLI Sanity, nie trafia do strony) przy naszym `typescript` 5.9. Nie blokuje instalacji.
 - Jedna kopia `react`, `react-dom`, `@sanity/ui`, `styled-components`, `next-sanity`. Build, lista tras i JS stron publicznych bez zmian.
+- Lint: typ `Section` jako unia sekcji page buildera (zamiast `Record<string, any>`), komponenty sekcji dostają swoje typy; wtyczka typography importowana jako ESM; nazwany eksport w `eslint.config.mjs`. W `Nav.tsx` dwa `setMounted(true)` w efekcie zostają (zabezpieczenie hydracji, komponent po pomiarach TBT/INP) z wyłączeniem reguły `react-hooks/set-state-in-effect` i komentarzem. Dwa `any` przy sprawdzaniu języka — w etapie 3.
 
 ## 2026-10-29
 

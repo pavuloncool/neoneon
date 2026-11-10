@@ -5,9 +5,9 @@ import { getArticles } from '@/lib/queries'
 import { Link } from '@/i18n/navigation'
 import { formatDate } from '@/lib/utils'
 import { FadeUp, StaggerList, StaggerItem } from '@/components/ui/Motion'
-import type { Section } from '@/types'
+import type { RecentArticlesSection } from '@/types'
 
-export async function RecentArticles({ section, locale }: { section: Section; locale: 'pl' | 'en' }) {
+export async function RecentArticles({ section, locale }: { section: RecentArticlesSection; locale: 'pl' | 'en' }) {
   const recent = await getArticles({ limit: section.limit ?? 6, locale })
   if (recent.length === 0) return null
 

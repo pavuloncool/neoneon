@@ -1,9 +1,9 @@
 // components/sections/FeatureGrid.tsx
 // Sekcja „Siatka obszarów” („O mnie”: Obszary działania).
 
-import type { Section } from '@/types'
+import type { FeatureGridSection } from '@/types'
 
-export function FeatureGrid({ section }: { section: Section }) {
+export function FeatureGrid({ section }: { section: FeatureGridSection }) {
   const items: { _key: string; title: string; description?: string }[] = section.items ?? []
 
   return (

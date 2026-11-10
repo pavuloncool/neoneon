@@ -4,15 +4,15 @@
 
 import { getLocale, getTranslations } from 'next-intl/server'
 import { HeroNeon } from './HeroNeon'
-import type { HeroSection, Section } from '@/types'
+import type { HeroSection } from '@/types'
 
-export async function Hero({ section }: { section: Section }) {
-  const { variant, eyebrow, heading, headingEmphasis, _key } = section as HeroSection
+export async function Hero({ section }: { section: HeroSection }) {
+  const { variant, eyebrow, heading, headingEmphasis, _key } = section
 
   if (variant === 'large') {
     const locale = await getLocale()
     const t = await getTranslations('home')
-    const { rotatingPrefix, rotatingWords } = section as HeroSection
+    const { rotatingPrefix, rotatingWords } = section
     return (
       // key={locale}: przy zmianie języka nowy montaż (sekwencja scramble), a nie tylko podmiana propsów
       <HeroNeon

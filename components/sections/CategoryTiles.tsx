@@ -3,9 +3,9 @@
 
 import { Link } from '@/i18n/navigation'
 import { FadeUp } from '@/components/ui/Motion'
-import type { Section } from '@/types'
+import type { CategoryTilesSection } from '@/types'
 
-export function CategoryTiles({ section }: { section: Section }) {
+export function CategoryTiles({ section }: { section: CategoryTilesSection }) {
   const tiles: { _key: string; category: string; title: string }[] = section.tiles ?? []
   if (tiles.length === 0) return null
 
