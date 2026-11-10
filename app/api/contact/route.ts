@@ -5,7 +5,7 @@
 import { randomUUID } from 'node:crypto'
 import { NextResponse } from 'next/server'
 import { writeClient } from '@/sanity/lib/client'
-import { clientIp, verifyTurnstile } from '@/lib/turnstile'
+import { clientIp, turnstileUnavailable, verifyTurnstile } from '@/lib/turnstile'
 import { escapeHtml } from '@/lib/utils'
 import { CONTACT_EMAIL, FORM_FROM_EMAIL } from '@/lib/site'
 import { getResend } from '@/lib/email'
@@ -14,6 +14,9 @@ export async function POST(request: Request) {
   try {
     const { name, email, message, turnstileToken } = await request.json()
 
+    if (turnstileUnavailable()) {
+      return NextResponse.json({ error: 'unavailable' }, { status: 503 })
+    }
     if (!(await verifyTurnstile(turnstileToken, clientIp(request)))) {
       return NextResponse.json({ error: 'captcha' }, { status: 403 })
     }

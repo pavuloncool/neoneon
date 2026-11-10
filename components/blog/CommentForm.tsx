@@ -13,7 +13,8 @@ interface CommentFormProps {
 
 export function CommentForm({ articleId }: CommentFormProps) {
   const t = useTranslations('comments')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'captcha'>('idle')
+  const tForm = useTranslations('form')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'captcha' | 'unavailable'>('idle')
   const [form, setForm] = useState({ author_name: '', author_email: '', body: '' })
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const turnstile = useRef<TurnstileHandle>(null)
@@ -27,6 +28,10 @@ export function CommentForm({ articleId }: CommentFormProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, article_id: articleId, turnstileToken }),
       })
+      if (res.status === 503) {
+        setStatus('unavailable')
+        return
+      }
       if (res.status === 403) {
         setStatus('captcha')
         // Odrzucony token → nowy do ponownej próby
@@ -83,6 +88,9 @@ export function CommentForm({ articleId }: CommentFormProps) {
           </div>
           {status === 'error' && (
             <p className="text-xs text-red-500">{t('error')}</p>
+          )}
+          {status === 'unavailable' && (
+            <p className="text-xs text-red-500">{tForm('unavailable')}</p>
           )}
           {status === 'captcha' && (
             <p className="text-xs text-red-500">{t('captchaError')}</p>
