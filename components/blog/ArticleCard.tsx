@@ -2,7 +2,6 @@
 // components/blog/ArticleCard.tsx
 import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
 import { formatDate, readingTime } from '@/lib/utils'
 import { TagBadge } from '@/components/blog/TagBadge'
 import type { Article } from '@/types'
@@ -20,7 +19,7 @@ export function ArticleCard({ article, variant = 'default', locale = 'pl' }: Art
 
   if (variant === 'featured') {
     return (
-      <motion.article className="group py-8" whileHover={{ x: 4 }} transition={{ duration: 0.2 }}>
+      <article className="group py-8 transition-transform duration-200 hover:translate-x-1 motion-reduce:hover:translate-x-0">
         <Link href={href} className="flex flex-col md:flex-row gap-8">
           {article.cover_image_url && (
             <div className="relative shrink-0 w-full md:w-64 aspect-[4/3] overflow-hidden">
@@ -48,15 +47,13 @@ export function ArticleCard({ article, variant = 'default', locale = 'pl' }: Art
             {article.tags.map((tag) => <TagBadge key={tag.id} tag={tag} />)}
           </div>
         )}
-      </motion.article>
+      </article>
     )
   }
 
   return (
-    <motion.article
-      className="group border-t border-border dark:border-white/10 py-6 px-4 -mx-4 hover:bg-ink dark:hover:bg-white transition-colors duration-300"
-      whileHover={{ x: 4 }}
-      transition={{ duration: 0.2 }}
+    <article
+      className="group border-t border-border dark:border-white/10 py-6 px-4 -mx-4 hover:bg-ink dark:hover:bg-white [transition:color_300ms,background-color_300ms,border-color_300ms,transform_200ms] hover:translate-x-1 motion-reduce:hover:translate-x-0"
     >
       <Link href={href} className="flex flex-col md:flex-row gap-6">
         {article.cover_image_url && (
@@ -87,6 +84,6 @@ export function ArticleCard({ article, variant = 'default', locale = 'pl' }: Art
           {article.tags.map((tag) => <TagBadge key={tag.id} tag={tag} />)}
         </div>
       )}
-    </motion.article>
+    </article>
   )
 }

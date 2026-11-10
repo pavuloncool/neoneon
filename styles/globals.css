@@ -223,6 +223,206 @@
   }
 }
 
+/* ── Nawigacja (components/layout/Nav.tsx) ── */
+/* Menu mobilne: zamknięte niewidoczne i schowane za dolną krawędzią (kurtyna od pilla);
+   GSAP przy otwarciu ustawia visibility: visible i animuje clip-path do inset(0). */
+.menu-dialog {
+  visibility: hidden;
+  clip-path: inset(100% 0% 0% 0%);
+  /* Bez CSS transition — inaczej reguła reduced motion (transition-duration: 0.01ms na *) robi z visibility
+     przejście i dialog jest jeszcze hidden w chwili ustawiania fokusu */
+  transition-property: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* universalna reguła niżej daje transition-duration wszystkim elementom (transition-property: all),
+     więc visibility linków też „przechodzi” — w menu wyłączamy to całkowicie */
+  .menu-dialog * {
+    transition-property: none !important;
+  }
+}
+
+/* Desktop: rolling text + złote podkreślenie (hover / focus-visible) */
+.nav-roll-link {
+  position: relative;
+}
+
+.nav-roll-link::after {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.15rem;
+  height: 1px;
+  background: #c8a96e;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-roll {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  /* wysokość jednej linii — druga kopia czeka pod spodem */
+  height: 1lh;
+}
+
+.nav-roll-track {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-roll-link:hover .nav-roll-track,
+.nav-roll-link:focus-visible .nav-roll-track {
+  transform: translateY(-50%);
+}
+
+.nav-roll-link:hover::after,
+.nav-roll-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* ── Artykuł: pasek postępu i odsłanianie h2 (components/blog/ArticleScroll.tsx) ── */
+.reading-progress {
+  transform: scaleX(0);
+  transform-origin: left;
+  pointer-events: none;
+}
+
+/* Nagłówki h2 artykułu: bez stanu startowego w CSS — ArticleScroll ukrywa z JS tylko te poniżej ekranu */
+
+/* ── Motion: stany startowe animacji wejścia (components/ui/Motion.tsx) ── */
+/* Tylko z JS (html.js ustawiane inline przed hydracją) i bez prośby o ograniczenie ruchu.
+   data-motion-done = animacja zakończona → reguła przestaje działać. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js [data-motion='fade-up']:not([data-motion-done]) {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  /* Elementy LCP: widoczne od pierwszego renderu (LCP nie czeka na hydrację) */
+  html.js [data-motion='fade-up'][data-motion-lcp='dim']:not([data-motion-done]) {
+    opacity: 0.15;
+  }
+
+  html.js [data-motion='fade-up'][data-motion-lcp='solid']:not([data-motion-done]) {
+    opacity: 1;
+  }
+
+  html.js [data-motion='fade-in']:not([data-motion-done]) {
+    opacity: 0;
+  }
+
+  html.js [data-motion='stagger-item']:not([data-motion-done]) {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+/* ── Hero: zapłon neonu (components/sections/HeroNeon.tsx) ── */
+/* Kursywa: w dzień złoty tusz, w nocy neon. Na jasnym tle ciemniejsze złoto — accent #c8a96e ma
+   kontrast 2.15:1, #9a7a3e ma 3.84:1 (SC 1.4.3, duży tekst ≥ 3:1). */
+.hero-emph {
+  --glow: 1;
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+  color: #9a7a3e;
+  /* SplitText dzieli kursywę na osobne elementy liter, co wyłącza kerning i ligatury; po revert() wracały
+     i litery „zbiegały się” na końcu animacji. Wyłączone na stałe — odstępy identyczne przed, w trakcie i po. */
+  font-kerning: none;
+  font-variant-ligatures: none;
+}
+
+.dark .hero-emph {
+  color: #f3e2b8;
+}
+
+/* Poświata: pseudo-element z tym samym tekstem (bez duplikatu w DOM), statyczny blur,
+   animowana wyłącznie opacity (przez --glow). Tylko w ciemnym motywie. */
+.hero-emph::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: none;
+  color: #c8a96e;
+  filter: blur(14px);
+  opacity: var(--glow);
+  pointer-events: none;
+  user-select: none;
+}
+
+.dark .hero-emph::after {
+  display: block;
+}
+
+/* Rotujące słowo: maska + komórka siatki z niewidocznymi słowami (szerokość najdłuższego) */
+.hero-word-mask {
+  display: inline-grid;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+  font-style: italic;
+  color: #9a7a3e;
+}
+
+.dark .hero-word-mask {
+  color: #c8a96e;
+}
+
+.hero-word-mask > * {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+}
+
+.hero-word {
+  display: inline-block;
+}
+
+/* Stan startowy (tylko z JS i bez prośby o ograniczenie ruchu): zgaszona rurka, poświata wyłączona */
+@media (prefers-reduced-motion: no-preference) {
+  html.js [data-hero-root]:not([data-hero-done]) :is([data-hero='heading'], [data-hero='emphasis']) {
+    opacity: 0.15;
+  }
+
+  html.js [data-hero-root]:not([data-hero-done]) .hero-emph {
+    --glow: 0;
+  }
+}
+
+/* ── Zmiana motywu: View Transitions (ThemeToggle w components/layout/Nav.tsx) ── */
+/* Nowy motyw odsłania się kołem od środka przycisku; stary snapshot stoi w miejscu.
+   --vt-x / --vt-y / --vt-r ustawia ThemeToggle na <html>. */
+html.theme-vt::view-transition-old(root),
+html.theme-vt::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html.theme-vt::view-transition-new(root) {
+  animation: theme-reveal 650ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 0));
+  }
+  to {
+    clip-path: circle(var(--vt-r, 150vmax) at var(--vt-x, 50%) var(--vt-y, 0));
+  }
+}
+
+/* Na czas przejścia bez transition-colors (body i linki) — snapshot „new” ma od razu docelowe kolory */
+html.theme-vt *,
+html.theme-vt *::before,
+html.theme-vt *::after {
+  transition: none !important;
+}
+
 /* ── SC 2.3.3 — prefers-reduced-motion ────────────────────── */
 /* Użytkownicy z preferencją ograniczonego ruchu (epilepsja, wrażliwość na animacje) */
 @media (prefers-reduced-motion: reduce) {

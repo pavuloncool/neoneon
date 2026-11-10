@@ -4,13 +4,16 @@
     "uxStrategies": "UX Strategies",
     "dataVisualisation": "Data Visualisation",
     "about": "O mnie",
-    "contact": "Kontakt"
+    "contact": "Kontakt",
+    "closeMenu": "Zamknij menu"
   },
   "home": {
     "tagline": "Content i UX dla|produktów cyfrowych",
     "subtitle": "Tworzę strategie contentu i doświadczenia UX dla użytkowników produktów cyfrowych",
     "recent": "Najnowsze",
-    "category": "Kategoria"
+    "category": "Kategoria",
+    "rotatingPause": "Wstrzymaj animację",
+    "rotatingResume": "Wznów animację"
   },
   "article": {
     "readMore": "Czytaj dalej",

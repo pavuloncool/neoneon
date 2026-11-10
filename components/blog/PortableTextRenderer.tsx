@@ -13,7 +13,8 @@ import { EMBED_PROVIDER_NAMES, parseEmbedUrl } from '@/lib/embeds'
 const components: PortableTextComponents = {
   // H2 i H3 dostają id z treści — kotwice do linkowania (#tytul-sekcji) w tekście i z zewnątrz
   block: {
-    h2: ({ children, value }) => <h2 id={slugify(toPlainText(value))}>{children}</h2>,
+    // data-reveal: odsłanianie z maski przy przewijaniu (ArticleScroll)
+    h2: ({ children, value }) => <h2 id={slugify(toPlainText(value))} data-reveal="">{children}</h2>,
     h3: ({ children, value }) => <h3 id={slugify(toPlainText(value))}>{children}</h3>,
   },
   marks: {

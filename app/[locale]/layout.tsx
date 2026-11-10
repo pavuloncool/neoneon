@@ -3,14 +3,17 @@ import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { draftMode } from 'next/headers'
 import Script from 'next/script'
-import { VisualEditing } from 'next-sanity/visual-editing'
 import { routing } from '@/i18n/routing'
 import { ThemeProvider } from '@/components/layout/ThemeProvider'
 import { cormorant, dmSans, dmMono } from '@/app/fonts'
-import { DraftModeBanner } from '@/components/layout/DraftModeBanner'
+import { DraftTools } from '@/components/layout/DraftTools'
+import { HtmlClassGuard } from '@/components/layout/HtmlClassGuard'
 import { getSiteSettings } from '@/lib/queries'
 import { OG_LOCALE, SITE_NAME, SITE_URL, localeUrl } from '@/lib/site'
 import type { Metadata } from 'next'
+
+const MOTION_BOOTSTRAP =
+  "(function(){var d=document.documentElement;d.classList.add('js');setTimeout(function(){if(window.__motionReady!==true){d.classList.remove('js');window.__motionFallback=true}},3000)})()"
 
 // Domyślne SEO z ustawień strony w Sanity; brakujące pola uzupełnia app/layout.tsx
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -51,19 +54,21 @@ export default async function LocaleLayout({
       suppressHydrationWarning
       className={`${cormorant.variable} ${dmSans.variable} ${dmMono.variable}`}
     >
+      <head>
+        {/* Znacznik JS przed hydracją — CSS ustawia stany startowe animacji tylko pod html.js.
+            Siatka bezpieczeństwa: jeśli GSAP nie wystartował w 3 s, zdejmujemy znacznik i treść jest widoczna. */}
+        <script dangerouslySetInnerHTML={{ __html: MOTION_BOOTSTRAP }} />
+      </head>
       <body className="bg-paper text-ink antialiased transition-colors duration-300">
+        {/* Przywraca klasy js / dark|light na <html> po zmianie języka (przed malowaniem) */}
+        <HtmlClassGuard />
         <ThemeProvider>
           <NextIntlClientProvider messages={messages}>
             {children}
           </NextIntlClientProvider>
         </ThemeProvider>
         {/* Podgląd szkiców z Presentation Tool w Studio — klikalna edycja treści */}
-        {isDraftMode && (
-          <>
-            <VisualEditing />
-            <DraftModeBanner />
-          </>
-        )}
+        {isDraftMode && <DraftTools />}
         {/* Umami — analityka bez cookies; data-domains pomija podglądy Vercel i localhost */}
         {!isDraftMode && umamiWebsiteId && (
           <Script

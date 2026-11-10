@@ -31,7 +31,7 @@ export default async function ContentWritingPage({ params, searchParams }: PageP
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-16">
-      <FadeUp>
+      <FadeUp lcp="solid">
         <header className="mb-12 pb-12 border-b border-border">
           <p className="text-xs tracking-widest text-muted dark:text-white/60 uppercase mb-3">{tc('label')}</p>
           <h1 className="font-display text-6xl md:text-7xl font-light leading-none">{tn('contentWriting')}</h1>

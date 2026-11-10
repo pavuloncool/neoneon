@@ -1,29 +1,29 @@
 // components/sections/Hero.tsx
-// Sekcja „Nagłówek strony”. Wariant `large` = strona główna, `page` = podstrona („O mnie”, „Kontakt”).
+// Sekcja „Nagłówek strony”. Wariant `large` = strona główna (HeroNeon — zapłon neonu),
+// `page` = podstrona („O mnie”, „Kontakt”).
 
-import { FadeUp } from '@/components/ui/Motion'
-import type { Section } from '@/types'
+import { getLocale, getTranslations } from 'next-intl/server'
+import { HeroNeon } from './HeroNeon'
+import type { HeroSection, Section } from '@/types'
 
-export function Hero({ section }: { section: Section }) {
-  const { variant, eyebrow, heading, headingEmphasis, _key } = section
+export async function Hero({ section }: { section: Section }) {
+  const { variant, eyebrow, heading, headingEmphasis, _key } = section as HeroSection
 
   if (variant === 'large') {
-    const id = `hero-${_key}`
+    const locale = await getLocale()
+    const t = await getTranslations('home')
+    const { rotatingPrefix, rotatingWords } = section as HeroSection
     return (
-      /* SC 1.3.6 — aria-labelledby wskazuje na h1 wewnątrz sekcji */
-      <section aria-labelledby={id} className="mb-20">
-        <FadeUp>
-          <h1 id={id} className="font-display text-7xl md:text-8xl font-light leading-none mb-6">
-            {heading}
-            {headingEmphasis && (
-              <>
-                <br />
-                <em>{headingEmphasis}</em>
-              </>
-            )}
-          </h1>
-        </FadeUp>
-      </section>
+      // key={locale}: przy zmianie języka nowy montaż (sekwencja scramble), a nie tylko podmiana propsów
+      <HeroNeon
+        key={locale}
+        id={`hero-${_key}`}
+        heading={heading}
+        headingEmphasis={headingEmphasis}
+        rotatingPrefix={rotatingPrefix}
+        rotatingWords={rotatingWords}
+        labels={{ pause: t('rotatingPause'), resume: t('rotatingResume') }}
+      />
     )
   }
 
