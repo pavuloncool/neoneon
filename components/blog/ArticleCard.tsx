@@ -5,16 +5,17 @@ import Image from 'next/image'
 import { formatDate, readingTime } from '@/lib/utils'
 import { TagBadge } from '@/components/blog/TagBadge'
 import type { Article } from '@/types'
+import { DATE_LOCALE, DEFAULT_LOCALE, type Locale } from '@/lib/locales'
 
 interface ArticleCardProps {
   article: Article
   variant?: 'default' | 'featured'
-  locale?: string
+  locale?: Locale
 }
 
-export function ArticleCard({ article, variant = 'default', locale = 'pl' }: ArticleCardProps) {
+export function ArticleCard({ article, variant = 'default', locale = DEFAULT_LOCALE }: ArticleCardProps) {
   const href = `/${article.category}/${article.slug}`
-  const date = article.published_at ? formatDate(article.published_at, locale === 'pl' ? 'pl-PL' : 'en-GB') : ''
+  const date = article.published_at ? formatDate(article.published_at, DATE_LOCALE[locale]) : ''
   const time = readingTime(article.content, locale)
 
   if (variant === 'featured') {

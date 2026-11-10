@@ -5,6 +5,7 @@
 import { defineArrayMember, defineField, defineType, type SlugValidationContext } from 'sanity'
 import { CATEGORIES } from './article'
 import { SECTION_TYPES } from './sections'
+import { DEFAULT_LOCALE } from '../../lib/locales'
 
 // Adresy zajęte przez kategorie i trasy aplikacji
 export const RESERVED_SLUGS = [...CATEGORIES.map((c) => c.value), 'search', 'studio', 'api', 'home']
@@ -15,7 +16,7 @@ async function isUniqueInLocale(slug: string, context: SlugValidationContext) {
   const id = (document?._id ?? '').replace(/^drafts\./, '')
   return getClient({ apiVersion: '2025-02-19' }).fetch<boolean>(
     '!defined(*[_type == "page" && slug.current == $slug && locale == $locale && !(_id in [$id, $draft])][0]._id)',
-    { slug, locale: document?.locale ?? 'pl', id, draft: `drafts.${id}` }
+    { slug, locale: document?.locale ?? DEFAULT_LOCALE, id, draft: `drafts.${id}` }
   )
 }
 

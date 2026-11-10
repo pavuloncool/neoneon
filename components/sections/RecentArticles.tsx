@@ -6,13 +6,14 @@ import { Link } from '@/i18n/navigation'
 import { formatDate } from '@/lib/utils'
 import { FadeUp, StaggerList, StaggerItem } from '@/components/ui/Motion'
 import type { RecentArticlesSection } from '@/types'
+import { DATE_LOCALE, type Locale } from '@/lib/locales'
 
-export async function RecentArticles({ section, locale }: { section: RecentArticlesSection; locale: 'pl' | 'en' }) {
+export async function RecentArticles({ section, locale }: { section: RecentArticlesSection; locale: Locale }) {
   const recent = await getArticles({ limit: section.limit ?? 6, locale })
   if (recent.length === 0) return null
 
   const id = `recent-${section._key}`
-  const dateLocale = locale === 'pl' ? 'pl-PL' : 'en-GB'
+  const dateLocale = DATE_LOCALE[locale]
 
   return (
     /* SC 1.3.6 — aria-labelledby wskazuje na nagłówek sekcji */

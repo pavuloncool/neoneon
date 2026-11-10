@@ -1,6 +1,8 @@
 // lib/site.ts
 // Adres produkcyjny i nazwa witryny — źródło dla canonical, hreflang, Open Graph, sitemapy i JSON-LD.
 
+import type { Locale } from '@/lib/locales'
+
 const DEFAULT_SITE_URL = 'https://neoneon.online'
 
 // Adres z NEXT_PUBLIC_SITE_URL (na Vercel: Production i Preview = https://neoneon.online, więc podglądy
@@ -19,15 +21,7 @@ export const IS_PRODUCTION = (process.env.VERCEL_ENV ?? process.env.NEXT_PUBLIC_
 export const FORM_FROM_EMAIL = 'formularz@neoneon.online'
 export const CONTACT_EMAIL = 'ask@neoneon.online'
 
-export type Locale = 'pl' | 'en'
-
-export const OG_LOCALE: Record<Locale, string> = { pl: 'pl_PL', en: 'en_GB' }
-
 // path bez prefiksu języka: '' = strona główna, '/o-mnie', '/ux-strategies/slug'
 export function localeUrl(locale: Locale, path = ''): string {
   return `${SITE_URL}/${locale}${path}`
-}
-
-export function otherLocale(locale: Locale): Locale {
-  return locale === 'pl' ? 'en' : 'pl'
 }

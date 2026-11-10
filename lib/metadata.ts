@@ -5,7 +5,8 @@
 
 import type { Metadata } from 'next'
 import { getPageTranslation, getSiteSettings } from '@/lib/queries'
-import { OG_LOCALE, SITE_NAME, localeUrl, otherLocale, type Locale } from '@/lib/site'
+import { SITE_NAME, localeUrl } from '@/lib/site'
+import { OG_LOCALE, otherLocale, type Locale } from '@/lib/locales'
 import type { Page, SanityImage } from '@/types'
 
 interface SeoInput {

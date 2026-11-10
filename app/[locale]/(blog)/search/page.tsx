@@ -3,13 +3,14 @@ import { ArticleCard } from '@/components/blog/ArticleCard'
 import { TagBadge } from '@/components/blog/TagBadge'
 import { getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
+import type { Locale } from '@/lib/locales'
 
 interface SearchPageProps {
-  params: Promise<{ locale: 'pl' | 'en' }>
+  params: Promise<{ locale: Locale }>
   searchParams: Promise<{ q?: string; tag?: string }>
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: 'pl' | 'en' }> }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'search' })
   // Wyniki wyszukiwania poza indeksem — linki do artykułów nadal są śledzone

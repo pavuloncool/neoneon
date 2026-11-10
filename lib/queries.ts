@@ -9,6 +9,7 @@ import { client, draftsClient } from '@/sanity/lib/client'
 import { sanityFetch } from '@/sanity/lib/fetch'
 import { LINK_PROJECTION } from '@/lib/links'
 import type { Article, Category, Tag, Comment, Page, SiteSettings } from '@/types'
+import { DEFAULT_LOCALE, type Locale } from '@/lib/locales'
 
 const TAG_PROJECTION = groq`{ "id": _id, name, "name_en": nameEn, "slug": slug.current }`
 
@@ -39,10 +40,10 @@ export async function getArticles(options?: {
   category?: Category
   tag?: string
   limit?: number
-  locale?: 'pl' | 'en'
+  locale?: Locale
 }): Promise<Article[]> {
   const filters = ['_type == "article"', 'locale == $locale']
-  const params: Record<string, string> = { locale: options?.locale ?? 'pl' }
+  const params: Record<string, string> = { locale: options?.locale ?? DEFAULT_LOCALE }
   if (options?.category) {
     filters.push('category == $category')
     params.category = options.category
@@ -66,7 +67,7 @@ export async function getArticles(options?: {
 
 export async function getArticleBySlug(
   slug: string,
-  locale: 'pl' | 'en' = 'pl'
+  locale: Locale = 'pl'
 ): Promise<Article | null> {
   return sanityFetch<Article | null>(
     groq`*[_type == "article" && slug.current == $slug && locale == $locale][0] ${ARTICLE_PROJECTION}`,
@@ -76,7 +77,7 @@ export async function getArticleBySlug(
 
 export async function searchArticles(
   query: string,
-  locale: 'pl' | 'en' = 'pl'
+  locale: Locale = 'pl'
 ): Promise<Article[]> {
   // `match` dopasowuje prefiksy słów — dla każdego słowa zapytania osobny warunek (AND)
   const terms = query.trim().split(/\s+/).filter(Boolean).map((t) => `${t}*`)
@@ -98,7 +99,7 @@ export async function searchArticles(
 // Wersja artykułu w drugim języku — powiązanie przez dokument translation.metadata
 export async function getArticleTranslation(
   articleId: string,
-  targetLocale: 'pl' | 'en'
+  targetLocale: Locale
 ): Promise<Article | null> {
   return sanityFetch<Article | null>(
     groq`*[_type == "article" && locale == $targetLocale && _id in *[_type == "translation.metadata" && references($articleId)].translations[].value._ref][0] ${ARTICLE_PROJECTION}`,
@@ -143,7 +144,7 @@ const IMAGE_PROJECTION = groq`{ "url": asset->url, alt, "width": asset->metadata
 const NAV_PROJECTION = groq`{ label, "link": link${LINK_PROJECTION} }`
 
 // cache(): layout, metadane i strona w jednym żądaniu dzielą jedno zapytanie
-export const getSiteSettings = cache(async (locale: 'pl' | 'en'): Promise<SiteSettings | null> =>
+export const getSiteSettings = cache(async (locale: Locale): Promise<SiteSettings | null> =>
   sanityFetch<SiteSettings | null>(
     groq`*[_type == "siteSettings" && locale == $locale][0]{
       siteTitle, titleTemplate, description,
@@ -169,11 +170,11 @@ const PAGE_PROJECTION = groq`{
   }
 }`
 
-export const getHomePage = cache(async (locale: 'pl' | 'en'): Promise<Page | null> =>
+export const getHomePage = cache(async (locale: Locale): Promise<Page | null> =>
   sanityFetch<Page | null>(groq`*[_type == "page" && isHome == true && locale == $locale][0]${PAGE_PROJECTION}`, { locale })
 )
 
-export const getPage = cache(async (locale: 'pl' | 'en', slug: string): Promise<Page | null> =>
+export const getPage = cache(async (locale: Locale, slug: string): Promise<Page | null> =>
   sanityFetch<Page | null>(
     groq`*[_type == "page" && isHome != true && slug.current == $slug && locale == $locale][0]${PAGE_PROJECTION}`,
     { locale, slug }
@@ -183,7 +184,7 @@ export const getPage = cache(async (locale: 'pl' | 'en', slug: string): Promise<
 // Wersja strony w drugim języku — powiązanie przez dokument translation.metadata
 export async function getPageTranslation(
   pageId: string,
-  targetLocale: 'pl' | 'en'
+  targetLocale: Locale
 ): Promise<{ slug: string | null; isHome: boolean | null } | null> {
   return sanityFetch(
     groq`*[_type == "page" && locale == $targetLocale && _id in *[_type == "translation.metadata" && references($pageId)].translations[].value._ref][0]{ "slug": slug.current, isHome }`,
@@ -193,8 +194,8 @@ export async function getPageTranslation(
 
 // Sitemapa — tylko opublikowane treści (bez podglądu szkiców), z powiązaniami tłumaczeń
 export interface SitemapData {
-  pages: { _id: string; locale: 'pl' | 'en'; isHome: boolean | null; slug: string | null; _updatedAt: string }[]
-  articles: { _id: string; locale: 'pl' | 'en'; category: Category; slug: string; _updatedAt: string }[]
+  pages: { _id: string; locale: Locale; isHome: boolean | null; slug: string | null; _updatedAt: string }[]
+  articles: { _id: string; locale: Locale; category: Category; slug: string; _updatedAt: string }[]
   translations: { refs: string[] | null }[]
 }
 

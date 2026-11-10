@@ -1,5 +1,6 @@
 import type { PortableTextBlock } from '@portabletext/react'
 import type { SanityLink } from '@/lib/links'
+import type { Locale } from '@/lib/locales'
 
 export interface Tag {
   id: string
@@ -35,7 +36,7 @@ export interface Article {
   updated_at: string
   tags?: Tag[]
   faq?: FaqItem[] | null
-  locale: 'pl' | 'en'
+  locale: Locale
 }
 
 export interface FaqItem {

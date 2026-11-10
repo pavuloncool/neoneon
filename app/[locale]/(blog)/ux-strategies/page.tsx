@@ -5,8 +5,9 @@ import { FadeUp } from '@/components/ui/Motion'
 import { getTranslations } from 'next-intl/server'
 import { seoMetadata } from '@/lib/metadata'
 import type { Metadata } from 'next'
+import type { Locale } from '@/lib/locales'
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: 'pl' | 'en' }> }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'nav' })
   // Filtr ?tag= nie tworzy osobnych adresów — canonical wskazuje stronę kategorii
@@ -14,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: '
 }
 
 interface PageProps {
-  params: Promise<{ locale: 'pl' | 'en' }>
+  params: Promise<{ locale: Locale }>
   searchParams: Promise<{ tag?: string }>
 }
 

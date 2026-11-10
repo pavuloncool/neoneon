@@ -13,6 +13,7 @@ import {
 } from '@sanity/document-internationalization'
 import { apiVersion, dataset, projectId } from './sanity/env'
 import { schemaTypes } from './sanity/schemaTypes'
+import { LOCALE_LABELS, LOCALES_DEFAULT_FIRST, toLocale } from './lib/locales'
 
 // Akcje wtyczki typują `action` jako string, a Sanity 6 oczekuje klucza akcji — w działaniu zgodne
 const TRANSLATION_ACTIONS = [useDeleteTranslationAction, useDuplicateWithTranslationsAction] as DocumentActionComponent[]
@@ -28,10 +29,8 @@ const HIDDEN_TEMPLATES = [
 
 // Dokumenty pojedyncze: siteSettings-pl/en, uiStrings-pl/en
 const SINGLETON_TYPES = ['siteSettings', 'uiStrings']
-const LOCALES = [
-  { id: 'pl', title: 'PL' },
-  { id: 'en', title: 'EN' },
-]
+// Języki z lib/locales.ts — domyślny (PL) pierwszy
+const LOCALES = LOCALES_DEFAULT_FIRST.map((id) => ({ id, title: LOCALE_LABELS[id].short }))
 
 export default defineConfig({
   name: 'neoneon',
@@ -57,11 +56,10 @@ export default defineConfig({
         S.list()
           .title('Treści')
           .items([
-            S.listItem().title('Artykuły PL').child(
-              S.documentList().title('Artykuły PL').filter('_type == "article" && locale == "pl"').defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
-            ),
-            S.listItem().title('Artykuły EN').child(
-              S.documentList().title('Artykuły EN').filter('_type == "article" && locale == "en"').defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+            ...LOCALES.map(({ id, title }) =>
+              S.listItem().title(`Artykuły ${title}`).child(
+                S.documentList().title(`Artykuły ${title}`).filter('_type == "article" && locale == $locale').params({ locale: id }).defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+              )
             ),
             S.divider(),
             S.documentTypeListItem('article').title('Wszystkie artykuły'),
@@ -123,7 +121,7 @@ export default defineConfig({
                 doc?.slug && doc.locale && doc.category
                   ? [
                       { title: doc.title || 'Artykuł', href: `/${doc.locale}/${doc.category}/${doc.slug}` },
-                      { title: doc.locale === 'en' ? 'Strona główna (EN)' : 'Strona główna (PL)', href: `/${doc.locale}` },
+                      { title: `Strona główna (${LOCALE_LABELS[toLocale(doc.locale)].short})`, href: `/${doc.locale}` },
                     ]
                   : [],
             }),
@@ -145,10 +143,7 @@ export default defineConfig({
     // Oryginał → tłumaczenie: przycisk „Translations” w artykule tworzy wersję w drugim języku,
     // połączoną z oryginałem dokumentem translation.metadata
     documentInternationalization({
-      supportedLanguages: [
-        { id: 'pl', title: 'Polski' },
-        { id: 'en', title: 'English' },
-      ],
+      supportedLanguages: LOCALES_DEFAULT_FIRST.map((id) => ({ id, title: LOCALE_LABELS[id].name })),
       schemaTypes: ['article', 'page'],
       languageField: 'locale',
       apiVersion,

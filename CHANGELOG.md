@@ -21,6 +21,12 @@
 - `.env.local.example`: dopisane `NEXT_PUBLIC_SITE_URL`, `RESEND_API_KEY`, `NEXT_PUBLIC_UMAMI_WEBSITE_ID`, `VERCEL_BYPASS` i opis zmiennych ustawianych przez Vercel; usunięty nieużywany `SANITY_MIGRATION_TOKEN`.
 - Canonical, hreflang, `og:*`, JSON-LD, sitemap i robots.txt na produkcji — bez zmian (porównanie 38 adresów).
 
+### Porządki techniczne — etap 3: jedna lista języków
+
+- `lib/locales.ts`: `LOCALES` (kolejność routingu `['en', 'pl']`), `DEFAULT_LOCALE`, typ `Locale`, `OG_LOCALE`, `DATE_LOCALE`, nazwy dla Studio, `isLocale`, `toLocale`, `otherLocale`.
+- Korzystają z niego: routing next-intl, oba layouty, `i18n/request.ts`, strony, sekcje, `ArticleCard`, `LanguageSwitcher`, `lib/queries.ts`, `lib/metadata.ts`, sitemap, typy oraz Studio (`sanity.config.ts`: listy artykułów, stron i ustawień, Presentation, wtyczka tłumaczeń; schematy `page` i `link`). Zniknęły ręcznie wpisane `'pl' | 'en'`, mapowania `pl-PL`/`en-GB` i dwa `as any` — `npm run lint` czysty.
+- Zachowanie bez zmian (porównanie 38 adresów).
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów

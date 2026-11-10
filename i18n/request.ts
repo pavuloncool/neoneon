@@ -2,6 +2,7 @@ import { getRequestConfig } from 'next-intl/server'
 import { routing } from './routing'
 import { getUiStrings } from '@/lib/queries'
 import { UI_STRING_GROUPS } from '@/sanity/uiStringFields'
+import { isLocale } from '@/lib/locales'
 
 type Messages = Record<string, Record<string, string>>
 
@@ -31,7 +32,7 @@ async function withSanityStrings(locale: string, messages: Messages): Promise<Me
 
 export default getRequestConfig(async ({ requestLocale }) => {
   let locale = await requestLocale
-  if (!locale || !routing.locales.includes(locale as any)) {
+  if (!isLocale(locale)) {
     locale = routing.defaultLocale
   }
   const messages = (await import(`../messages/${locale}.json`)).default as Messages

@@ -4,6 +4,7 @@
 
 import { defineField, defineType } from 'sanity'
 import { CATEGORIES } from './article'
+import { DEFAULT_LOCALE } from '../../lib/locales'
 
 export const link = defineType({
   name: 'link',
@@ -34,7 +35,7 @@ export const link = defineType({
       to: [{ type: 'page' }],
       // Tylko strony w tym samym języku co edytowany dokument
       options: {
-        filter: ({ document }) => ({ filter: 'locale == $locale', params: { locale: document?.locale ?? 'pl' } }),
+        filter: ({ document }) => ({ filter: 'locale == $locale', params: { locale: document?.locale ?? DEFAULT_LOCALE } }),
       },
       hidden: ({ parent }) => parent?.linkType !== 'page',
       validation: (r) => r.custom((value, ctx) => ((ctx.parent as { linkType?: string })?.linkType === 'page' && !value ? 'Wybierz stronę' : true)),

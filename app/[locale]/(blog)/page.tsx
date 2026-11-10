@@ -6,13 +6,14 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { pageMetadata } from '@/lib/metadata'
 import { SITE_NAME, SITE_URL, localeUrl } from '@/lib/site'
 import type { Metadata } from 'next'
+import type { Locale } from '@/lib/locales'
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: 'pl' | 'en' }> }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
   const { locale } = await params
   return pageMetadata(await getHomePage(locale), locale)
 }
 
-export default async function HomePage({ params }: { params: Promise<{ locale: 'pl' | 'en' }> }) {
+export default async function HomePage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params
   const [page, settings] = await Promise.all([getHomePage(locale), getSiteSettings(locale)])
   if (!page) notFound()

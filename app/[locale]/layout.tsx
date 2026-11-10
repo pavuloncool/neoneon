@@ -3,13 +3,13 @@ import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { draftMode } from 'next/headers'
 import Script from 'next/script'
-import { routing } from '@/i18n/routing'
 import { ThemeProvider } from '@/components/layout/ThemeProvider'
 import { cormorant, dmSans, dmMono } from '@/app/fonts'
 import { DraftTools } from '@/components/layout/DraftTools'
 import { HtmlClassGuard } from '@/components/layout/HtmlClassGuard'
 import { getSiteSettings } from '@/lib/queries'
-import { IS_PRODUCTION, OG_LOCALE, SITE_NAME, SITE_URL, localeUrl } from '@/lib/site'
+import { IS_PRODUCTION, SITE_NAME, SITE_URL, localeUrl } from '@/lib/site'
+import { OG_LOCALE, isLocale, toLocale } from '@/lib/locales'
 import type { Metadata } from 'next'
 
 // Umami działa tylko z NEXT_PUBLIC_UMAMI_WEBSITE_ID; brak na produkcji = statystyki wyłączone (ostrzeżenie raz na proces)
@@ -23,7 +23,7 @@ const MOTION_BOOTSTRAP =
 // Domyślne SEO z ustawień strony w Sanity; brakujące pola uzupełnia app/layout.tsx
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params
-  const lang = locale === 'en' ? 'en' : 'pl'
+  const lang = toLocale(locale)
   const settings = await getSiteSettings(lang)
   if (!settings) return {}
   const og = settings.ogImage?.url
@@ -45,7 +45,7 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params
 
-  if (!routing.locales.includes(locale as any)) {
+  if (!isLocale(locale)) {
     notFound()
   }
 
