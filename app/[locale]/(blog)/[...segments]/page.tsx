@@ -11,6 +11,7 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { FaqJsonLd } from '@/components/seo/FaqJsonLd'
 import { formatDate, readingTime } from '@/lib/utils'
 import { PortableTextRenderer } from '@/components/blog/PortableTextRenderer'
+import { ArticleScroll } from '@/components/blog/ArticleScroll'
 import { FaqSection } from '@/components/blog/FaqSection'
 import { TagBadge } from '@/components/blog/TagBadge'
 import { CommentForm } from '@/components/blog/CommentForm'
@@ -105,6 +106,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       />
       <FaqJsonLd faq={article.faq} />
       <article>
+        {/* Pasek postępu czytania + odsłanianie nagłówków h2 */}
+        <ArticleScroll />
         <div className="max-w-5xl mx-auto px-6 py-12 md:py-16">
           <FadeUp lcp="solid">
             <header className="mb-10 md:mb-14">
@@ -154,7 +157,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             </header>
           </FadeUp>
           <FadeUp delay={0.15}>
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-3xl mx-auto" data-article-body="">
               {article.content && <PortableTextRenderer content={article.content} />}
               <FaqSection faq={article.faq} heading={tArticle('faqHeading')} />
               <div className="mt-16 pt-8 border-t border-border" />

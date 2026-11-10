@@ -284,6 +284,21 @@
   transform: scaleX(1);
 }
 
+/* ── Artykuł: pasek postępu i odsłanianie h2 (components/blog/ArticleScroll.tsx) ── */
+.reading-progress {
+  transform: scaleX(0);
+  transform-origin: left;
+  pointer-events: none;
+}
+
+/* Tylko h2 w treści artykułu (PortableTextRenderer działa też na stronach page buildera — tam bez efektu);
+   tylko ekran (wydruk pokazuje wszystko) */
+@media screen and (prefers-reduced-motion: no-preference) {
+  html.js [data-article-body] h2[data-reveal]:not([data-reveal-done]) {
+    opacity: 0;
+  }
+}
+
 /* ── Motion: stany startowe animacji wejścia (components/ui/Motion.tsx) ── */
 /* Tylko z JS (html.js ustawiane inline przed hydracją) i bez prośby o ograniczenie ruchu.
    data-motion-done = animacja zakończona → reguła przestaje działać. */
