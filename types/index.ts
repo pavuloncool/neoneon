@@ -21,6 +21,8 @@ export interface Article {
   slug: string
   title: string
   excerpt?: string | null
+  seo_title?: string | null // puste → title
+  seo_description?: string | null // puste → excerpt
   content: PortableTextBlock[] | null // Portable Text (Sanity)
   category: 'content-writing' | 'ux-strategies' | 'data-visualisation'
   cover_image_url?: string | null

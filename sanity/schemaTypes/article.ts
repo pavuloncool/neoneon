@@ -45,6 +45,22 @@ export const article = defineType({
       validation: (r) => r.required(),
     }),
     defineField({ name: 'excerpt', title: 'Zajawka', type: 'text', rows: 3 }),
+    // Nieobowiązkowe: puste = w wynikach wyszukiwania i udostępnieniach idzie Tytuł / Zajawka
+    defineField({
+      name: 'seoTitle',
+      title: 'Tytuł SEO',
+      description: 'Tytuł w Google i w karcie przeglądarki. Puste = użyty zostanie Tytuł. Końcówka z „Ustawień strony” (np. „| neoneon”) dopisze się sama.',
+      type: 'string',
+      validation: (r) => r.max(60).warning('Google zwykle ucina tytuły dłuższe niż ok. 60 znaków (razem z końcówką).'),
+    }),
+    defineField({
+      name: 'seoDescription',
+      title: 'Opis SEO',
+      description: 'Opis w Google i przy udostępnianiu. Puste = użyta zostanie Zajawka. Zalecane 120–160 znaków.',
+      type: 'text',
+      rows: 3,
+      validation: (r) => r.max(160).warning('Google zwykle ucina opisy dłuższe niż ok. 160 znaków.'),
+    }),
     defineField({
       name: 'coverImage',
       title: 'Okładka',

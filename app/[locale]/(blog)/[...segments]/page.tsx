@@ -45,8 +45,9 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     locale,
     path: `/${article.category}/${article.slug}`,
     altPath: translation ? `/${translation.category}/${translation.slug}` : null,
-    title,
-    description: stegaClean(article.excerpt),
+    // Tytuł SEO / Opis SEO są nieobowiązkowe — puste pole = tytuł i zajawka
+    title: stegaClean(article.seo_title)?.trim() || title,
+    description: stegaClean(article.seo_description)?.trim() || stegaClean(article.excerpt),
     image: article.cover_image_url ? { url: article.cover_image_url, alt: title } : null,
     article: { publishedTime: article.published_at, modifiedTime: article.updated_at },
   })

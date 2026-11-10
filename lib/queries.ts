@@ -17,6 +17,8 @@ const ARTICLE_PROJECTION = groq`{
   "slug": slug.current,
   title,
   excerpt,
+  "seo_title": seoTitle,
+  "seo_description": seoDescription,
   content,
   category,
   "cover_image_url": coverImage.asset->url,
