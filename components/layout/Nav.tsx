@@ -7,7 +7,6 @@ import { cn } from '@/lib/utils'
 import { useState, useEffect, useRef } from 'react'
 import { Search, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { gsap, useGSAP } from '@/lib/gsap'
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher'
 
 // Dane z ustawień strony w Sanity (siteSettings) — przygotowuje je app/[locale]/(blog)/layout.tsx
@@ -151,55 +150,72 @@ export function Nav({ links, logo, labels }: NavProps) {
   }
 
   // Kurtyna od dołu (od pilla) + linie linków wjeżdżające z maski; zamknięcie = odwrotna timeline.
-  // Budowana w czasie bezczynności po załadowaniu, nie przy hydracji: GSAP czyta style elementów
-  // (wymuszone przeliczenie stylu — na długim artykule ~17 ms w długim tasku → TBT). Gdyby menu otwarto
-  // wcześniej, timeline powstaje na żądanie (buildMenu.current).
-  const buildMenu = useRef<(() => void) | null>(null)
-  useGSAP(
-    (_, contextSafe) => {
-      const d = dialogRef.current
-      if (!d || !contextSafe) return
-      const build = contextSafe(() => {
-        if (timeline.current) return
-        timeline.current = gsap
-          .timeline({ paused: true })
-          .fromTo(d, { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.55, ease: 'power3.inOut' })
-          .fromTo(d.querySelectorAll('[data-menu-line]'), { yPercent: 110 }, { yPercent: 0, duration: 0.5, ease: 'power3.out', stagger: 0.06 }, '-=0.2')
-          .fromTo(d.querySelectorAll('[data-menu-fade]'), { opacity: 0 }, { opacity: 1, duration: 0.3 }, '<0.1')
-      })
-      buildMenu.current = build
-      const idle = typeof window.requestIdleCallback === 'function'
-        ? window.requestIdleCallback(() => build(), { timeout: 3000 })
-        : window.setTimeout(build, 1500)
-      return () => {
-        if (typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idle)
-        else window.clearTimeout(idle)
-      }
-    },
-    { scope: dialogRef },
-  )
+  // GSAP ładowany dynamicznie, nie statycznym importem: Nav jest w layoucie, a statyczny import wiązał
+  // moduł layoutu z chunkiem GSAP — inicjalizacja i hydracja szły wtedy jednym długim taskiem
+  // (TBT +~50 ms na artykule). GSAP i tak jest już w cache z animacji strony (Motion).
+  // Timeline budowana w czasie bezczynności (GSAP czyta style elementów); przy wcześniejszym otwarciu — na żądanie.
+  const buildMenu = useRef<(() => Promise<void>) | null>(null)
+  const isOpen = useRef(false)
+  useEffect(() => {
+    const d = dialogRef.current
+    if (!d) return
+    let cancelled = false
+    let ctx: gsap.Context | null = null
+    let pending: Promise<void> | null = null
+    const build = () =>
+      (pending ??= import('@/lib/gsap').then(({ gsap }) => {
+        if (cancelled || timeline.current) return
+        ctx = gsap.context(() => {
+          timeline.current = gsap
+            .timeline({ paused: true })
+            .fromTo(d, { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.55, ease: 'power3.inOut' })
+            .fromTo(d.querySelectorAll('[data-menu-line]'), { yPercent: 110 }, { yPercent: 0, duration: 0.5, ease: 'power3.out', stagger: 0.06 }, '-=0.2')
+            .fromTo(d.querySelectorAll('[data-menu-fade]'), { opacity: 0 }, { opacity: 1, duration: 0.3 }, '<0.1')
+        }, d)
+        // Zbudowana, gdy menu było już otwarte w trybie reduced motion — od razu stan końcowy
+        if (isOpen.current && window.matchMedia('(prefers-reduced-motion: reduce)').matches) timeline.current?.progress(1).pause()
+      }))
+    buildMenu.current = build
+    const idle = typeof window.requestIdleCallback === 'function'
+      ? window.requestIdleCallback(() => { build() }, { timeout: 3000 })
+      : window.setTimeout(() => { build() }, 1500)
+    return () => {
+      cancelled = true
+      if (typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idle)
+      else window.clearTimeout(idle)
+      ctx?.revert()
+      timeline.current = null
+    }
+  }, [])
 
   // Otwieranie/zamykanie: animacja, inert dla wszystkiego poza dialogiem, blokada scrolla, fokus, Esc
   useEffect(() => {
     const d = dialogRef.current
     if (!d) return
+    isOpen.current = menuOpen
     if (!menuOpen && !wasOpen.current) return // stan początkowy — nic do cofania
-    if (!timeline.current) buildMenu.current?.()
-    const tl = timeline.current
-    if (!tl) return
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     // Rodzeństwo dialogu (skip link, header, pill, main, footer) — inert na czas otwarcia
     const outside = Array.from(d.parentElement?.children ?? []).filter((el) => el !== d && el.tagName !== 'SCRIPT') as HTMLElement[]
 
     if (menuOpen) {
       wasOpen.current = true
+      let stale = false
       outside.forEach((el) => { el.inert = true })
       document.body.style.overflow = 'hidden'
-      // Widoczność poza timeline — od razu, żeby fokus mógł wejść do dialogu w tej samej klatce
-      tl.eventCallback('onReverseComplete', null)
-      gsap.set(d, { visibility: 'visible' })
-      if (reduce) tl.progress(1).pause()
-      else tl.timeScale(1).play()
+      // Widoczność od razu (nie w timeline) — fokus może wejść do dialogu w następnej klatce
+      d.style.visibility = 'visible'
+      if (reduce) {
+        if (timeline.current) timeline.current.progress(1).pause()
+        else d.style.clipPath = 'none'
+      } else {
+        buildMenu.current?.().then(() => {
+          const tl = timeline.current
+          if (stale || !tl) return
+          tl.eventCallback('onReverseComplete', null)
+          tl.timeScale(1).play()
+        })
+      }
       // Fokus na pierwszy link w następnej klatce — po zdjęciu inert i ustawieniu widoczności
       const raf = requestAnimationFrame(() => d.querySelector<HTMLElement>('a[href], button')?.focus())
 
@@ -214,6 +230,7 @@ export function Nav({ links, logo, labels }: NavProps) {
       }
       document.addEventListener('keydown', onKey)
       return () => {
+        stale = true
         cancelAnimationFrame(raf)
         document.removeEventListener('keydown', onKey)
       }
@@ -221,9 +238,10 @@ export function Nav({ links, logo, labels }: NavProps) {
 
     outside.forEach((el) => { el.inert = false })
     document.body.style.overflow = ''
-    // Po zamknięciu wraca visibility: hidden z CSS (.menu-dialog)
-    const hide = () => gsap.set(d, { clearProps: 'visibility' })
-    if (reduce) { tl.progress(0).pause(); hide() }
+    // Po zamknięciu wracają visibility: hidden i clip-path z CSS (.menu-dialog)
+    const hide = () => { d.style.visibility = ''; d.style.clipPath = '' }
+    const tl = timeline.current
+    if (reduce || !tl) { tl?.progress(0).pause(); hide() }
     else { tl.eventCallback('onReverseComplete', hide); tl.timeScale(1.4).reverse() }
     // Powrót fokusu na przycisk otwierający (tylko jeśli fokus był w dialogu — nie przy zmianie strony)
     if (d.contains(document.activeElement)) openerRef.current?.focus()
