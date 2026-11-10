@@ -36,6 +36,12 @@
 - **JS:** formularze (komentarz, kontakt), embedy z linku i `ArticleScroll` ładowane przez `next/dynamic` z SSR (`components/blog/lazy.tsx`) — strona kategorii we wspólnej trasie nie pobiera ich kodu. HTML bez zmian.
 - Porównanie 38 adresów + 12 przypadków brzegowych względem produkcji: zero różnic. Lighthouse mobile (mediana z 5) w progach względem `814c4f7`.
 
+### Porządki techniczne — etap 4b-1: migracja danych kategorii (wykonana 2026-11-10, 22:34)
+
+- Kopia przed migracją: eksport typów `article`, `category`, `siteSettings`, `page`, `translation.metadata` (`--raw`, z odwołaniami do obrazów; bez komentarzy i wiadomości kontaktowych).
+- Migracja `migrations/kategorie-4b-1` (jedna transakcja): 4 dokumenty `category` (Tworzenie treści / Content Writing, Strategie UX / UX Strategies), 2 powiązania tłumaczeń PL ↔ EN, `categoryRef` w 15 artykułach. Pole `category` bez zmian. Wycofanie: `migrations/kategorie-4b-1-wycofanie`.
+- Na stronie: etykieta nad 8 artykułami PL ma polską nazwę („Tworzenie treści”, „Strategie UX”) zamiast angielskiej. Skutek uboczny: `_updatedAt` 15 artykułów = czas migracji, więc `article:modified_time`, `dateModified` w JSON-LD i `lastmod` w sitemapie pokazują 2026-11-10.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
