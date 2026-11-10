@@ -11,6 +11,10 @@ if (!process.env.NEXT_PUBLIC_SITE_URL && typeof window === 'undefined') {
 }
 export const SITE_NAME = 'neoneon'
 
+// Środowisko Vercel: 'production' | 'preview' | 'development'; lokalnie brak = nie-produkcja.
+// W przeglądarce dostępne tylko NEXT_PUBLIC_VERCEL_ENV (Vercel ustawia je sam dla Next.js).
+export const IS_PRODUCTION = (process.env.VERCEL_ENV ?? process.env.NEXT_PUBLIC_VERCEL_ENV) === 'production'
+
 // Adresy e-mail formularzy (Resend): nadawca musi być w domenie zweryfikowanej w Resend
 export const FORM_FROM_EMAIL = 'formularz@neoneon.online'
 export const CONTACT_EMAIL = 'ask@neoneon.online'

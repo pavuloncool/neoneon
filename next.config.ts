@@ -18,6 +18,11 @@ const nextConfig: NextConfig = {
       { source: '/stats/api/send', destination: 'https://cloud.umami.is/api/send' },
     ]
   },
+  // Poza produkcją (podglądy Vercel, lokalne buildy) — noindex na każdej odpowiedzi
+  async headers() {
+    if (process.env.VERCEL_ENV === 'production') return []
+    return [{ source: '/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] }]
+  },
   images: {
     remotePatterns: [
       {
