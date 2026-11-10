@@ -17,7 +17,8 @@
 - **Resend** (`lib/email.ts`): klient tworzony przy pierwszym użyciu. Wcześniej brak klucza wywracał całe trasy `/api/contact` i `/api/comments`; teraz wyłącza tylko maile, wpisy trafiają do Sanity.
 - **Turnstile:** brak kluczy na produkcji = formularz wyłączony z komunikatem „Formularz chwilowo niedostępny” (`messages: form.unavailable`, trasy zwracają 503); poza produkcją = weryfikacja pominięta z ostrzeżeniem w logu.
 - **Umami:** brak `NEXT_PUBLIC_UMAMI_WEBSITE_ID` na produkcji = ostrzeżenie w logu (skrypt jak dotąd się nie ładuje).
-- `.env.local.example`: dopisane `NEXT_PUBLIC_SITE_URL`, `RESEND_API_KEY`, `NEXT_PUBLIC_UMAMI_WEBSITE_ID`, `VERCEL_BYPASS` i opis zmiennych ustawianych przez Vercel.
+- **Zabezpieczenie przy buildzie** (`next.config.ts`): na produkcji `NEXT_PUBLIC_SITE_URL` bez `https://` albo w domenie `*.vercel.app` przerywa build czytelnym błędem. Powód: w Vercel zmienna miała wartość `https://neoneon.vercel.app` (poprawiona na `https://neoneon.online` we wszystkich środowiskach przed wdrożeniem).
+- `.env.local.example`: dopisane `NEXT_PUBLIC_SITE_URL`, `RESEND_API_KEY`, `NEXT_PUBLIC_UMAMI_WEBSITE_ID`, `VERCEL_BYPASS` i opis zmiennych ustawianych przez Vercel; usunięty nieużywany `SANITY_MIGRATION_TOKEN`.
 - Canonical, hreflang, `og:*`, JSON-LD, sitemap i robots.txt na produkcji — bez zmian (porównanie 38 adresów).
 
 ## 2026-10-29
