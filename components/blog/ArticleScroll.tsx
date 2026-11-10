@@ -54,9 +54,9 @@ export function ArticleScroll() {
                 gsap.set(h, { opacity: 1 })
                 return gsap.from(self.lines, {
                   yPercent: 100,
-                  duration: 0.7,
+                  duration: 0.45,
                   ease: 'power3.out',
-                  stagger: 0.08,
+                  stagger: 0.05,
                   onComplete: () => {
                     // revert() cofa też tę animację — stan końcowy = oryginał, DOM wraca do czystego h2
                     self.revert()
@@ -80,10 +80,11 @@ export function ArticleScroll() {
               reveal(e.target as HTMLElement)
             }
           },
-          // Górny margines ogromny: nagłówek „przecina się” z obszarem, gdy jest gdziekolwiek powyżej linii
-          // 88% wysokości ekranu — także gdy został przeskoczony (kotwica, skok na koniec strony).
-          // Bez tego zostałby z opacity 0 nad ekranem.
-          { rootMargin: '100000px 0px -12% 0px' },
+          // Górny margines ogromny: nagłówek „przecina się” z obszarem, gdy jest gdziekolwiek powyżej dolnej
+          // krawędzi ekranu + 10% — także gdy został przeskoczony (kotwica, skok na koniec strony).
+          // Bez tego zostałby z opacity 0 nad ekranem. Dolny margines dodatni: odsłanianie rusza tuż przed
+          // wejściem w widok, więc czytelnik nie czeka na pusty nagłówek.
+          { rootMargin: '100000px 0px 10% 0px' },
         )
         below.forEach((h) => io!.observe(h))
       }
