@@ -34,7 +34,7 @@ export interface Article {
   status: 'draft' | 'published'
   published_at?: string | null
   created_at: string
-  updated_at: string
+  updated_at: string | null // data modyfikacji: contentUpdatedAt, a bez niej publishedAt
   tags?: Tag[]
   faq?: FaqItem[] | null
   locale: Locale

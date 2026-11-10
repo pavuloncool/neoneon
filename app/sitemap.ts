@@ -6,11 +6,18 @@ import type { Locale } from '@/lib/locales'
 // Odświeżana co godzinę — nowe artykuły trafiają do sitemapy bez ponownego wdrożenia
 export const revalidate = 3600
 
-type Doc = { _id: string; locale: Locale; path: string; _updatedAt: string }
+type Doc = { _id: string; locale: Locale; path: string; modifiedAt: string | null }
 
 // Jak w lib/metadata.ts: x-default wskazuje wersję PL, jeśli istnieje
 function withDefault(languages: Partial<Record<Locale, string>>): Record<string, string> {
   return languages.pl ? { ...languages, 'x-default': languages.pl } : (languages as Record<string, string>)
+}
+
+// Późniejsza z dwóch dat ISO (różne formaty strefy, więc porównanie przez Date.parse)
+function newer(a: string | null, b: string | null): string | null {
+  if (!a) return b
+  if (!b) return a
+  return Date.parse(b) > Date.parse(a) ? b : a
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -33,21 +40,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const group = groupOf.get(d._id) ?? [d]
     return {
       url: localeUrl(d.locale, d.path),
-      lastModified: d._updatedAt,
+      lastModified: d.modifiedAt ?? undefined,
       alternates: { languages: withDefault(Object.fromEntries(group.map((g) => [g.locale, localeUrl(g.locale, g.path)]))) },
     }
   })
 
-  // Strony kategorii: tylko w językach, w których kategoria ma artykuły
-  const localesByCategory = new Map<string, Set<Locale>>()
+  // Strony kategorii: tylko w językach, w których kategoria ma artykuły.
+  // lastmod = najnowsza data modyfikacji artykułu tej kategorii w danym języku.
+  const byCategory = new Map<string, Map<Locale, string | null>>()
   for (const a of articles) {
-    if (!localesByCategory.has(a.category)) localesByCategory.set(a.category, new Set())
-    localesByCategory.get(a.category)!.add(a.locale)
+    const locales = byCategory.get(a.category) ?? new Map<Locale, string | null>()
+    byCategory.set(a.category, locales)
+    const current = locales.get(a.locale) ?? null
+    locales.set(a.locale, newer(current, a.modifiedAt))
   }
-  for (const [category, locales] of localesByCategory) {
-    const languages = withDefault(Object.fromEntries([...locales].map((l) => [l, localeUrl(l, `/${category}`)])))
-    for (const locale of locales) {
-      entries.push({ url: localeUrl(locale, `/${category}`), alternates: { languages } })
+  for (const [category, locales] of byCategory) {
+    const languages = withDefault(Object.fromEntries([...locales.keys()].map((l) => [l, localeUrl(l, `/${category}`)])))
+    for (const [locale, modifiedAt] of locales) {
+      entries.push({ url: localeUrl(locale, `/${category}`), lastModified: modifiedAt ?? undefined, alternates: { languages } })
     }
   }
 

@@ -36,6 +36,26 @@
 - **JS:** formularze (komentarz, kontakt), embedy z linku i `ArticleScroll` ładowane przez `next/dynamic` z SSR (`components/blog/lazy.tsx`) — strona kategorii we wspólnej trasie nie pobiera ich kodu. HTML bez zmian.
 - Porównanie 38 adresów + 12 przypadków brzegowych względem produkcji: zero różnic. Lighthouse mobile (mediana z 5) w progach względem `814c4f7`.
 
+### Porządki techniczne — etap 4b-1: migracja danych kategorii (wykonana 2026-11-10, 22:34)
+
+- Kopia przed migracją: eksport typów `article`, `category`, `siteSettings`, `page`, `translation.metadata` (`--raw`, z odwołaniami do obrazów; bez komentarzy i wiadomości kontaktowych).
+- Migracja `migrations/kategorie-4b-1` (jedna transakcja): 4 dokumenty `category` (Tworzenie treści / Content Writing, Strategie UX / UX Strategies), 2 powiązania tłumaczeń PL ↔ EN, `categoryRef` w 15 artykułach. Pole `category` bez zmian. Wycofanie: `migrations/kategorie-4b-1-wycofanie`.
+- Na stronie: etykieta nad 8 artykułami PL ma polską nazwę („Tworzenie treści”, „Strategie UX”) zamiast angielskiej. Skutek uboczny: `_updatedAt` 15 artykułów = czas migracji, więc `article:modified_time`, `dateModified` w JSON-LD i `lastmod` w sitemapie pokazują 2026-11-10.
+
+### Porządki techniczne — data modyfikacji artykułów niezależna od `_updatedAt`
+
+- Nowe nieobowiązkowe pole artykułu „Data aktualizacji treści” (`contentUpdatedAt`), ustawiane ręcznie tylko po istotnej zmianie treści.
+- Data modyfikacji artykułu (`article:modified_time`, `dateModified` w JSON-LD, `lastmod` w sitemapie) = `coalesce(contentUpdatedAt, publishedAt)`. `_updatedAt` zmienia każda edycja i migracja, także techniczna — dla artykułów nie jest już używany.
+- Strony kategorii w sitemapie dostają `lastmod` (wcześniej bez niego): najnowsza data modyfikacji artykułu tej kategorii w danym języku.
+- Strony z page buildera (`page`) bez zmian: `lastmod` = `_updatedAt`.
+- Na stronie: daty modyfikacji 15 artykułów wracają do dat publikacji (po 4b-1 pokazywały 2026-11-10).
+
+### Porządki techniczne — etap 4b-2 (kod): kategorie w linkach i kafelkach jako referencje
+
+- Link (menu, stopka, przycisk w sekcji „Tekst ze zdjęciem”) i kafelek w sekcji „Kafelki kategorii”: nowe pole „Kategoria (dokument)” (`categoryRef`, tylko kategorie w języku dokumentu) obok dotychczasowego, przemianowanego na „Kategoria (dotychczasowa)”. Walidacja: wymagane jedno z nich.
+- Zapytania: slug kategorii = `coalesce(categoryRef->slug.current, category)` (`CATEGORY_SLUG` w `lib/links.ts`) — w projekcji linku i kafelków.
+- Bez zmian na stronie, dopóki dane nie zostaną przeniesione (porównanie 38 + 12 adresów).
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów

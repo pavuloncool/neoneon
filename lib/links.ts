@@ -30,5 +30,9 @@ export function resolveHref(link?: SanityLink | null): ResolvedLink | null {
   }
 }
 
+// Slug kategorii w linku albo kafelku: dokument `category` (categoryRef), a bez niego dotychczasowe pole
+// z listy z kodu (okres przejściowy do etapu 4c)
+export const CATEGORY_SLUG = `coalesce(categoryRef->slug.current, category)`
+
 // Projekcja GROQ dla pola typu `link`
-export const LINK_PROJECTION = `{ linkType, category, url, "page": page->{ "slug": slug.current, isHome } }`
+export const LINK_PROJECTION = `{ linkType, "category": ${CATEGORY_SLUG}, url, "page": page->{ "slug": slug.current, isHome } }`
