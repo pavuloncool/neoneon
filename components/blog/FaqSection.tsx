@@ -13,10 +13,10 @@ export function FaqSection({ faq, heading }: { faq?: FaqItem[] | null; heading: 
       <h2 id="faq" className="font-display text-3xl font-light mb-6 scroll-mt-20">{heading}</h2>
       <div className="divide-y divide-border border-y border-border">
         {items.map((item, i) => (
-          <details key={i} className="group py-5">
+          <details key={i} className="group/faq py-5">
             <summary className="flex cursor-pointer list-none items-start justify-between gap-6 text-lg leading-snug [&::-webkit-details-marker]:hidden">
               <h3 className="font-medium">{item.question}</h3>
-              <span aria-hidden className="mt-0.5 shrink-0 text-2xl font-light leading-none text-muted transition-transform duration-200 group-open:rotate-45 dark:text-white/60">+</span>
+              <span aria-hidden className="mt-0.5 shrink-0 text-2xl font-light leading-none text-muted transition-transform duration-200 group-open/faq:rotate-45 dark:text-white/60">+</span>
             </summary>
             <p className="mt-3 whitespace-pre-line leading-relaxed text-muted dark:text-white/70">{item.answer}</p>
           </details>
