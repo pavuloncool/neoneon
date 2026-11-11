@@ -55,7 +55,7 @@ export const page = defineType({
           if (!value?.current) return 'Podaj adres strony'
           if (APP_RESERVED_SLUGS.includes(value.current)) return `Adres „${value.current}” jest zajęty przez funkcję strony`
           const locale = String(ctx.document?.locale ?? DEFAULT_LOCALE)
-          if (await slugTaken(ctx.getClient, 'category', value.current, locale, undefined)) return `Adres „${value.current}” ma już kategoria w tym języku`
+          if (await slugTaken(ctx.getClient, 'category', value.current, locale, undefined)) return `Adres „${value.current}” ma (albo miała wcześniej) kategoria w tym języku`
           return true
         }),
     }),

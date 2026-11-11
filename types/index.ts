@@ -28,6 +28,7 @@ export interface Article {
   content: PortableTextBlock[] | null // Portable Text (Sanity)
   category: string // slug dokumentu `category`
   category_title?: string | null // nazwa z dokumentu `category`
+  category_previous_slugs?: string[] | null // dawne slugi kategorii (przekierowania 308)
   cover_image_url?: string | null
   cover_focal_x?: number | null
   cover_focal_y?: number | null

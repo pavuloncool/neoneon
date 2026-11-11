@@ -1,9 +1,9 @@
 export const dynamic = 'force-dynamic'
 
 import { getTranslations } from 'next-intl/server'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import Image from 'next/image'
-import { getArticleBySlug, getCommentsByArticle, getArticleTranslation, getPage } from '@/lib/queries'
+import { getArticleBySlug, getCommentsByArticle, getArticleTranslation, getCategorySlugByPreviousSlug, getPage } from '@/lib/queries'
 import { PageSections } from '@/components/sections/SectionRendererLazy'
 import { CategoryPage } from '@/components/blog/CategoryPage'
 import { resolveCategory } from '@/lib/categoryRoute'
@@ -25,11 +25,21 @@ import { stegaClean } from 'next-sanity'
 
 interface ArticlePageProps {
   params: Promise<{ locale: Locale; segments: string[] }>
-  searchParams: Promise<{ tag?: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-// /{locale}/{slug} = kategoria (dokument `category`, w okresie przejściowym też lista z kodu),
-//   a gdy to nie kategoria — strona z page buildera („O mnie”, „Kontakt”, nowe strony); inaczej 404.
+// Parametry adresu (np. ?tag=) przenoszone do adresu docelowego przekierowania
+function queryString(params: Record<string, string | string[] | undefined>): string {
+  const qs = new URLSearchParams()
+  for (const [key, value] of Object.entries(params)) {
+    for (const v of Array.isArray(value) ? value : value === undefined ? [] : [value]) qs.append(key, v)
+  }
+  const out = qs.toString()
+  return out ? `?${out}` : ''
+}
+
+// /{locale}/{slug} = kategoria (dokument `category`), a gdy to nie kategoria — strona z page buildera
+//   („O mnie”, „Kontakt”, nowe strony); dawny adres kategorii (`previousSlugs`) → 308; inaczej 404.
 //   Walidacja w Studio nie pozwala, by kategoria i strona miały ten sam slug w jednym języku.
 // /{locale}/{kategoria}/{slug} = artykuł
 // Opis artykułu dla wyszukiwarek (meta description i JSON-LD): Opis SEO, a gdy pusty — zajawka.
@@ -82,17 +92,27 @@ export default async function ArticlePage({ params, searchParams }: ArticlePageP
 
   if (segments.length === 1) {
     const category = await resolveCategory(locale, segments[0])
-    if (category) return <CategoryPage category={category} locale={locale} tag={(await searchParams).tag} />
+    const query = await searchParams
+    if (category) return <CategoryPage category={category} locale={locale} tag={typeof query.tag === 'string' ? query.tag : undefined} />
     const page = await getPage(locale, segments[0])
-    if (!page) notFound()
-    return <PageSections page={page} locale={locale} />
+    if (page) return <PageSections page={page} locale={locale} />
+    // Dawny adres kategorii (`previousSlugs`) → 308 na obecny, z parametrami adresu
+    const current = await getCategorySlugByPreviousSlug(locale, segments[0])
+    if (current && current !== segments[0]) permanentRedirect(`/${locale}/${current}${queryString(query)}`)
+    notFound()
   }
 
   const { category, slug } = getRouteParams(segments)
 
   const article = await getArticleBySlug(slug, locale)
   if (!article) notFound()
-  if (article.category !== category) notFound()
+  if (article.category !== category) {
+    // Artykuł pod dawnym adresem swojej kategorii → 308 na obecny; inna kategoria w adresie → 404
+    if (article.category_previous_slugs?.includes(category)) {
+      permanentRedirect(`/${locale}/${article.category}/${article.slug}${queryString(await searchParams)}`)
+    }
+    notFound()
+  }
 
   const comments = await getCommentsByArticle(article.id)
   const t = await getTranslations('comments')

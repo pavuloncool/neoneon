@@ -185,6 +185,33 @@
 
 - Obrazki z Portable Text dostają `width`/`height` z identyfikatora zasobu Sanity (`image-<hash>-<szer>x<wys>-<format>`, z uwzględnieniem przycięcia). Wcześniej `<img loading="lazy">` miał wysokość 0 do załadowania i potem przesuwał treść — to on przy wejściu z `#faq` odpychał nagłówek (np. 0 → 342 px). Wygląd po załadowaniu bez zmian (CSS: `width: 100%; height: auto`). Dotyczy 9 obrazków w artykułach; żaden nie jest przycięty.
 
+### Porządki techniczne — etap 6a: poprzednie adresy kategorii (model i walidacja)
+
+- `category.previousSlugs` („Poprzednie adresy”, lista, tylko do odczytu w Studio): dawne slugi, które strona przekierowuje (308) na obecny.
+- Walidacja sluga kategorii: zmiana sluga opublikowanej kategorii dozwolona tylko wtedy, gdy stary slug jest w `previousSlugs` (dopisuje go akcja publikacji); inaczej błąd z instrukcją. Zastępuje blokadę z 4c.
+- Kolizje (perspektywa `raw`, `slugTaken`): slug kategorii nie może być obecnym ani poprzednim adresem innej kategorii w tym języku, stroną page buildera ani adresem zarezerwowanym; strona nie może zająć obecnego ani poprzedniego adresu kategorii.
+
+### Porządki techniczne — etap 6a: akcja „Opublikuj (zmiana adresu)” dla kategorii
+
+- `sanity/actions/categoryPublish.tsx`: zastępuje „Opublikuj” w kategorii. Bez zmiany sluga działa jak zwykła publikacja. Przy zmianie sluga opublikowanej kategorii: etykieta „Opublikuj (zmiana adresu)”, okno potwierdzenia (stary i nowy adres, przekierowania 308), potem dopisanie starego sluga do `previousSlugs` (powrót do dawnego adresu usuwa go z listy) i publikacja. Aktywna tylko wtedy, gdy jedynym błędem walidacji jest zmiana adresu.
+
+### Porządki techniczne — etap 6a: przekierowania 308 z dawnych adresów kategorii
+
+- Trasa `[...segments]`, tylko na ścieżce „nie znaleziono” (bez dodatkowych zapytań dla działających adresów): `/{locale}/{dawny-slug}` → 308 na `/{locale}/{slug}` (gdy to nie kategoria ani strona, a slug jest w `previousSlugs` kategorii); `/{locale}/{dawny-slug}/{artykuł}` → 308 na `/{locale}/{slug}/{artykuł}`, tylko gdy artykuł ma tę kategorię (inna kategoria w adresie nadal 404). Parametry adresu (`?tag=`) zachowane. `permanentRedirect()`.
+- Zapytania: `getCategorySlugByPreviousSlug`, w projekcji artykułu `category_previous_slugs`.
+
+### Porządki techniczne — etap 6a: przełącznik języka na stronie kategorii
+
+- Strona kategorii zapisuje adres odpowiednika w drugim języku (`TranslationStore` ze slugiem z powiązania tłumaczeń). Wcześniej przełącznik zostawiał ten sam slug — przy różnych slugach PL/EN prowadziłby do 404.
+
+### Porządki techniczne — etap 6a: lokalna symulacja danych (narzędzie testowe)
+
+- `SANITY_API_HOST` (tylko lokalnie; na Vercel ignorowane): klient strony czyta treści z innego adresu API. Służy do testów z danymi zmienionymi w pamięci (`higiena/sanity-mock.mjs`, GROQ przez `groq-js`) — bez zapisu do Sanity.
+
+### Porządki techniczne — etap 6a: polski komunikat kolizji sluga kategorii
+
+- Kolizję z obecnym lub poprzednim adresem innej kategorii w tym języku zgłasza walidacja pola: „Ten adres jest już używany przez inną kategorię w tym języku (obecny lub poprzedni adres).” Domyślne sprawdzenie Sanity („Slug is already in use”) wyłączone. Test walidacji 12/12.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
