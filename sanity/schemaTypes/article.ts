@@ -6,6 +6,7 @@
 import { defineField, defineType } from 'sanity'
 import { faqField } from './faqField'
 import { categoryRefField } from './category'
+import { publishedSlug } from '../slugConflicts'
 
 export const article = defineType({
   name: 'article',
@@ -17,12 +18,21 @@ export const article = defineType({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
+      description:
+        'Część adresu artykułu: /{język}/{kategoria}/{slug}. Po publikacji zmiana jest zablokowana — stary adres zwracałby 404.',
       options: { source: 'title', maxLength: 96 },
-      // Wielkie litery w URL-u tworzą duplikaty w Google; proxy.ts i tak przekierowuje na małe litery
       validation: (r) =>
-        r.required().custom((slug) =>
-          !slug?.current || slug.current === slug.current.toLowerCase() ? true : 'Slug tylko małymi literami'
-        ),
+        r.required().custom(async (slug, ctx) => {
+          if (!slug?.current) return true
+          // Wielkie litery w URL-u tworzą duplikaty w Google; proxy.ts i tak przekierowuje na małe litery
+          if (slug.current !== slug.current.toLowerCase()) return 'Slug tylko małymi literami'
+          // Opublikowany artykuł: zmiana sluga = stary adres 404 (bez przekierowań). Błąd blokuje „Opublikuj”.
+          const published = await publishedSlug(ctx.getClient, ctx.document?._id)
+          if (published && published !== slug.current) {
+            return `Nie można zmienić adresu opublikowanego artykułu: stary adres (i linki do niego) zwracałby 404. Przywróć „${published}”.`
+          }
+          return true
+        }),
     }),
     defineField({
       // Ustawiane przez wtyczkę document-internationalization (languageField: 'locale')

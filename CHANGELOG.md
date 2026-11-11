@@ -124,6 +124,32 @@
 - Usunięte `scripts/export_supabase_backup.sh` (zrzut bazy Supabase przez CLI) i katalog `supabase/` (`schema.sql`, `2026-10-28_sanity_comments_fk.sql`, `.temp/cli-latest`). Projekt Supabase nie istnieje, kopie danych są poza repozytorium.
 - W kodzie zostają 4 komentarze historyczne o pochodzeniu danych (m.in. `_id` zmigrowanych artykułów = dawny UUID z Supabase). Brak zmiennych `SUPABASE_*` i zależności Supabase. Wpis `backups/` w `.gitignore` zostaje.
 
+### Porządki techniczne — etap 7, A1: `tsc --noEmit` bez błędu `globals.css`
+
+- `types/css.d.ts`: deklaracja `*.css` dla importu `@/styles/globals.css`. Przyczyna błędu TS2882: `node_modules/.bin/tsc` (też `npx tsc`) to TypeScript 6.0.3 z CLI Sanity (`@sanity/workflow-cli` → `@typescript/old`), który domyślnie sprawdza importy dla efektu ubocznego. Projektowy TypeScript 5.9 (`npm run typecheck`, build Next) błędu nie zgłaszał.
+- Czysto: `tsc --noEmit` (TS 6), `npm run typecheck` (TS 5.9), lint.
+
+### Porządki techniczne — etap 7, A2: bez bezpośredniej zależności `@sanity/language-filter`
+
+- Nic w kodzie go nie importuje. To peer `sanity-plugin-internationalized-array` (peer `@sanity/document-internationalization`): wpis był potrzebny przy `legacy-peer-deps`; od etapu 1 npm instaluje peery sam, więc pakiet zostaje w `node_modules` jako peer (lockfile: `"peer": true`).
+- Build przechodzi, Studio ładuje się lokalnie do ekranu logowania bez błędów w konsoli.
+
+### Porządki techniczne — etap 7, A3: blokada zmiany sluga opublikowanego artykułu
+
+- Walidacja sluga artykułu (`sanity/schemaTypes/article.ts`) jak w kategoriach: gdy slug różni się od opublikowanej wersji (`publishedSlug`), błąd blokuje „Opublikuj” z komunikatem i podpowiedzią starego sluga. Nowe (nieopublikowane) artykuły bez ograniczeń. Opis pola mówi o blokadzie.
+- Test walidacji w trybie Studio (bez zapisu): zmiana sluga szkicu i dokumentu → błąd, slug bez zmian i nowy artykuł → OK, 15/15 opublikowanych artykułów bez fałszywego alarmu.
+
+### Porządki techniczne — etap 7, A4: hreflang kategorii w sitemapie z powiązań tłumaczeń
+
+- Budowa sitemapy przeniesiona do `lib/sitemap.ts` (`buildSitemap`, testowalna bez Sanity); `app/sitemap.ts` tylko pobiera dane.
+- Strony kategorii: odpowiednik językowy z `translation.metadata` dokumentu `category` (zapytanie zwraca też `categoryId` artykułów i listę kategorii), a nie z założenia „ten sam slug w obu językach”. Nadal tylko kategorie i języki z artykułami; `lastmod` jak dotąd.
+- Dziś slugi są identyczne: sitemap bajt w bajt taki sam jak na produkcji (SHA-256). Test jednostkowy na danych z różnymi slugami (PL `strategie-ux` ↔ EN `ux-strategies`, kategoria bez artykułów EN, kategoria bez powiązania): 9/9.
+
+### Porządki techniczne — etap 7, A5: opis artykułu w JSON-LD jak w meta description
+
+- `BlogPosting.description` = „Opis SEO”, a gdy pusty — zajawka (wspólna funkcja `articleDescription` dla metadanych i JSON-LD). Wcześniej JSON-LD brał zawsze zajawkę.
+- Dziś żaden z 15 artykułów nie ma wypełnionego „Opisu SEO” — JSON-LD bez zmian na wszystkich stronach.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
