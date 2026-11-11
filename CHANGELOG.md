@@ -212,6 +212,11 @@
 
 - Kolizję z obecnym lub poprzednim adresem innej kategorii w tym języku zgłasza walidacja pola: „Ten adres jest już używany przez inną kategorię w tym języku (obecny lub poprzedni adres).” Domyślne sprawdzenie Sanity („Slug is already in use”) wyłączone. Test walidacji 12/12.
 
+### Porządki techniczne — etap 6b: polskie slugi kategorii PL (zmiana w Studio, 18:49)
+
+- Kategorie PL zmienione w Studio akcją „Opublikuj (zmiana adresu)”: `content-writing` → `tworzenie-tresci`, `ux-strategies` → `strategie-ux` („Poprzednie adresy” = dawne slugi). EN bez zmian. Linków do adresów kategorii w treściach nie było.
+- Na produkcji: 12 dawnych adresów PL (2 kategorie z `?tag=` i bez, 8 artykułów) → 308 na nowe (200); canonical, hreflang PL ↔ EN, sitemap, menu, stopka, kafelki, przełącznik języka i Presentation wskazują nowe adresy.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
