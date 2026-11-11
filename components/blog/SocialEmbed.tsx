@@ -5,6 +5,7 @@
 // <blockquote> w pełny post (z dopasowaną wysokością); bez JS zostaje zwykły link.
 
 import { useEffect, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 
 const SCRIPTS = {
   instagram: 'https://www.instagram.com/embed.js',
@@ -24,6 +25,7 @@ function process(provider: keyof typeof SCRIPTS, el: HTMLElement) {
 
 export function SocialEmbed({ provider, permalink }: { provider: keyof typeof SCRIPTS; permalink: string }) {
   const ref = useRef<HTMLDivElement>(null)
+  const t = useTranslations('embed')
 
   useEffect(() => {
     const el = ref.current
@@ -51,11 +53,11 @@ export function SocialEmbed({ provider, permalink }: { provider: keyof typeof SC
     <div ref={ref} className="embed-container social-embed">
       {provider === 'instagram' ? (
         <blockquote className="instagram-media" data-instgrm-permalink={permalink} data-instgrm-version="14">
-          <a href={permalink} target="_blank" rel="noopener noreferrer">Zobacz post na Instagramie</a>
+          <a href={permalink} target="_blank" rel="noopener noreferrer">{t('viewOnInstagram')}</a>
         </blockquote>
       ) : (
         <blockquote className="twitter-tweet" data-dnt="true">
-          <a href={permalink} target="_blank" rel="noopener noreferrer">Zobacz post na X</a>
+          <a href={permalink} target="_blank" rel="noopener noreferrer">{t('viewOnX')}</a>
         </blockquote>
       )}
     </div>

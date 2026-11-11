@@ -27,10 +27,10 @@ export function formatDate(dateString: string, locale: string = 'pl-PL'): string
   })
 }
 
-// Szacowany czas czytania (słowa / 200 wpm) — content to Portable Text z Sanity
-export function readingTime(content: unknown, locale: string = 'pl'): string {
+// Szacowany czas czytania w minutach (słowa / 200 wpm) — content to Portable Text z Sanity.
+// Tekst („5 min czytania” / „5 min read”) z tłumaczeń: article.readingTime.
+export function readingMinutes(content: unknown): number {
   const text = Array.isArray(content) ? toPlainText(content) : ''
   const words = text.split(/\s+/).filter(Boolean).length
-  const minutes = Math.ceil(words / 200)
-  return locale === 'pl' ? `${minutes} min czytania` : `${minutes} min read`
+  return Math.ceil(words / 200)
 }

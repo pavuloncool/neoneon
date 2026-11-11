@@ -81,6 +81,18 @@
 - „Kategoria” (`categoryRef`) wymagana w artykule, linku do kategorii i kafelku. Zapytania: `categoryRef->slug.current` bez `coalesce`. Sitemapa pomija artykuł bez kategorii (zamiast adresu `/null/…`).
 - Na stronie: `/pl|en/data-visualisation` (i z parametrami) → 404 — kategoria bez artykułów i bez dokumentu. Pozostałe adresy bez zmian.
 
+### Porządki techniczne — etap 4c: migracja danych (wykonana 10:38)
+
+- Migracja `migrations/kategorie-4c` (jedna transakcja, `ifRevision`): usunięte stare pole `category` w 15 artykułach, w 8 linkach menu i stopki (`siteSettings-pl/en`) i w 4 kafelkach (`page-home-pl/en`). Wycofanie: `migrations/kategorie-4c-wycofanie` (odtwarza pole z `categoryRef`).
+- Na stronie bez zmian (porównanie 38 + 12 adresów); `lastmod` `/pl` i `/en` w sitemapie = czas migracji (`_updatedAt` stron). Daty artykułów bez zmian (`coalesce(contentUpdatedAt, publishedAt)`).
+
+### Porządki techniczne — etap 5: teksty interfejsu w tłumaczeniach
+
+- „5 min czytania” / „5 min read”: `article.readingTime` w `messages/*.json` (`readingMinutes()` w `lib/utils.ts` liczy tylko minuty).
+- Link zapasowy osadzonego posta (`SocialEmbed`): `embed.viewOnInstagram` / `embed.viewOnX` — wcześniej tylko po polsku, także na stronach EN.
+- Zapasowe etykiety a11y w `(blog)/layout.tsx` (gdy pole w Ustawieniach strony jest puste): z `a11y.*` w języku strony; wcześniej po polsku, a „Toggle theme” po angielsku. Dziś nieaktywne — oba `siteSettings` mają komplet etykiet.
+- `DraftModeBanner` i domyślne etykiety `LanguageSwitcher` bez zmian (widzi je tylko redaktor / zapas).
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów

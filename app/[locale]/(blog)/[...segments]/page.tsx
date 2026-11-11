@@ -12,7 +12,7 @@ import { SITE_NAME, SITE_URL, localeUrl } from '@/lib/site'
 import { DATE_LOCALE, otherLocale, type Locale } from '@/lib/locales'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { FaqJsonLd } from '@/components/seo/FaqJsonLd'
-import { formatDate, readingTime } from '@/lib/utils'
+import { formatDate, readingMinutes } from '@/lib/utils'
 import { PortableTextRenderer } from '@/components/blog/PortableTextRenderer'
 import { FaqSection } from '@/components/blog/FaqSection'
 import { TagBadge } from '@/components/blog/TagBadge'
@@ -98,6 +98,7 @@ export default async function ArticlePage({ params, searchParams }: ArticlePageP
   const categoryLabel = article.category_title ?? article.category
 
   const dateLocale = DATE_LOCALE[locale]
+  const readingTime = tArticle('readingTime', { minutes: readingMinutes(article.content) })
 
   return (
     <>
@@ -144,7 +145,7 @@ export default async function ArticlePage({ params, searchParams }: ArticlePageP
                       <span className="text-border">·</span>
                       <span className="text-xs text-muted dark:text-white/60">{article.published_at ? formatDate(article.published_at, dateLocale) : ''}</span>
                       <span className="text-border">·</span>
-                      <span className="text-xs text-muted dark:text-white/60">{readingTime(article.content, locale)}</span>
+                      <span className="text-xs text-muted dark:text-white/60">{readingTime}</span>
                     </div>
                   </div>
                 </div>
@@ -155,7 +156,7 @@ export default async function ArticlePage({ params, searchParams }: ArticlePageP
                     <span className="text-border">·</span>
                     <span className="text-xs text-muted dark:text-white/60">{article.published_at ? formatDate(article.published_at, dateLocale) : ''}</span>
                     <span className="text-border">·</span>
-                    <span className="text-xs text-muted dark:text-white/60">{readingTime(article.content, locale)}</span>
+                    <span className="text-xs text-muted dark:text-white/60">{readingTime}</span>
                   </div>
                   <h1 className="font-display text-5xl md:text-8xl font-light leading-tight mb-6">{article.title}</h1>
                 </div>

@@ -18,7 +18,8 @@
   "article": {
     "readMore": "Read more",
     "publishedAt": "Published",
-    "faqHeading": "Frequently asked questions"
+    "faqHeading": "Frequently asked questions",
+    "readingTime": "{minutes} min read"
   },
   "footer": {
     "allRightsReserved": "All rights reserved."
@@ -93,5 +94,20 @@
   },
   "form": {
     "unavailable": "The form is temporarily unavailable. Please try again later."
+  },
+  "embed": {
+    "viewOnInstagram": "View post on Instagram",
+    "viewOnX": "View post on X"
+  },
+  "a11y": {
+    "skipToContent": "Skip to main content",
+    "mainNav": "Main navigation",
+    "mobileNav": "Mobile navigation",
+    "search": "Search",
+    "menu": "Open navigation menu",
+    "themeToggle": "Toggle theme",
+    "languagePl": "Polski",
+    "languageEn": "English",
+    "footerNav": "Footer links"
   }
 }
