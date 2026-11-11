@@ -155,6 +155,11 @@
 - `getArticles` i `searchArticles` zwracają `ArticleListItem` (bez `content` i `faq`): zapytanie pobiera `pt::text(content)`, serwer liczy minuty (`readingMinutesFromText` — ten sam podział na słowa co `toPlainText`), do `ArticleCard` (komponent kliencki) trafia tylko `reading_minutes`. Wcześniej pełna treść Portable Text każdego artykułu z listy była w danych RSC strony.
 - Czas czytania identyczny dla 15/15 artykułów. HTML (brotli): kategoria PL 20,3 → 8,9 KB, `/pl/content-writing` 36,2 → 9,0 KB, `/pl/search` 48,3 → 10,5 KB, `/en/search` 40,3 → 9,5 KB; strona główna bez zmian (lista renderowana na serwerze). 38 + 12 adresów bez różnic.
 
+### Porządki techniczne — etap 7, B8: kategoria bez kodu HeroNeon
+
+- Sekcje page buildera: `PageSectionsBase.tsx` (`createPageSections(HeroNeon)`, bez importu HeroNeon), `SectionRenderer.tsx` dla strony głównej (HeroNeon statycznie — element LCP) i `SectionRendererLazy.tsx` dla trasy `[...segments]` (HeroNeon przez `next/dynamic` z SSR, `components/sections/lazy.tsx`). `Hero` dostaje komponent HeroNeon z zewnątrz.
+- JS (brotli, KB): kategoria 178 → **170** (punkt odniesienia `814c4f7`: 171), artykuł 198 → 195, kontakt 181 → 172, „O mnie” 170, strona główna 178 → 177. HTML bez zmian (38 + 12 adresów), 0 błędów hydracji.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
