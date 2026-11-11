@@ -7,7 +7,6 @@ import { getArticleBySlug, getCommentsByArticle, getArticleTranslation, getPage 
 import { PageSections } from '@/components/sections/SectionRenderer'
 import { CategoryPage } from '@/components/blog/CategoryPage'
 import { resolveCategory } from '@/lib/categoryRoute'
-import { legacyCategory } from '@/lib/categories'
 import { pageMetadata, seoMetadata } from '@/lib/metadata'
 import { SITE_NAME, SITE_URL, localeUrl } from '@/lib/site'
 import { DATE_LOCALE, otherLocale, type Locale } from '@/lib/locales'
@@ -96,7 +95,7 @@ export default async function ArticlePage({ params, searchParams }: ArticlePageP
   const translation = await getArticleTranslation(article.id, targetLocale)
 
   // Nazwa z dokumentu `category`; bez referencji — dotychczasowa nazwa z kodu
-  const categoryLabel = article.category_title ?? legacyCategory(article.category)?.title ?? article.category
+  const categoryLabel = article.category_title ?? article.category
 
   const dateLocale = DATE_LOCALE[locale]
 

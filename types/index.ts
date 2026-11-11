@@ -26,8 +26,8 @@ export interface Article {
   seo_title?: string | null // puste → title
   seo_description?: string | null // puste → excerpt
   content: PortableTextBlock[] | null // Portable Text (Sanity)
-  category: 'content-writing' | 'ux-strategies' | 'data-visualisation'
-  category_title?: string | null // nazwa z dokumentu `category`; brak = nazwa z dotychczasowej listy
+  category: string // slug dokumentu `category`
+  category_title?: string | null // nazwa z dokumentu `category`
   cover_image_url?: string | null
   cover_focal_x?: number | null
   cover_focal_y?: number | null
@@ -44,8 +44,6 @@ export interface FaqItem {
   question: string
   answer: string
 }
-
-export type Category = 'content-writing' | 'ux-strategies' | 'data-visualisation'
 
 // Dokument `category` w Sanity (strona kategorii /{locale}/{slug})
 export interface CategoryDoc {

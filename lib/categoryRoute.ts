@@ -1,12 +1,9 @@
 // lib/categoryRoute.ts
 // Rozwiązanie adresu /{locale}/{slug} na kategorię (trasa [...segments]):
-// 1) dokument `category` w Sanity (z tłumaczeniem do hreflang),
-// 2) okres przejściowy — dotychczasowa lista z kodu (lib/categories.ts, nazwy z tekstów interfejsu),
-// 3) brak = to nie kategoria (trasa sprawdza dalej stronę z page buildera).
+// dokument `category` w Sanity (z tłumaczeniem do hreflang); brak = to nie kategoria
+// (trasa sprawdza dalej stronę z page buildera).
 
-import { getTranslations } from 'next-intl/server'
 import { getCategory, getCategoryTranslation } from '@/lib/queries'
-import { legacyCategory } from '@/lib/categories'
 import { otherLocale, type Locale } from '@/lib/locales'
 
 export interface ResolvedCategory {
@@ -30,14 +27,6 @@ export async function resolveCategory(locale: Locale, slug: string): Promise<Res
       seoDescription: doc.seo_description?.trim() || doc.description?.trim() || null,
       altSlug: translation?.slug ?? null,
     }
-  }
-
-  const legacy = legacyCategory(slug)
-  if (legacy) {
-    // Jak dotąd: nazwa z tekstów interfejsu (uiStrings → messages), ten sam adres w obu językach
-    const t = await getTranslations({ locale, namespace: 'nav' })
-    const title = t(legacy.messageKey)
-    return { slug: legacy.value, title, seoTitle: title, seoDescription: null, altSlug: legacy.value }
   }
 
   return null

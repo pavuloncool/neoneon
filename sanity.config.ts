@@ -121,12 +121,12 @@ export default defineConfig({
         // Gdzie dany artykuł występuje na stronie (lista w edytorze artykułu)
         locations: {
           article: defineLocations({
-            select: { title: 'title', slug: 'slug.current', locale: 'locale', category: 'category', categorySlug: 'categoryRef.slug.current' },
+            select: { title: 'title', slug: 'slug.current', locale: 'locale', categorySlug: 'categoryRef.slug.current' },
             resolve: (doc) => ({
               locations:
-                doc?.slug && doc.locale && (doc.categorySlug || doc.category)
+                doc?.slug && doc.locale && doc.categorySlug
                   ? [
-                      { title: doc.title || 'Artykuł', href: `/${doc.locale}/${doc.categorySlug || doc.category}/${doc.slug}` },
+                      { title: doc.title || 'Artykuł', href: `/${doc.locale}/${doc.categorySlug}/${doc.slug}` },
                       { title: `Strona główna (${LOCALE_LABELS[toLocale(doc.locale)].short})`, href: `/${doc.locale}` },
                     ]
                   : [],
