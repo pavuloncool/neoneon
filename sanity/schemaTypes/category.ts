@@ -6,7 +6,7 @@
 import { defineField, defineType, type SlugValidationContext } from 'sanity'
 import { DEFAULT_LOCALE } from '../../lib/locales'
 import { APP_RESERVED_SLUGS } from '../../lib/categories'
-import { slugTaken } from '../slugConflicts'
+import { publishedSlug, slugTaken } from '../slugConflicts'
 
 // Slug unikalny wśród kategorii w obrębie języka
 async function isUniqueCategorySlug(slug: string, context: SlugValidationContext) {
@@ -42,7 +42,8 @@ export const category = defineType({
     defineField({
       name: 'slug',
       title: 'Adres (slug)',
-      description: 'Kategoria będzie pod /pl/{slug} lub /en/{slug}. Nie zmieniaj adresu opublikowanej kategorii — zmieni się adres w Google.',
+      description:
+        'Kategoria będzie pod /pl/{slug} lub /en/{slug}. Zmiana sluga zmienia adresy strony kategorii i wszystkich artykułów tej kategorii — dlatego po publikacji jest zablokowana.',
       type: 'slug',
       group: 'content',
       options: { source: 'title', maxLength: 64, isUnique: isUniqueCategorySlug },
@@ -53,6 +54,12 @@ export const category = defineType({
           // Wielkie litery w URL-u tworzą duplikaty w Google; proxy.ts i tak przekierowuje na małe litery
           if (slug !== slug.toLowerCase()) return 'Slug tylko małymi literami'
           if (APP_RESERVED_SLUGS.includes(slug)) return `Adres „${slug}” jest zajęty przez funkcję strony`
+          // Opublikowana kategoria: zmiana sluga zmieniłaby adresy jej strony i wszystkich artykułów (404 bez
+          // przekierowań). Błąd walidacji blokuje „Opublikuj”. Zmiana z przekierowaniami — etap 6.
+          const published = await publishedSlug(ctx.getClient, ctx.document?._id)
+          if (published && published !== slug) {
+            return `Nie można zmienić adresu opublikowanej kategorii: zmieniłyby się adresy strony kategorii i wszystkich jej artykułów (stare adresy zwracałyby 404). Przywróć „${published}”.`
+          }
           const locale = String(ctx.document?.locale ?? DEFAULT_LOCALE)
           if (await slugTaken(ctx.getClient, 'page', slug, locale, undefined)) return `Adres „${slug}” ma już strona w tym języku`
           return true

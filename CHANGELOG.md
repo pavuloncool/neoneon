@@ -56,6 +56,12 @@
 - Zapytania: slug kategorii = `coalesce(categoryRef->slug.current, category)` (`CATEGORY_SLUG` w `lib/links.ts`) — w projekcji linku i kafelków.
 - Bez zmian na stronie, dopóki dane nie zostaną przeniesione (porównanie 38 + 12 adresów).
 
+### Porządki techniczne — blokada zmiany sluga opublikowanej kategorii
+
+- Powód: 2026-11-11 01:23 zmiana slugów kategorii PL w Studio (`content-writing` → `tworzenie-tresci`, `ux-strategies` → `strategie-ux`) dała 404 pod starymi adresami 8 artykułów PL; slugi przywrócone w Studio o 01:34.
+- Walidacja sluga w `category`: jeśli kategoria ma wersję opublikowaną, a slug się różni — błąd z komunikatem, który blokuje „Opublikuj”. Nowe kategorie bez zmian. Opis pola mówi, że zmiana sluga zmienia adresy strony kategorii i wszystkich jej artykułów.
+- Zmiana slugów z przekierowaniami — etap 6.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów

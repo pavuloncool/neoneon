@@ -21,3 +21,13 @@ export async function slugTaken(
     { type, slug, locale, id, draft: `drafts.${id}` }
   )
 }
+
+// Slug opublikowanej wersji dokumentu (null = dokument jeszcze nieopublikowany).
+// Perspektywa raw: zapytanie po dokładnym _id wersji opublikowanej, niezależnie od domyślnej perspektywy API.
+export async function publishedSlug(getClient: GetClient, documentId: string | undefined): Promise<string | null> {
+  const id = (documentId ?? '').replace(/^(drafts|versions\.[^.]+)\./, '')
+  if (!id) return null
+  return getClient({ apiVersion })
+    .withConfig({ perspective: 'raw' })
+    .fetch<string | null>('*[_id == $id][0].slug.current', { id })
+}
