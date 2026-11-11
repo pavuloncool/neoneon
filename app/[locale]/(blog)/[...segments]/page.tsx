@@ -15,6 +15,7 @@ import { FaqJsonLd } from '@/components/seo/FaqJsonLd'
 import { formatDate, readingMinutes } from '@/lib/utils'
 import { PortableTextRenderer } from '@/components/blog/PortableTextRenderer'
 import { FaqSection } from '@/components/blog/FaqSection'
+import { AnchorScroll } from '@/components/blog/AnchorScroll'
 import { TagBadge } from '@/components/blog/TagBadge'
 import { ArticleScroll, CommentForm } from '@/components/blog/lazy'
 import { FadeUp } from '@/components/ui/Motion'
@@ -131,6 +132,8 @@ export default async function ArticlePage({ params, searchParams }: ArticlePageP
       <article>
         {/* Pasek postępu czytania + odsłanianie nagłówków h2 */}
         <ArticleScroll />
+        {/* Kotwica (np. #faq) odporna na dorastanie treści po załadowaniu */}
+        <AnchorScroll />
         <div className="max-w-5xl mx-auto px-6 py-12 md:py-16">
           <FadeUp lcp="solid">
             <header className="mb-10 md:mb-14">
