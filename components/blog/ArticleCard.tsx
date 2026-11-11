@@ -3,13 +3,13 @@
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
-import { formatDate, readingMinutes } from '@/lib/utils'
+import { formatDate } from '@/lib/utils'
 import { TagBadge } from '@/components/blog/TagBadge'
-import type { Article } from '@/types'
+import type { ArticleListItem } from '@/types'
 import { DATE_LOCALE, DEFAULT_LOCALE, type Locale } from '@/lib/locales'
 
 interface ArticleCardProps {
-  article: Article
+  article: ArticleListItem
   variant?: 'default' | 'featured'
   locale?: Locale
 }
@@ -18,7 +18,7 @@ export function ArticleCard({ article, variant = 'default', locale = DEFAULT_LOC
   const href = `/${article.category}/${article.slug}`
   const date = article.published_at ? formatDate(article.published_at, DATE_LOCALE[locale]) : ''
   const t = useTranslations('article')
-  const time = t('readingTime', { minutes: readingMinutes(article.content) })
+  const time = t('readingTime', { minutes: article.reading_minutes })
 
   if (variant === 'featured') {
     return (

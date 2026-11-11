@@ -36,7 +36,11 @@ export function formatDate(dateString: string, locale: string = 'pl-PL'): string
 // Szacowany czas czytania w minutach (słowa / 200 wpm) — content to Portable Text z Sanity.
 // Tekst („5 min czytania” / „5 min read”) z tłumaczeń: article.readingTime.
 export function readingMinutes(content: unknown): number {
-  const text = Array.isArray(content) ? toPlainText(content) : ''
-  const words = text.split(/\s+/).filter(Boolean).length
+  return readingMinutesFromText(Array.isArray(content) ? toPlainText(content) : '')
+}
+
+// To samo dla gotowego tekstu (listy artykułów: pt::text(content) z GROQ — ten sam tekst co toPlainText)
+export function readingMinutesFromText(text: string | null | undefined): number {
+  const words = (text ?? '').split(/\s+/).filter(Boolean).length
   return Math.ceil(words / 200)
 }

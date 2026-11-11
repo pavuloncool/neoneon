@@ -40,6 +40,10 @@ export interface Article {
   locale: Locale
 }
 
+// Artykuł na liście (karty, „Najnowsze”, wyszukiwarka): bez treści i FAQ, z gotowym czasem czytania.
+// Treść zostaje na serwerze — do komponentów klienckich trafia tylko liczba minut.
+export type ArticleListItem = Omit<Article, 'content' | 'faq'> & { reading_minutes: number }
+
 export interface FaqItem {
   question: string
   answer: string

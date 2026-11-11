@@ -150,6 +150,11 @@
 - `BlogPosting.description` = „Opis SEO”, a gdy pusty — zajawka (wspólna funkcja `articleDescription` dla metadanych i JSON-LD). Wcześniej JSON-LD brał zawsze zajawkę.
 - Dziś żaden z 15 artykułów nie ma wypełnionego „Opisu SEO” — JSON-LD bez zmian na wszystkich stronach.
 
+### Porządki techniczne — etap 7, B7: listy artykułów bez treści w HTML
+
+- `getArticles` i `searchArticles` zwracają `ArticleListItem` (bez `content` i `faq`): zapytanie pobiera `pt::text(content)`, serwer liczy minuty (`readingMinutesFromText` — ten sam podział na słowa co `toPlainText`), do `ArticleCard` (komponent kliencki) trafia tylko `reading_minutes`. Wcześniej pełna treść Portable Text każdego artykułu z listy była w danych RSC strony.
+- Czas czytania identyczny dla 15/15 artykułów. HTML (brotli): kategoria PL 20,3 → 8,9 KB, `/pl/content-writing` 36,2 → 9,0 KB, `/pl/search` 48,3 → 10,5 KB, `/en/search` 40,3 → 9,5 KB; strona główna bez zmian (lista renderowana na serwerze). 38 + 12 adresów bez różnic.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
