@@ -176,6 +176,15 @@
 - Audit: 40 (1 critical, 7 high) → 35 (0 critical, 3 high). Pozostałe high tylko w CLI Sanity, bez poprawki u autora, nie ma ich w buildzie strony: `js-yaml` 3.13.1 i `smol-toml` 1.5.2 (przypięte w `@vercel/frameworks`, także w najnowszej 3.35.0), `undici` 7.29.1 (przypięte w `@module-federation/dts-plugin`; strona w runtime używa `undici` 7.30.1 przez `@sanity/client`). Moderate `next-sanity` = ten sam łańcuch przez `sanity` → `@sanity/cli`.
 - Koszt: ok. +6 KB brotli JS frameworka na każdej stronie, TBT +8–10 ms (Lighthouse, 5 przebiegów). Poprawki bezpieczeństwa frameworka mają pierwszeństwo przed progami wydajności dla zmian własnych; nowy punkt odniesienia — pomiar po merge.
 
+### Porządki techniczne — etap 7, D13: kotwica w artykule odporna na dorastanie treści
+
+- `components/blog/AnchorScroll.tsx` (na stronie artykułu): przy wejściu z kotwicą (np. `#faq`) po każdej zmianie wysokości strony cel jest ponownie ustawiany u góry ekranu (`scrollIntoView`, `behavior: 'instant'`, z `scroll-margin`), aż użytkownik sam zacznie przewijać (kółko, dotyk, klawisz, kliknięcie) albo minie 5 s. Bez kotwicy nic nie robi.
+- Przyczyna (pomiar): przeglądarka przewijała do `#faq`, gdy strona była jeszcze krótsza (obrazy, embedy, fonty dorastają później). Hipoteza o pasku narzędzi Vercel obalona: na Preview z paskiem 5/8, z zablokowanym paskiem 1/8, produkcja 8/8 — różnica wynika z szybkości ładowania, nie z paska.
+
+### Porządki techniczne — etap 7, D13 (przyczyna): obrazki w treści artykułu z wymiarami
+
+- Obrazki z Portable Text dostają `width`/`height` z identyfikatora zasobu Sanity (`image-<hash>-<szer>x<wys>-<format>`, z uwzględnieniem przycięcia). Wcześniej `<img loading="lazy">` miał wysokość 0 do załadowania i potem przesuwał treść — to on przy wejściu z `#faq` odpychał nagłówek (np. 0 → 342 px). Wygląd po załadowaniu bez zmian (CSS: `width: 100%; height: auto`). Dotyczy 9 obrazków w artykułach; żaden nie jest przycięty.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
