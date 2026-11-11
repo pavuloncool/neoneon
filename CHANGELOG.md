@@ -119,6 +119,11 @@
 - Migracja `migrations/etap5-uistrings-nav` (jedna transakcja, `ifRevision`): usunięty obiekt `nav` (nazwy kategorii) z `uiStrings-pl` i `uiStrings-en`. Pozostałe pola bez zmian. Wycofanie: `migrations/etap5-uistrings-nav-wycofanie`.
 - Na stronie bez zmian (porównanie 38 + 12 adresów).
 
+### Porządki po usunięciu projektu Supabase
+
+- Usunięte `scripts/export_supabase_backup.sh` (zrzut bazy Supabase przez CLI) i katalog `supabase/` (`schema.sql`, `2026-10-28_sanity_comments_fk.sql`, `.temp/cli-latest`). Projekt Supabase nie istnieje, kopie danych są poza repozytorium.
+- W kodzie zostają 4 komentarze historyczne o pochodzeniu danych (m.in. `_id` zmigrowanych artykułów = dawny UUID z Supabase). Brak zmiennych `SUPABASE_*` i zależności Supabase. Wpis `backups/` w `.gitignore` zostaje.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
