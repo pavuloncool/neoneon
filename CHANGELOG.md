@@ -145,6 +145,11 @@
 - Strony kategorii: odpowiednik językowy z `translation.metadata` dokumentu `category` (zapytanie zwraca też `categoryId` artykułów i listę kategorii), a nie z założenia „ten sam slug w obu językach”. Nadal tylko kategorie i języki z artykułami; `lastmod` jak dotąd.
 - Dziś slugi są identyczne: sitemap bajt w bajt taki sam jak na produkcji (SHA-256). Test jednostkowy na danych z różnymi slugami (PL `strategie-ux` ↔ EN `ux-strategies`, kategoria bez artykułów EN, kategoria bez powiązania): 9/9.
 
+### Porządki techniczne — etap 7, A5: opis artykułu w JSON-LD jak w meta description
+
+- `BlogPosting.description` = „Opis SEO”, a gdy pusty — zajawka (wspólna funkcja `articleDescription` dla metadanych i JSON-LD). Wcześniej JSON-LD brał zawsze zajawkę.
+- Dziś żaden z 15 artykułów nie ma wypełnionego „Opisu SEO” — JSON-LD bez zmian na wszystkich stronach.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów

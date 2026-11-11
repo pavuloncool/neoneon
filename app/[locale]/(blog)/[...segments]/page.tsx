@@ -31,6 +31,12 @@ interface ArticlePageProps {
 //   a gdy to nie kategoria — strona z page buildera („O mnie”, „Kontakt”, nowe strony); inaczej 404.
 //   Walidacja w Studio nie pozwala, by kategoria i strona miały ten sam slug w jednym języku.
 // /{locale}/{kategoria}/{slug} = artykuł
+// Opis artykułu dla wyszukiwarek (meta description i JSON-LD): Opis SEO, a gdy pusty — zajawka.
+// W podglądzie pola niosą znaczniki edycji (stega) — w metadanych są zbędne.
+function articleDescription(article: { seo_description?: string | null; excerpt?: string | null }) {
+  return stegaClean(article.seo_description)?.trim() || stegaClean(article.excerpt)
+}
+
 function getRouteParams(segments: string[]) {
   if (segments.length !== 2) notFound()
   return { category: segments[0], slug: segments[1] }
@@ -64,7 +70,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     altPath: translation ? `/${translation.category}/${translation.slug}` : null,
     // Tytuł SEO / Opis SEO są nieobowiązkowe — puste pole = tytuł i zajawka
     title: stegaClean(article.seo_title)?.trim() || title,
-    description: stegaClean(article.seo_description)?.trim() || stegaClean(article.excerpt),
+    description: articleDescription(article),
     image: article.cover_image_url ? { url: article.cover_image_url, alt: title } : null,
     article: { publishedTime: article.published_at, modifiedTime: article.updated_at },
   })
@@ -110,7 +116,7 @@ export default async function ArticlePage({ params, searchParams }: ArticlePageP
           '@context': 'https://schema.org',
           '@type': 'BlogPosting',
           headline: stegaClean(article.title),
-          description: stegaClean(article.excerpt) ?? undefined,
+          description: articleDescription(article) ?? undefined,
           image: article.cover_image_url ?? undefined,
           datePublished: article.published_at ?? undefined,
           dateModified: article.updated_at ?? undefined,
