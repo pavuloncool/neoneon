@@ -165,6 +165,11 @@
 - `lib/useHydrated.ts` (`useSyncExternalStore`: `false` na serwerze i w hydracji, `true` po niej) zamiast `useEffect(() => setMounted(true), [])` w `ThemeToggle` i `Logo`. Usunięte oba `eslint-disable react-hooks/set-state-in-effect`; lint czysty.
 - 0 błędów hydracji (motyw jasny, ciemny, `prefers-reduced-motion`), logo zmienia się z motywem i po przeładowaniu. INP (390×844, CPU 4×, 10 przebiegów naprzemiennie z produkcją): menu 80 / 80 ms, motyw 40 / 40 ms, język 80 / 84 ms, INP 84 / 84 ms (produkcja / tylko B10).
 
+### Porządki techniczne — etap 7, B9: TBT na `/pl/kontakt` (pomiar, bez osobnej zmiany kodu)
+
+- 20 przebiegów `814c4f7` kontra produkcja `176780c` w jednej sesji: 104 / 105 ms, 13/20 i 14/20 wysokich — hipoteza o leniwym `ContactForm` z 4a obalona. Długie zadania identyczne w obu wariantach i w obu trybach: wykonanie React DOM (~150 ms) i modułu GSAP (~65 ms); zadania Turnstile działają w osobnym procesie ramki `challenges.cloudflare.com` i nie wchodzą do TBT strony. Dwumodalność = symulacja Lighthouse (`throttlingMethod: simulate`): przy tych samych zadaniach szacowany TTI raz obejmuje, raz nie obejmuje zadania GSAP; z dławieniem DevTools rozkład jest jednomodalny (~100 ms).
+- Po B8 (kontakt bez kodu HeroNeon, JS 181 → 172 KB brotli): protokół z zasady 6 — mediana **58 ms**, 19/20 przebiegów 54–68 ms (produkcja 107 ms). Dławienie DevTools: 94 / 100,5 ms (gałąź / produkcja) — te same długie zadania.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
