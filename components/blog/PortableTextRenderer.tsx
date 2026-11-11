@@ -9,6 +9,20 @@ import { urlFor } from '@/sanity/lib/image'
 import { slugify } from '@/lib/slugify'
 import { EMBED_PROVIDER_NAMES, parseEmbedUrl } from '@/lib/embeds'
 
+// Wymiary obrazka z identyfikatora zasobu Sanity (image-<hash>-<szer>x<wys>-<format>), z uwzględnieniem
+// przycięcia (crop). Atrybuty width/height pozwalają przeglądarce zarezerwować miejsce przed załadowaniem
+// (CSS: width 100%, height auto) — bez tego obrazek ma wysokość 0 i po załadowaniu przesuwa treść
+// (CLS przy przewijaniu, wejście z kotwicą #faq kończyło się w losowym miejscu).
+type Crop = { top?: number; bottom?: number; left?: number; right?: number }
+function imageSize(value: { asset?: { _ref?: string }; crop?: Crop }): { width: number; height: number } | null {
+  const m = value.asset?._ref?.match(/-(\d+)x(\d+)-[a-z0-9]+$/i)
+  if (!m) return null
+  const c = value.crop ?? {}
+  const width = Math.round(Number(m[1]) * (1 - (c.left ?? 0) - (c.right ?? 0)))
+  const height = Math.round(Number(m[2]) * (1 - (c.top ?? 0) - (c.bottom ?? 0)))
+  return width > 0 && height > 0 ? { width, height } : null
+}
+
 const components: PortableTextComponents = {
   // H2 i H3 dostają id z treści — kotwice do linkowania (#tytul-sekcji) w tekście i z zewnątrz
   block: {
@@ -28,7 +42,12 @@ const components: PortableTextComponents = {
     image: ({ value }) =>
       value?.asset ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={urlFor(value).width(1600).fit('max').auto('format').url()} alt={value.alt ?? ''} loading="lazy" />
+        <img
+          src={urlFor(value).width(1600).fit('max').auto('format').url()}
+          alt={value.alt ?? ''}
+          loading="lazy"
+          {...imageSize(value)}
+        />
       ) : null,
     divider: () => <hr />,
     mediaEmbed: ({ value }) => {

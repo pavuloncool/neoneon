@@ -181,6 +181,10 @@
 - `components/blog/AnchorScroll.tsx` (na stronie artykułu): przy wejściu z kotwicą (np. `#faq`) po każdej zmianie wysokości strony cel jest ponownie ustawiany u góry ekranu (`scrollIntoView`, `behavior: 'instant'`, z `scroll-margin`), aż użytkownik sam zacznie przewijać (kółko, dotyk, klawisz, kliknięcie) albo minie 5 s. Bez kotwicy nic nie robi.
 - Przyczyna (pomiar): przeglądarka przewijała do `#faq`, gdy strona była jeszcze krótsza (obrazy, embedy, fonty dorastają później). Hipoteza o pasku narzędzi Vercel obalona: na Preview z paskiem 5/8, z zablokowanym paskiem 1/8, produkcja 8/8 — różnica wynika z szybkości ładowania, nie z paska.
 
+### Porządki techniczne — etap 7, D13 (przyczyna): obrazki w treści artykułu z wymiarami
+
+- Obrazki z Portable Text dostają `width`/`height` z identyfikatora zasobu Sanity (`image-<hash>-<szer>x<wys>-<format>`, z uwzględnieniem przycięcia). Wcześniej `<img loading="lazy">` miał wysokość 0 do załadowania i potem przesuwał treść — to on przy wejściu z `#faq` odpychał nagłówek (np. 0 → 342 px). Wygląd po załadowaniu bez zmian (CSS: `width: 100%; height: auto`). Dotyczy 9 obrazków w artykułach; żaden nie jest przycięty.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
