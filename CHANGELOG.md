@@ -124,6 +124,11 @@
 - Usunięte `scripts/export_supabase_backup.sh` (zrzut bazy Supabase przez CLI) i katalog `supabase/` (`schema.sql`, `2026-10-28_sanity_comments_fk.sql`, `.temp/cli-latest`). Projekt Supabase nie istnieje, kopie danych są poza repozytorium.
 - W kodzie zostają 4 komentarze historyczne o pochodzeniu danych (m.in. `_id` zmigrowanych artykułów = dawny UUID z Supabase). Brak zmiennych `SUPABASE_*` i zależności Supabase. Wpis `backups/` w `.gitignore` zostaje.
 
+### Porządki techniczne — etap 7, A1: `tsc --noEmit` bez błędu `globals.css`
+
+- `types/css.d.ts`: deklaracja `*.css` dla importu `@/styles/globals.css`. Przyczyna błędu TS2882: `node_modules/.bin/tsc` (też `npx tsc`) to TypeScript 6.0.3 z CLI Sanity (`@sanity/workflow-cli` → `@typescript/old`), który domyślnie sprawdza importy dla efektu ubocznego. Projektowy TypeScript 5.9 (`npm run typecheck`, build Next) błędu nie zgłaszał.
+- Czysto: `tsc --noEmit` (TS 6), `npm run typecheck` (TS 5.9), lint.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
