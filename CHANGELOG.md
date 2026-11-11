@@ -160,6 +160,11 @@
 - Sekcje page buildera: `PageSectionsBase.tsx` (`createPageSections(HeroNeon)`, bez importu HeroNeon), `SectionRenderer.tsx` dla strony głównej (HeroNeon statycznie — element LCP) i `SectionRendererLazy.tsx` dla trasy `[...segments]` (HeroNeon przez `next/dynamic` z SSR, `components/sections/lazy.tsx`). `Hero` dostaje komponent HeroNeon z zewnątrz.
 - JS (brotli, KB): kategoria 178 → **170** (punkt odniesienia `814c4f7`: 171), artykuł 198 → 195, kontakt 181 → 172, „O mnie” 170, strona główna 178 → 177. HTML bez zmian (38 + 12 adresów), 0 błędów hydracji.
 
+### Porządki techniczne — etap 7, B10: `Nav` bez `setState` w efekcie
+
+- `lib/useHydrated.ts` (`useSyncExternalStore`: `false` na serwerze i w hydracji, `true` po niej) zamiast `useEffect(() => setMounted(true), [])` w `ThemeToggle` i `Logo`. Usunięte oba `eslint-disable react-hooks/set-state-in-effect`; lint czysty.
+- 0 błędów hydracji (motyw jasny, ciemny, `prefers-reduced-motion`), logo zmienia się z motywem i po przeładowaniu. INP (390×844, CPU 4×, 10 przebiegów naprzemiennie z produkcją): menu 80 / 80 ms, motyw 40 / 40 ms, język 80 / 84 ms, INP 84 / 84 ms (produkcja / tylko B10).
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
