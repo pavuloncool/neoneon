@@ -79,25 +79,6 @@ export function FadeUp({
   )
 }
 
-// Fade in — dla obrazków i elementów bez przesunięcia
-export function FadeIn({
-  children,
-  delay = 0,
-  className,
-}: {
-  children: React.ReactNode
-  delay?: number
-  className?: string
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-  useEnter(ref, () => (ref.current ? [ref.current] : []), { opacity: 1, duration: 0.6, delay, ease: 'power2.out' })
-  return (
-    <div ref={ref} data-motion="fade-in" className={className}>
-      {children}
-    </div>
-  )
-}
-
 // Stagger container — dzieci (StaggerItem) animują się kolejno
 export function StaggerList({
   children,

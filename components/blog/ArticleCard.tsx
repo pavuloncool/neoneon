@@ -1,8 +1,9 @@
 'use client'
 // components/blog/ArticleCard.tsx
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
-import { formatDate, readingTime } from '@/lib/utils'
+import { formatDate, readingMinutes } from '@/lib/utils'
 import { TagBadge } from '@/components/blog/TagBadge'
 import type { Article } from '@/types'
 import { DATE_LOCALE, DEFAULT_LOCALE, type Locale } from '@/lib/locales'
@@ -16,7 +17,8 @@ interface ArticleCardProps {
 export function ArticleCard({ article, variant = 'default', locale = DEFAULT_LOCALE }: ArticleCardProps) {
   const href = `/${article.category}/${article.slug}`
   const date = article.published_at ? formatDate(article.published_at, DATE_LOCALE[locale]) : ''
-  const time = readingTime(article.content, locale)
+  const t = useTranslations('article')
+  const time = t('readingTime', { minutes: readingMinutes(article.content) })
 
   if (variant === 'featured') {
     return (

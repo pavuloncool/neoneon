@@ -81,6 +81,39 @@
 - „Kategoria” (`categoryRef`) wymagana w artykule, linku do kategorii i kafelku. Zapytania: `categoryRef->slug.current` bez `coalesce`. Sitemapa pomija artykuł bez kategorii (zamiast adresu `/null/…`).
 - Na stronie: `/pl|en/data-visualisation` (i z parametrami) → 404 — kategoria bez artykułów i bez dokumentu. Pozostałe adresy bez zmian.
 
+### Porządki techniczne — etap 4c: migracja danych (wykonana 10:38)
+
+- Migracja `migrations/kategorie-4c` (jedna transakcja, `ifRevision`): usunięte stare pole `category` w 15 artykułach, w 8 linkach menu i stopki (`siteSettings-pl/en`) i w 4 kafelkach (`page-home-pl/en`). Wycofanie: `migrations/kategorie-4c-wycofanie` (odtwarza pole z `categoryRef`).
+- Na stronie bez zmian (porównanie 38 + 12 adresów); `lastmod` `/pl` i `/en` w sitemapie = czas migracji (`_updatedAt` stron). Daty artykułów bez zmian (`coalesce(contentUpdatedAt, publishedAt)`).
+
+### Porządki techniczne — etap 5: teksty interfejsu w tłumaczeniach
+
+- „5 min czytania” / „5 min read”: `article.readingTime` w `messages/*.json` (`readingMinutes()` w `lib/utils.ts` liczy tylko minuty).
+- Link zapasowy osadzonego posta (`SocialEmbed`): `embed.viewOnInstagram` / `embed.viewOnX` — wcześniej tylko po polsku, także na stronach EN.
+- Zapasowe etykiety a11y w `(blog)/layout.tsx` (gdy pole w Ustawieniach strony jest puste): z `a11y.*` w języku strony; wcześniej po polsku, a „Toggle theme” po angielsku. Dziś nieaktywne — oba `siteSettings` mają komplet etykiet.
+- `DraftModeBanner` i domyślne etykiety `LanguageSwitcher` bez zmian (widzi je tylko redaktor / zapas).
+
+### Porządki techniczne — etap 5: strefa czasowa dat
+
+- `formatDate()` formatuje w stałej strefie `Europe/Warsaw` (`SITE_TIME_ZONE` w `lib/utils.ts`), w obu językach. Wcześniej strefa serwera (Vercel: UTC), a w karcie artykułu (komponent kliencki) po hydracji — strefa przeglądarki.
+- Zmiana widocznych dat (data publikacji po 22:00/23:00 UTC): `moja-strona-z-ai` 21 → 22 marca 2026, `frictionless-lead-generation` 4 → 5 kwietnia 2026, `free-content-to-frictionless-lead-generation` 4 → 5 April 2026. Daty w metadanych (`article:*_time`, JSON-LD, sitemap) to ISO z godziną — bez zmian.
+
+### Porządki techniczne — etap 5 (kod): bez kluczy `nav.*` z nazwami kategorii
+
+- Usunięte `nav.contentWriting`, `nav.uxStrategies`, `nav.dataVisualisation` z `messages/*.json` i grupa „Nazwy kategorii” z dokumentu „Teksty interfejsu” (`sanity/uiStringFields.ts`). Nazwy kategorii od etapu 4c są tylko w dokumentach `category`.
+- Dane: migracja `migrations/etap5-uistrings-nav` usuwa obiekt `nav` z `uiStrings-pl/en`; wycofanie: `migrations/etap5-uistrings-nav-wycofanie`.
+
+### Porządki techniczne — etap 5: martwy kod
+
+- Usunięte nieimportowane komponenty shadcn/ui: `badge`, `button`, `dialog`, `input`, `separator`, `textarea` (`button` używał tylko `dialog`). Zostają `Motion`, `Turnstile`.
+- `FadeIn` (`components/ui/Motion.tsx`) i jego reguła CSS `[data-motion='fade-in']` — nieużywane.
+- `getTagsByCategory` (`lib/queries.ts`) — nieużywana, a po 4c filtrowała po usuniętym polu `category`.
+- Nieużywane klucze tłumaczeń (trafiały do klienta w każdej stronie): `nav.about`, `nav.contact`, `home.tagline/subtitle/recent/category`, `article.readMore/publishedAt`, cała przestrzeń `footer` i `about` (teksty z czasów przed page builderem), `contact.label/heading/intro1/intro2`. Żaden nie jest polem w „Tekstach interfejsu”.
+
+### Porządki techniczne — etap 5: nieużywane zależności
+
+- Odinstalowane `@radix-ui/react-dialog`, `@radix-ui/react-separator`, `@radix-ui/react-slot`, `class-variance-authority` — używały ich tylko usunięte komponenty shadcn/ui (z lockfile znika 27 pakietów). `components.json` (konfiguracja shadcn) zostaje.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
