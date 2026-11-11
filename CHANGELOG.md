@@ -110,6 +110,10 @@
 - `getTagsByCategory` (`lib/queries.ts`) — nieużywana, a po 4c filtrowała po usuniętym polu `category`.
 - Nieużywane klucze tłumaczeń (trafiały do klienta w każdej stronie): `nav.about`, `nav.contact`, `home.tagline/subtitle/recent/category`, `article.readMore/publishedAt`, cała przestrzeń `footer` i `about` (teksty z czasów przed page builderem), `contact.label/heading/intro1/intro2`. Żaden nie jest polem w „Tekstach interfejsu”.
 
+### Porządki techniczne — etap 5: nieużywane zależności
+
+- Odinstalowane `@radix-ui/react-dialog`, `@radix-ui/react-separator`, `@radix-ui/react-slot`, `class-variance-authority` — używały ich tylko usunięte komponenty shadcn/ui (z lockfile znika 27 pakietów). `components.json` (konfiguracja shadcn) zostaje.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
