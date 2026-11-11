@@ -114,6 +114,11 @@
 
 - Odinstalowane `@radix-ui/react-dialog`, `@radix-ui/react-separator`, `@radix-ui/react-slot`, `class-variance-authority` — używały ich tylko usunięte komponenty shadcn/ui (z lockfile znika 27 pakietów). `components.json` (konfiguracja shadcn) zostaje.
 
+### Porządki techniczne — etap 5: migracja `uiStrings` (wykonana 11:47)
+
+- Migracja `migrations/etap5-uistrings-nav` (jedna transakcja, `ifRevision`): usunięty obiekt `nav` (nazwy kategorii) z `uiStrings-pl` i `uiStrings-en`. Pozostałe pola bez zmian. Wycofanie: `migrations/etap5-uistrings-nav-wycofanie`.
+- Na stronie bez zmian (porównanie 38 + 12 adresów).
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
