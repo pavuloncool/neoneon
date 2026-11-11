@@ -134,6 +134,11 @@
 - Nic w kodzie go nie importuje. To peer `sanity-plugin-internationalized-array` (peer `@sanity/document-internationalization`): wpis był potrzebny przy `legacy-peer-deps`; od etapu 1 npm instaluje peery sam, więc pakiet zostaje w `node_modules` jako peer (lockfile: `"peer": true`).
 - Build przechodzi, Studio ładuje się lokalnie do ekranu logowania bez błędów w konsoli.
 
+### Porządki techniczne — etap 7, A3: blokada zmiany sluga opublikowanego artykułu
+
+- Walidacja sluga artykułu (`sanity/schemaTypes/article.ts`) jak w kategoriach: gdy slug różni się od opublikowanej wersji (`publishedSlug`), błąd blokuje „Opublikuj” z komunikatem i podpowiedzią starego sluga. Nowe (nieopublikowane) artykuły bez ograniczeń. Opis pola mówi o blokadzie.
+- Test walidacji w trybie Studio (bez zapisu): zmiana sluga szkicu i dokumentu → błąd, slug bez zmian i nowy artykuł → OK, 15/15 opublikowanych artykułów bez fałszywego alarmu.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
