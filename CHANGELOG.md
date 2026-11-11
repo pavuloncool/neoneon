@@ -185,6 +185,12 @@
 
 - Obrazki z Portable Text dostają `width`/`height` z identyfikatora zasobu Sanity (`image-<hash>-<szer>x<wys>-<format>`, z uwzględnieniem przycięcia). Wcześniej `<img loading="lazy">` miał wysokość 0 do załadowania i potem przesuwał treść — to on przy wejściu z `#faq` odpychał nagłówek (np. 0 → 342 px). Wygląd po załadowaniu bez zmian (CSS: `width: 100%; height: auto`). Dotyczy 9 obrazków w artykułach; żaden nie jest przycięty.
 
+### Porządki techniczne — etap 6a: poprzednie adresy kategorii (model i walidacja)
+
+- `category.previousSlugs` („Poprzednie adresy”, lista, tylko do odczytu w Studio): dawne slugi, które strona przekierowuje (308) na obecny.
+- Walidacja sluga kategorii: zmiana sluga opublikowanej kategorii dozwolona tylko wtedy, gdy stary slug jest w `previousSlugs` (dopisuje go akcja publikacji); inaczej błąd z instrukcją. Zastępuje blokadę z 4c.
+- Kolizje (perspektywa `raw`, `slugTaken`): slug kategorii nie może być obecnym ani poprzednim adresem innej kategorii w tym języku, stroną page buildera ani adresem zarezerwowanym; strona nie może zająć obecnego ani poprzedniego adresu kategorii.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów

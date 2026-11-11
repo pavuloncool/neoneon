@@ -7,7 +7,9 @@ import { apiVersion } from './env'
 
 type GetClient = (options: { apiVersion: string }) => SanityClient
 
-// Czy inny dokument danego typu (opublikowany albo szkic) w tym języku ma już ten slug
+// Czy inny dokument danego typu (opublikowany albo szkic) w tym języku ma już ten slug.
+// Kategorie: także wśród poprzednich adresów (`previousSlugs`) — stary adres kategorii jest przekierowywany
+// (308) na nowy, więc nie może go zająć inna kategoria ani strona.
 export async function slugTaken(
   getClient: GetClient,
   type: 'page' | 'category',
@@ -21,7 +23,7 @@ export async function slugTaken(
   return getClient({ apiVersion })
     .withConfig({ perspective: 'raw' })
     .fetch<boolean>(
-      'defined(*[_type == $type && slug.current == $slug && locale == $locale && !(_id in [$id, $draft]) && !(_id in path("versions.**"))][0]._id)',
+      'defined(*[_type == $type && (slug.current == $slug || $slug in coalesce(previousSlugs, [])) && locale == $locale && !(_id in [$id, $draft]) && !(_id in path("versions.**"))][0]._id)',
       { type, slug, locale, id, draft: `drafts.${id}` }
     )
 }
