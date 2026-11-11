@@ -103,6 +103,13 @@
 - Usunięte `nav.contentWriting`, `nav.uxStrategies`, `nav.dataVisualisation` z `messages/*.json` i grupa „Nazwy kategorii” z dokumentu „Teksty interfejsu” (`sanity/uiStringFields.ts`). Nazwy kategorii od etapu 4c są tylko w dokumentach `category`.
 - Dane: migracja `migrations/etap5-uistrings-nav` usuwa obiekt `nav` z `uiStrings-pl/en`; wycofanie: `migrations/etap5-uistrings-nav-wycofanie`.
 
+### Porządki techniczne — etap 5: martwy kod
+
+- Usunięte nieimportowane komponenty shadcn/ui: `badge`, `button`, `dialog`, `input`, `separator`, `textarea` (`button` używał tylko `dialog`). Zostają `Motion`, `Turnstile`.
+- `FadeIn` (`components/ui/Motion.tsx`) i jego reguła CSS `[data-motion='fade-in']` — nieużywane.
+- `getTagsByCategory` (`lib/queries.ts`) — nieużywana, a po 4c filtrowała po usuniętym polu `category`.
+- Nieużywane klucze tłumaczeń (trafiały do klienta w każdej stronie): `nav.about`, `nav.contact`, `home.tagline/subtitle/recent/category`, `article.readMore/publishedAt`, cała przestrzeń `footer` i `about` (teksty z czasów przed page builderem), `contact.label/heading/intro1/intro2`. Żaden nie jest polem w „Tekstach interfejsu”.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów

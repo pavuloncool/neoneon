@@ -1,52 +1,21 @@
 {
   "nav": {
-    "about": "About",
-    "contact": "Contact",
     "closeMenu": "Close menu"
   },
   "home": {
-    "tagline": "Content and UX|in digital products",
-    "subtitle": "Exploring the intersection of content strategy and user experience design.",
-    "recent": "Recent",
-    "category": "Category",
     "rotatingPause": "Pause animation",
     "rotatingResume": "Resume animation"
   },
   "article": {
-    "readMore": "Read more",
-    "publishedAt": "Published",
     "faqHeading": "Frequently asked questions",
     "readingTime": "{minutes} min read"
-  },
-  "footer": {
-    "allRightsReserved": "All rights reserved."
   },
   "category": {
     "label": "Category",
     "filterByTag": "Filter by tag",
     "noArticles": "No articles in this category."
   },
-  "about": {
-    "label": "About",
-    "bio1": "I write content that resonates with users, guiding them toward desired change. I craft authentic messages consistent with the brand’s vision and stakeholder expectations.",
-    "bio2": "I design user interfaces and experiences that clearly and intuitively guide them to effectively resolve tasks on websites and in applications.",
-    "bio3": "When I'm not writing or creating, you can most often find me in the forest or by the sea, where my imagination opens new windows.",
-    "cta": "Get in touch →",
-    "areasLabel": "Areas of focus",
-    "area1Title": "Content Strategy",
-    "area1Desc": "Information architecture, content audits, editorial planning and voice development.",
-    "area2Title": "UX Writing",
-    "area2Desc": "Interface copy, microcopy, onboarding flows and error messaging.",
-    "area3Title": "Content Design",
-    "area3Desc": "Bridging the gap between design systems and the words that live inside them.",
-    "area4Title": "Editorial",
-    "area4Desc": "Long-form articles, case studies, white papers and brand storytelling."
-  },
   "contact": {
-    "label": "Contact",
-    "heading": "Get in touch",
-    "intro1": "Whether you have a project in mind, a question about my work, or just want to say hello — I would love to hear from you.",
-    "intro2": "I typically respond within two business days.",
     "fieldName": "Name",
     "fieldEmail": "Email",
     "fieldMessage": "Message",

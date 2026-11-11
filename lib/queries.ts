@@ -121,13 +121,6 @@ export async function getAllTags(): Promise<Tag[]> {
   return sanityFetch<Tag[]>(groq`*[_type == "tag"] | order(name asc) ${TAG_PROJECTION}`)
 }
 
-export async function getTagsByCategory(category: string): Promise<Tag[]> {
-  return sanityFetch<Tag[]>(
-    groq`*[_type == "tag" && count(*[_type == "article" && category == $category && references(^._id)]) > 0] | order(name asc) ${TAG_PROJECTION}`,
-    { category }
-  )
-}
-
 // ── Kategorie ────────────────────────────────────────────────
 
 const CATEGORY_PROJECTION = groq`{

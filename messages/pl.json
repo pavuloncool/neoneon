@@ -1,52 +1,21 @@
 {
   "nav": {
-    "about": "O mnie",
-    "contact": "Kontakt",
     "closeMenu": "Zamknij menu"
   },
   "home": {
-    "tagline": "Content i UX dla|produktów cyfrowych",
-    "subtitle": "Tworzę strategie contentu i doświadczenia UX dla użytkowników produktów cyfrowych",
-    "recent": "Najnowsze",
-    "category": "Kategoria",
     "rotatingPause": "Wstrzymaj animację",
     "rotatingResume": "Wznów animację"
   },
   "article": {
-    "readMore": "Czytaj dalej",
-    "publishedAt": "Opublikowano",
     "faqHeading": "Najczęściej zadawane pytania",
     "readingTime": "{minutes} min czytania"
-  },
-  "footer": {
-    "allRightsReserved": "Wszelkie prawa zastrzeżone."
   },
   "category": {
     "label": "Kategoria",
     "filterByTag": "Filtruj po tagu",
     "noArticles": "Brak artykułów w tej kategorii."
   },
-  "about": {
-    "label": "O mnie",
-    "bio1": "Piszę treści, które oddziałują na użytkowników, prowadząc ich w kierunku pożądanej zmiany. Buduję autentyczne komunikaty spójne z wizją marki i oczekiwaniami interesariuszy.",
-    "bio2": "Projektuję interfejsy i doświadczenia użytkowników, które jasno i intuicyjnie kierują ich do skutecznego rozwiązania zadań na stronach i w aplikacjach.",
-    "bio3": "Gdy nie piszę ani nie tworzę, najczęściej można spotkać mnie w lesie lub nad morzem, gdzie moja wyobraźnia otwiera nowe okna.",
-    "cta": "Skontaktuj się →",
-    "areasLabel": "Obszary działania",
-    "area1Title": "Strategia treści",
-    "area1Desc": "Architektura informacji, audyty treści, planowanie redakcyjne i budowanie głosu marki.",
-    "area2Title": "UX Writing",
-    "area2Desc": "Teksty interfejsu, microcopy, przepływy onboardingowe i komunikaty błędów.",
-    "area3Title": "Content Design",
-    "area3Desc": "Łączenie systemów projektowania ze słowami, które w nich żyją.",
-    "area4Title": "Redakcja",
-    "area4Desc": "Artykuły promocyjne, advertoriale, case studies, white papers i brand storytelling."
-  },
   "contact": {
-    "label": "Kontakt",
-    "heading": "Napisz do mnie",
-    "intro1": "Masz projekt? Pytanie o moją pracę? Czy po prostu pijesz kawę i chcesz pogadać? Chętnie dołączę.",
-    "intro2": "Zazwyczaj odpowiadam w ciągu kilku godzin.",
     "fieldName": "Imię",
     "fieldEmail": "Email",
     "fieldMessage": "Wiadomość",

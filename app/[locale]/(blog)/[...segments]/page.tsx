@@ -94,7 +94,7 @@ export default async function ArticlePage({ params, searchParams }: ArticlePageP
   const targetLocale = otherLocale(locale)
   const translation = await getArticleTranslation(article.id, targetLocale)
 
-  // Nazwa z dokumentu `category`; bez referencji — dotychczasowa nazwa z kodu
+  // Nazwa z dokumentu `category` (zapasowo slug)
   const categoryLabel = article.category_title ?? article.category
 
   const dateLocale = DATE_LOCALE[locale]
