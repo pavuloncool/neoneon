@@ -8,7 +8,8 @@ import { groq } from 'next-sanity'
 import { client, draftsClient } from '@/sanity/lib/client'
 import { sanityFetch } from '@/sanity/lib/fetch'
 import { CATEGORY_SLUG, LINK_PROJECTION } from '@/lib/links'
-import type { Article, CategoryDoc, Tag, Comment, Page, SiteSettings } from '@/types'
+import type { Article, ArticleListItem, CategoryDoc, Tag, Comment, Page, SiteSettings } from '@/types'
+import { readingMinutesFromText } from '@/lib/utils'
 import { DEFAULT_LOCALE, type Locale } from '@/lib/locales'
 
 const TAG_PROJECTION = groq`{ "id": _id, name, "name_en": nameEn, "slug": slug.current }`
@@ -42,6 +43,35 @@ const ARTICLE_PROJECTION = groq`{
   locale
 }`
 
+// Lista artykułów: bez `content` i `faq`. Zamiast treści — sam tekst (pt::text), z którego serwer liczy
+// czas czytania; tekst nie trafia dalej (komponenty dostają tylko reading_minutes).
+const ARTICLE_LIST_PROJECTION = groq`{
+  "id": _id,
+  "slug": slug.current,
+  title,
+  excerpt,
+  "seo_title": seoTitle,
+  "seo_description": seoDescription,
+  "plain_text": pt::text(content),
+  "category": ${ARTICLE_CATEGORY},
+  "category_title": categoryRef->title,
+  "cover_image_url": coverImage.asset->url,
+  "cover_focal_x": coverImage.hotspot.x,
+  "cover_focal_y": coverImage.hotspot.y,
+  "status": select(_id in path("drafts.**") => "draft", "published"),
+  "published_at": publishedAt,
+  "created_at": _createdAt,
+  "updated_at": ${ARTICLE_MODIFIED},
+  "tags": tags[]->${TAG_PROJECTION},
+  locale
+}`
+
+type ArticleListRow = Omit<ArticleListItem, 'reading_minutes'> & { plain_text: string | null }
+
+function toListItems(rows: ArticleListRow[]): ArticleListItem[] {
+  return rows.map(({ plain_text, ...rest }) => ({ ...rest, reading_minutes: readingMinutesFromText(plain_text) }))
+}
+
 // ── Artykuły ────────────────────────────────────────────────
 
 export async function getArticles(options?: {
@@ -49,7 +79,7 @@ export async function getArticles(options?: {
   tag?: string
   limit?: number
   locale?: Locale
-}): Promise<Article[]> {
+}): Promise<ArticleListItem[]> {
   const filters = ['_type == "article"', 'locale == $locale']
   const params: Record<string, string> = { locale: options?.locale ?? DEFAULT_LOCALE }
   if (options?.category) {
@@ -63,10 +93,10 @@ export async function getArticles(options?: {
   const slice = options?.limit ? `[0...${Math.floor(options.limit)}]` : ''
 
   try {
-    return await sanityFetch<Article[]>(
-      groq`*[${filters.join(' && ')}] | order(publishedAt desc) ${slice} ${ARTICLE_PROJECTION}`,
+    return toListItems(await sanityFetch<ArticleListRow[]>(
+      groq`*[${filters.join(' && ')}] | order(publishedAt desc) ${slice} ${ARTICLE_LIST_PROJECTION}`,
       params
-    )
+    ))
   } catch (error) {
     console.error('getArticles error:', error)
     return []
@@ -86,7 +116,7 @@ export async function getArticleBySlug(
 export async function searchArticles(
   query: string,
   locale: Locale = 'pl'
-): Promise<Article[]> {
+): Promise<ArticleListItem[]> {
   // `match` dopasowuje prefiksy słów — dla każdego słowa zapytania osobny warunek (AND)
   const terms = query.trim().split(/\s+/).filter(Boolean).map((t) => `${t}*`)
   if (terms.length === 0) return []
@@ -94,10 +124,10 @@ export async function searchArticles(
   const params = Object.fromEntries(terms.map((t, i) => [`t${i}`, t]))
 
   try {
-    return await sanityFetch<Article[]>(
-      groq`*[_type == "article" && locale == $locale && ${conditions}] | order(publishedAt desc) ${ARTICLE_PROJECTION}`,
+    return toListItems(await sanityFetch<ArticleListRow[]>(
+      groq`*[_type == "article" && locale == $locale && ${conditions}] | order(publishedAt desc) ${ARTICLE_LIST_PROJECTION}`,
       { locale, ...params }
-    )
+    ))
   } catch (error) {
     console.error('searchArticles error:', error)
     return []

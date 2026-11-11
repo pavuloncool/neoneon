@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { Link, usePathname } from '@/i18n/navigation'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
+import { useHydrated } from '@/lib/useHydrated'
 import { useState, useEffect, useRef } from 'react'
 import { Search, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
@@ -34,11 +35,8 @@ const glass: React.CSSProperties = {
 
 function ThemeToggle({ className, label }: { className?: string; label: string }) {
   const { resolvedTheme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-  // Zabezpieczenie hydracji: motyw znamy dopiero w przeglądarce, więc pierwszy render (serwer i hydracja)
-  // musi być identyczny. Refaktor wzorca montowania — osobne zadanie (wymaga ponownych pomiarów TBT/INP).
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => setMounted(true), [])
+  // Motyw znamy dopiero w przeglądarce — pierwszy render (serwer i hydracja) bez niego, potem właściwy
+  const mounted = useHydrated()
   const isDark = mounted && resolvedTheme === 'dark'
 
   // Zmiana motywu przez View Transitions: nowy motyw „rozlewa się” kołem od przycisku
@@ -87,11 +85,8 @@ function ThemeToggle({ className, label }: { className?: string; label: string }
 
 function Logo({ logo }: { logo: NavProps['logo'] }) {
   const { resolvedTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-  // Zabezpieczenie hydracji: motyw znamy dopiero w przeglądarce, więc pierwszy render (serwer i hydracja)
-  // musi być identyczny. Refaktor wzorca montowania — osobne zadanie (wymaga ponownych pomiarów TBT/INP).
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => setMounted(true), [])
+  // Motyw znamy dopiero w przeglądarce — pierwszy render (serwer i hydracja) bez niego, potem właściwy
+  const mounted = useHydrated()
   if (!mounted) return <div className="h-8 w-28" />
   return (
     <Image

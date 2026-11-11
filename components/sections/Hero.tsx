@@ -2,11 +2,15 @@
 // Sekcja „Nagłówek strony”. Wariant `large` = strona główna (HeroNeon — zapłon neonu),
 // `page` = podstrona („O mnie”, „Kontakt”).
 
+import type { ComponentType } from 'react'
 import { getLocale, getTranslations } from 'next-intl/server'
-import { HeroNeon } from './HeroNeon'
+import type { HeroNeonProps } from './HeroNeon'
 import type { HeroSection } from '@/types'
 
-export async function Hero({ section }: { section: HeroSection }) {
+// HeroNeon przekazywany z zewnątrz: strona główna — import statyczny (element LCP, kod w paczce trasy),
+// trasa [...segments] — wersja ładowana osobno (components/sections/lazy.tsx), bo kategorie i podstrony
+// go nie używają, a statyczny import dokładałby GSAP SplitText/ScrambleText do ich JS.
+export async function Hero({ section, HeroNeon }: { section: HeroSection; HeroNeon: ComponentType<HeroNeonProps> }) {
   const { variant, eyebrow, heading, headingEmphasis, _key } = section
 
   if (variant === 'large') {
