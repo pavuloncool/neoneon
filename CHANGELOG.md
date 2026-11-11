@@ -62,6 +62,12 @@
 - Walidacja sluga w `category`: jeśli kategoria ma wersję opublikowaną, a slug się różni — błąd z komunikatem, który blokuje „Opublikuj”. Nowe kategorie bez zmian. Opis pola mówi, że zmiana sluga zmienia adresy strony kategorii i wszystkich jej artykułów.
 - Zmiana slugów z przekierowaniami — etap 6.
 
+### Porządki techniczne — kolizje slugów widzą szkice
+
+- `slugTaken` (`sanity/slugConflicts.ts`) pyta w perspektywie `raw`. Przy API `2025-02-19` domyślna perspektywa to „published”, więc kontrola kolizji (kategoria ↔ strona, strona ↔ strona, kategoria ↔ kategoria) nie widziała szkiców, choć tak ją opisano w etapie 4a. Wersje z wydań (`versions.*`) pomijane.
+- Unikalność sluga strony (`isUniqueInLocale` w `page.ts`) korzysta teraz z `slugTaken` zamiast własnej kopii zapytania z tym samym błędem.
+- Test na danych z kopii + sztucznych szkicach (walidacja w trybie Studio): przed poprawką 4 z 4 kolizji ze szkicem niewykryte, po poprawce 8/8 przypadków zgodnych.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
