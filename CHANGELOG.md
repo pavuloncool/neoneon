@@ -195,6 +195,11 @@
 
 - `sanity/actions/categoryPublish.tsx`: zastępuje „Opublikuj” w kategorii. Bez zmiany sluga działa jak zwykła publikacja. Przy zmianie sluga opublikowanej kategorii: etykieta „Opublikuj (zmiana adresu)”, okno potwierdzenia (stary i nowy adres, przekierowania 308), potem dopisanie starego sluga do `previousSlugs` (powrót do dawnego adresu usuwa go z listy) i publikacja. Aktywna tylko wtedy, gdy jedynym błędem walidacji jest zmiana adresu.
 
+### Porządki techniczne — etap 6a: przekierowania 308 z dawnych adresów kategorii
+
+- Trasa `[...segments]`, tylko na ścieżce „nie znaleziono” (bez dodatkowych zapytań dla działających adresów): `/{locale}/{dawny-slug}` → 308 na `/{locale}/{slug}` (gdy to nie kategoria ani strona, a slug jest w `previousSlugs` kategorii); `/{locale}/{dawny-slug}/{artykuł}` → 308 na `/{locale}/{slug}/{artykuł}`, tylko gdy artykuł ma tę kategorię (inna kategoria w adresie nadal 404). Parametry adresu (`?tag=`) zachowane. `permanentRedirect()`.
+- Zapytania: `getCategorySlugByPreviousSlug`, w projekcji artykułu `category_previous_slugs`.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów

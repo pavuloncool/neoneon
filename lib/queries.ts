@@ -31,6 +31,7 @@ const ARTICLE_PROJECTION = groq`{
   content,
   "category": ${ARTICLE_CATEGORY},
   "category_title": categoryRef->title,
+  "category_previous_slugs": categoryRef->previousSlugs,
   "cover_image_url": coverImage.asset->url,
   "cover_focal_x": coverImage.hotspot.x,
   "cover_focal_y": coverImage.hotspot.y,
@@ -165,6 +166,15 @@ export const getCategory = cache(async (locale: Locale, slug: string): Promise<C
     { locale, slug }
   )
 )
+
+// Kategoria, która miała kiedyś ten slug (`previousSlugs`) — do przekierowania 308 starego adresu.
+// Wywoływane tylko wtedy, gdy adresu nie da się rozwiązać inaczej (brak kategorii i strony).
+export async function getCategorySlugByPreviousSlug(locale: Locale, slug: string): Promise<string | null> {
+  return sanityFetch<string | null>(
+    groq`*[_type == "category" && locale == $locale && $slug in previousSlugs][0].slug.current`,
+    { locale, slug }
+  )
+}
 
 // Wersja kategorii w drugim języku — powiązanie przez dokument translation.metadata
 export const getCategoryTranslation = cache(async (categoryId: string, targetLocale: Locale): Promise<{ slug: string | null } | null> =>
