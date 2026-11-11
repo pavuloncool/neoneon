@@ -221,14 +221,16 @@ export async function getPageTranslation(
 export interface SitemapData {
   // modifiedAt: strony = _updatedAt, artykuły = ARTICLE_MODIFIED (null = brak daty)
   pages: { _id: string; locale: Locale; isHome: boolean | null; slug: string | null; modifiedAt: string }[]
-  articles: { _id: string; locale: Locale; category: string; slug: string; modifiedAt: string | null }[]
+  articles: { _id: string; locale: Locale; category: string; categoryId: string; slug: string; modifiedAt: string | null }[]
+  categories: { _id: string; locale: Locale; slug: string }[]
   translations: { refs: string[] | null }[]
 }
 
 export async function getSitemapData(): Promise<SitemapData> {
   return client.fetch<SitemapData>(groq`{
     "pages": *[_type == "page" && defined(locale)]{ _id, locale, isHome, "slug": slug.current, "modifiedAt": _updatedAt },
-    "articles": *[_type == "article" && defined(locale) && defined(slug.current) && defined(${ARTICLE_CATEGORY})]{ _id, locale, "category": ${ARTICLE_CATEGORY}, "slug": slug.current, "modifiedAt": ${ARTICLE_MODIFIED} },
+    "articles": *[_type == "article" && defined(locale) && defined(slug.current) && defined(${ARTICLE_CATEGORY})]{ _id, locale, "category": ${ARTICLE_CATEGORY}, "categoryId": categoryRef._ref, "slug": slug.current, "modifiedAt": ${ARTICLE_MODIFIED} },
+    "categories": *[_type == "category" && defined(locale) && defined(slug.current)]{ _id, locale, "slug": slug.current },
     "translations": *[_type == "translation.metadata"]{ "refs": translations[].value._ref }
   }`)
 }

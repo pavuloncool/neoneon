@@ -139,6 +139,12 @@
 - Walidacja sluga artykułu (`sanity/schemaTypes/article.ts`) jak w kategoriach: gdy slug różni się od opublikowanej wersji (`publishedSlug`), błąd blokuje „Opublikuj” z komunikatem i podpowiedzią starego sluga. Nowe (nieopublikowane) artykuły bez ograniczeń. Opis pola mówi o blokadzie.
 - Test walidacji w trybie Studio (bez zapisu): zmiana sluga szkicu i dokumentu → błąd, slug bez zmian i nowy artykuł → OK, 15/15 opublikowanych artykułów bez fałszywego alarmu.
 
+### Porządki techniczne — etap 7, A4: hreflang kategorii w sitemapie z powiązań tłumaczeń
+
+- Budowa sitemapy przeniesiona do `lib/sitemap.ts` (`buildSitemap`, testowalna bez Sanity); `app/sitemap.ts` tylko pobiera dane.
+- Strony kategorii: odpowiednik językowy z `translation.metadata` dokumentu `category` (zapytanie zwraca też `categoryId` artykułów i listę kategorii), a nie z założenia „ten sam slug w obu językach”. Nadal tylko kategorie i języki z artykułami; `lastmod` jak dotąd.
+- Dziś slugi są identyczne: sitemap bajt w bajt taki sam jak na produkcji (SHA-256). Test jednostkowy na danych z różnymi slugami (PL `strategie-ux` ↔ EN `ux-strategies`, kategoria bez artykułów EN, kategoria bez powiązania): 9/9.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
