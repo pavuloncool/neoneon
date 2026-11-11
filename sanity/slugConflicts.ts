@@ -16,8 +16,22 @@ export async function slugTaken(
   documentId: string | undefined
 ): Promise<boolean> {
   const id = (documentId ?? '').replace(/^drafts\./, '')
-  return getClient({ apiVersion }).fetch<boolean>(
-    'defined(*[_type == $type && slug.current == $slug && locale == $locale && !(_id in [$id, $draft])][0]._id)',
-    { type, slug, locale, id, draft: `drafts.${id}` }
-  )
+  // Perspektywa raw: widać też szkice (domyślna perspektywa API 2025-02-19 to „published”).
+  // Wersje z wydań (versions.*) pomijane — projekt ich nie używa, a raw pokazałby też własną wersję dokumentu.
+  return getClient({ apiVersion })
+    .withConfig({ perspective: 'raw' })
+    .fetch<boolean>(
+      'defined(*[_type == $type && slug.current == $slug && locale == $locale && !(_id in [$id, $draft]) && !(_id in path("versions.**"))][0]._id)',
+      { type, slug, locale, id, draft: `drafts.${id}` }
+    )
+}
+
+// Slug opublikowanej wersji dokumentu (null = dokument jeszcze nieopublikowany).
+// Perspektywa raw: zapytanie po dokładnym _id wersji opublikowanej, niezależnie od domyślnej perspektywy API.
+export async function publishedSlug(getClient: GetClient, documentId: string | undefined): Promise<string | null> {
+  const id = (documentId ?? '').replace(/^(drafts|versions\.[^.]+)\./, '')
+  if (!id) return null
+  return getClient({ apiVersion })
+    .withConfig({ perspective: 'raw' })
+    .fetch<string | null>('*[_id == $id][0].slug.current', { id })
 }

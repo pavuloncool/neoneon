@@ -15,11 +15,7 @@ export const RESERVED_SLUGS = [...CATEGORIES.map((c) => c.value), ...APP_RESERVE
 // Slug unikalny w obrębie języka — /pl/about i /en/about mogą istnieć jednocześnie
 async function isUniqueInLocale(slug: string, context: SlugValidationContext) {
   const { document, getClient } = context
-  const id = (document?._id ?? '').replace(/^drafts\./, '')
-  return getClient({ apiVersion: '2025-02-19' }).fetch<boolean>(
-    '!defined(*[_type == "page" && slug.current == $slug && locale == $locale && !(_id in [$id, $draft])][0]._id)',
-    { slug, locale: document?.locale ?? DEFAULT_LOCALE, id, draft: `drafts.${id}` }
-  )
+  return !(await slugTaken(getClient, 'page', slug, String(document?.locale ?? DEFAULT_LOCALE), document?._id))
 }
 
 export const page = defineType({
