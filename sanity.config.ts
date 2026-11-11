@@ -13,6 +13,7 @@ import {
 } from '@sanity/document-internationalization'
 import { apiVersion, dataset, projectId } from './sanity/env'
 import { schemaTypes } from './sanity/schemaTypes'
+import { createCategoryPublishAction } from './sanity/actions/categoryPublish'
 import { LOCALE_LABELS, LOCALES_DEFAULT_FIRST, toLocale } from './lib/locales'
 
 // Akcje wtyczki typują `action` jako string, a Sanity 6 oczekuje klucza akcji — w działaniu zgodne
@@ -46,7 +47,11 @@ export default defineConfig({
       // Komentarze i wiadomości zostają szkicami (niepubliczne) — bez „Publish”
       if (schemaType === 'comment') return prev.filter(({ action }) => action === 'delete')
       if (SINGLETON_TYPES.includes(schemaType)) return prev.filter(({ action }) => action !== 'duplicate' && action !== 'delete')
-      if (schemaType === 'article' || schemaType === 'page' || schemaType === 'category') return [...prev, ...TRANSLATION_ACTIONS]
+      // Kategoria: „Opublikuj” dopisuje stary slug do previousSlugs przy zmianie adresu (przekierowania 308)
+      if (schemaType === 'category') {
+        return [...prev.map((a) => (a.action === 'publish' ? createCategoryPublishAction(a) : a)), ...TRANSLATION_ACTIONS]
+      }
+      if (schemaType === 'article' || schemaType === 'page') return [...prev, ...TRANSLATION_ACTIONS]
       return prev
     },
   },

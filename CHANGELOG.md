@@ -191,6 +191,10 @@
 - Walidacja sluga kategorii: zmiana sluga opublikowanej kategorii dozwolona tylko wtedy, gdy stary slug jest w `previousSlugs` (dopisuje go akcja publikacji); inaczej błąd z instrukcją. Zastępuje blokadę z 4c.
 - Kolizje (perspektywa `raw`, `slugTaken`): slug kategorii nie może być obecnym ani poprzednim adresem innej kategorii w tym języku, stroną page buildera ani adresem zarezerwowanym; strona nie może zająć obecnego ani poprzedniego adresu kategorii.
 
+### Porządki techniczne — etap 6a: akcja „Opublikuj (zmiana adresu)” dla kategorii
+
+- `sanity/actions/categoryPublish.tsx`: zastępuje „Opublikuj” w kategorii. Bez zmiany sluga działa jak zwykła publikacja. Przy zmianie sluga opublikowanej kategorii: etykieta „Opublikuj (zmiana adresu)”, okno potwierdzenia (stary i nowy adres, przekierowania 308), potem dopisanie starego sluga do `previousSlugs` (powrót do dawnego adresu usuwa go z listy) i publikacja. Aktywna tylko wtedy, gdy jedynym błędem walidacji jest zmiana adresu.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
