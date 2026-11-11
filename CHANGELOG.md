@@ -204,6 +204,10 @@
 
 - Strona kategorii zapisuje adres odpowiednika w drugim języku (`TranslationStore` ze slugiem z powiązania tłumaczeń). Wcześniej przełącznik zostawiał ten sam slug — przy różnych slugach PL/EN prowadziłby do 404.
 
+### Porządki techniczne — etap 6a: lokalna symulacja danych (narzędzie testowe)
+
+- `SANITY_API_HOST` (tylko lokalnie; na Vercel ignorowane): klient strony czyta treści z innego adresu API. Służy do testów z danymi zmienionymi w pamięci (`higiena/sanity-mock.mjs`, GROQ przez `groq-js`) — bez zapisu do Sanity.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów

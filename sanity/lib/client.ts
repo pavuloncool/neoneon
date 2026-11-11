@@ -4,6 +4,10 @@
 import { createClient } from 'next-sanity'
 import { apiVersion, dataset, projectId } from '../env'
 
+// Tylko lokalne testy (symulacja danych bez zapisu do Sanity, np. etap 6 — higiena/sanity-mock.mjs):
+// inny adres API dla odczytu treści. Na Vercel (każde środowisko) ignorowane.
+const testApiHost = process.env.VERCEL ? undefined : process.env.SANITY_API_HOST
+
 // Odczyt opublikowanych treści przez CDN Sanity (token Viewer)
 export const client = createClient({
   projectId,
@@ -12,6 +16,7 @@ export const client = createClient({
   useCdn: true,
   perspective: 'published',
   token: process.env.SANITY_API_READ_TOKEN,
+  ...(testApiHost ? { apiHost: testApiHost, useCdn: false } : {}),
 })
 
 // Szkice komentarzy (token Viewer) — tylko po stronie serwera, bez e-maili w projekcji
