@@ -217,6 +217,13 @@
 - Kategorie PL zmienione w Studio akcją „Opublikuj (zmiana adresu)”: `content-writing` → `tworzenie-tresci`, `ux-strategies` → `strategie-ux` („Poprzednie adresy” = dawne slugi). EN bez zmian. Linków do adresów kategorii w treściach nie było.
 - Na produkcji: 12 dawnych adresów PL (2 kategorie z `?tag=` i bez, 8 artykułów) → 308 na nowe (200); canonical, hreflang PL ↔ EN, sitemap, menu, stopka, kafelki, przełącznik języka i Presentation wskazują nowe adresy.
 
+### Porządki techniczne — E1: sitemapa generowana przy zapytaniu
+
+- **Problem:** `app/sitemap.ts` z `revalidate = 3600` budował się jako poprawny Prerender ISR (`expiration: 3600`), ale Vercel serwował treść z builda jako plik statyczny: `pathType: static` przy `MISS` i `HIT`, zero wywołań funkcji, `Age` ponad 5500 s bez `STALE`. Sitemapa zmieniała się tylko przy wdrożeniu (po 6b miała stare adresy PL do następnego deployu).
+- **Poprawka:** `app/sitemap.xml/route.ts` zamiast `app/sitemap.ts` — trasa dynamiczna (`force-dynamic`) z nagłówkiem `Cache-Control: public, s-maxage=3600, stale-while-revalidate=86400` (cache na CDN Vercel). Konwencja `sitemap.ts` nie pozwala ustawić nagłówka (Next wpisuje na stałe `max-age=0`). XML z tego samego serializera Next (`resolveRouteData`), dane z `lib/sitemap.ts` bez zmian.
+- Bez webhooków i nowych sekretów. `robots.txt`, `icon.png`, `apple-icon.png` zostają statyczne — nie zależą od Sanity. Obrazów OG generowanych przy buildzie nie ma (OG z Sanity w metadanych stron dynamicznych).
+- Treść sitemapy na dzisiejszych danych bajt w bajt jak na produkcji; zmiana danych (atrapa Sanity) widoczna bez nowego builda.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
