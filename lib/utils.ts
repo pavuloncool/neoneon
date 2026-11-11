@@ -18,12 +18,18 @@ export function escapeHtml(str: string): string {
     .replace(/'/g, '&#39;')
 }
 
+// Strefa czasowa dat na stronie — stała, niezależna od serwera (Vercel: UTC) i przeglądarki.
+// Bez niej artykuł opublikowany np. 23:55 czasu polskiego miał datę z poprzedniego dnia,
+// a karta artykułu (komponent kliencki) mogła się różnić między serwerem a przeglądarką.
+export const SITE_TIME_ZONE = 'Europe/Warsaw'
+
 // Formatowanie daty: "12 stycznia 2025" / "12 January 2025"
 export function formatDate(dateString: string, locale: string = 'pl-PL'): string {
   return new Date(dateString).toLocaleDateString(locale, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
+    timeZone: SITE_TIME_ZONE,
   })
 }
 

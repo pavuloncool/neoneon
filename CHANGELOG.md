@@ -93,6 +93,11 @@
 - Zapasowe etykiety a11y w `(blog)/layout.tsx` (gdy pole w Ustawieniach strony jest puste): z `a11y.*` w języku strony; wcześniej po polsku, a „Toggle theme” po angielsku. Dziś nieaktywne — oba `siteSettings` mają komplet etykiet.
 - `DraftModeBanner` i domyślne etykiety `LanguageSwitcher` bez zmian (widzi je tylko redaktor / zapas).
 
+### Porządki techniczne — etap 5: strefa czasowa dat
+
+- `formatDate()` formatuje w stałej strefie `Europe/Warsaw` (`SITE_TIME_ZONE` w `lib/utils.ts`), w obu językach. Wcześniej strefa serwera (Vercel: UTC), a w karcie artykułu (komponent kliencki) po hydracji — strefa przeglądarki.
+- Zmiana widocznych dat (data publikacji po 22:00/23:00 UTC): `moja-strona-z-ai` 21 → 22 marca 2026, `frictionless-lead-generation` 4 → 5 kwietnia 2026, `free-content-to-frictionless-lead-generation` 4 → 5 April 2026. Daty w metadanych (`article:*_time`, JSON-LD, sitemap) to ISO z godziną — bez zmian.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
