@@ -68,6 +68,19 @@
 - Unikalność sluga strony (`isUniqueInLocale` w `page.ts`) korzysta teraz z `slugTaken` zamiast własnej kopii zapytania z tym samym błędem.
 - Test na danych z kopii + sztucznych szkicach (walidacja w trybie Studio): przed poprawką 4 z 4 kolizji ze szkicem niewykryte, po poprawce 8/8 przypadków zgodnych.
 
+## 2026-11-11
+
+### Porządki techniczne — etap 4b-2: migracja danych (wykonana 01:52)
+
+- Migracja `migrations/kategorie-4b-2` (jedna transakcja): `categoryRef` w 8 linkach menu i stopki (`siteSettings-pl/en`) i w 4 kafelkach (`page-home-pl/en`). Stare pola bez zmian. Wycofanie: `migrations/kategorie-4b-2-wycofanie`.
+- Na stronie bez zmian (porównanie 38 + 12 adresów); `lastmod` `/pl` i `/en` w sitemapie = czas migracji (`_updatedAt` stron).
+
+### Porządki techniczne — etap 4c (kod): kategorie tylko z dokumentów `category`
+
+- Usunięte: pole `category` artykułu (lista z kodu), stare pola kategorii w linku i kafelku, `LEGACY_CATEGORIES` / `legacyCategory` (`lib/categories.ts` zostaje z `APP_RESERVED_SLUGS`), zapasowa ścieżka w `resolveCategory`, `RESERVED_SLUGS` stron (zostają `APP_RESERVED_SLUGS` + kontrola kolizji z kategoriami), typ `Category`.
+- „Kategoria” (`categoryRef`) wymagana w artykule, linku do kategorii i kafelku. Zapytania: `categoryRef->slug.current` bez `coalesce`. Sitemapa pomija artykuł bez kategorii (zamiast adresu `/null/…`).
+- Na stronie: `/pl|en/data-visualisation` (i z parametrami) → 404 — kategoria bez artykułów i bez dokumentu. Pozostałe adresy bez zmian.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów

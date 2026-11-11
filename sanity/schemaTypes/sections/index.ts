@@ -2,7 +2,6 @@
 // Sekcje page buildera. Każda odpowiada komponentowi w components/sections/.
 
 import { defineArrayMember, defineField, defineType } from 'sanity'
-import { CATEGORIES } from '../article'
 import { categoryRefField } from '../category'
 
 // Prosta treść sekcji (akapity, pogrubienie, kursywa, linki)
@@ -86,18 +85,12 @@ export const categoryTiles = defineType({
           type: 'object',
           name: 'tile',
           fields: [
-            defineField({
-              ...categoryRefField(),
-              validation: (r) =>
-                r.custom((value, ctx) => (!value && !(ctx.parent as { category?: string } | undefined)?.category ? 'Wybierz kategorię' : true)),
-            }),
-            // Dotychczasowe pole (lista z kodu) — używane, gdy „Kategoria (dokument)” jest pusta; do usunięcia w etapie 4c
-            defineField({ name: 'category', title: 'Kategoria (dotychczasowa)', type: 'string', options: { list: CATEGORIES } }),
+            defineField({ ...categoryRefField(), validation: (r) => r.required() }),
             defineField({ name: 'title', title: 'Nazwa na kafelku', type: 'string', validation: (r) => r.required() }),
           ],
           preview: {
-            select: { title: 'title', category: 'category', categorySlug: 'categoryRef.slug.current' },
-            prepare: ({ title, category, categorySlug }) => ({ title, subtitle: categorySlug ?? category ?? '' }),
+            select: { title: 'title', categorySlug: 'categoryRef.slug.current' },
+            prepare: ({ title, categorySlug }) => ({ title, subtitle: categorySlug ?? '' }),
           },
         }),
       ],

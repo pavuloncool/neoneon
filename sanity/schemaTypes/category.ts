@@ -14,12 +14,11 @@ async function isUniqueCategorySlug(slug: string, context: SlugValidationContext
   return !(await slugTaken(getClient, 'category', slug, String(document?.locale ?? DEFAULT_LOCALE), document?._id))
 }
 
-// Okres przejściowy (etap 4b-2): pole `categoryRef` obok dotychczasowego `category` w linku i w kafelku.
-// Strona czyta najpierw referencję, a gdy jest pusta — stare pole. Stare pole zniknie w etapie 4c.
+// Pole `categoryRef` (artykuł, link, kafelek): tylko kategorie w języku edytowanego dokumentu
 export const categoryRefField = () =>
   defineField({
     name: 'categoryRef',
-    title: 'Kategoria (dokument)',
+    title: 'Kategoria',
     description: 'Kategoria z listy „Kategorie” w tym samym języku.',
     type: 'reference',
     to: [{ type: 'category' }],

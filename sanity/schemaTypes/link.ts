@@ -3,7 +3,6 @@
 // Adres wylicza lib/links.ts (resolveHref).
 
 import { defineField, defineType } from 'sanity'
-import { CATEGORIES } from './article'
 import { DEFAULT_LOCALE } from '../../lib/locales'
 import { categoryRefField } from './category'
 
@@ -44,19 +43,7 @@ export const link = defineType({
     defineField({
       ...categoryRefField(),
       hidden: ({ parent }) => parent?.linkType !== 'category',
-      validation: (r) =>
-        r.custom((value, ctx) => {
-          const parent = ctx.parent as { linkType?: string; category?: string } | undefined
-          return parent?.linkType === 'category' && !value && !parent.category ? 'Wybierz kategorię' : true
-        }),
-    }),
-    // Dotychczasowe pole (lista z kodu) — używane, gdy „Kategoria (dokument)” jest pusta; do usunięcia w etapie 4c
-    defineField({
-      name: 'category',
-      title: 'Kategoria (dotychczasowa)',
-      type: 'string',
-      options: { list: CATEGORIES },
-      hidden: ({ parent }) => parent?.linkType !== 'category',
+      validation: (r) => r.custom((value, ctx) => ((ctx.parent as { linkType?: string })?.linkType === 'category' && !value ? 'Wybierz kategorię' : true)),
     }),
     defineField({
       name: 'url',

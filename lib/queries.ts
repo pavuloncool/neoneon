@@ -8,14 +8,13 @@ import { groq } from 'next-sanity'
 import { client, draftsClient } from '@/sanity/lib/client'
 import { sanityFetch } from '@/sanity/lib/fetch'
 import { CATEGORY_SLUG, LINK_PROJECTION } from '@/lib/links'
-import type { Article, Category, CategoryDoc, Tag, Comment, Page, SiteSettings } from '@/types'
+import type { Article, CategoryDoc, Tag, Comment, Page, SiteSettings } from '@/types'
 import { DEFAULT_LOCALE, type Locale } from '@/lib/locales'
 
 const TAG_PROJECTION = groq`{ "id": _id, name, "name_en": nameEn, "slug": slug.current }`
 
-// Okres przejściowy (etap 4): kategoria artykułu z dokumentu `category`, a gdy referencji brak —
-// z dotychczasowego pola tekstowego `category`
-const ARTICLE_CATEGORY = groq`coalesce(categoryRef->slug.current, category)`
+// Kategoria artykułu = slug dokumentu `category` (referencja categoryRef)
+const ARTICLE_CATEGORY = CATEGORY_SLUG
 
 // Data modyfikacji artykułu (og, JSON-LD, sitemapa): ręcznie ustawiana „Data aktualizacji treści”,
 // a bez niej data publikacji. Nie _updatedAt — ten zmienia każda edycja i migracja, także techniczna.
@@ -229,14 +228,14 @@ export async function getPageTranslation(
 export interface SitemapData {
   // modifiedAt: strony = _updatedAt, artykuły = ARTICLE_MODIFIED (null = brak daty)
   pages: { _id: string; locale: Locale; isHome: boolean | null; slug: string | null; modifiedAt: string }[]
-  articles: { _id: string; locale: Locale; category: Category; slug: string; modifiedAt: string | null }[]
+  articles: { _id: string; locale: Locale; category: string; slug: string; modifiedAt: string | null }[]
   translations: { refs: string[] | null }[]
 }
 
 export async function getSitemapData(): Promise<SitemapData> {
   return client.fetch<SitemapData>(groq`{
     "pages": *[_type == "page" && defined(locale)]{ _id, locale, isHome, "slug": slug.current, "modifiedAt": _updatedAt },
-    "articles": *[_type == "article" && defined(locale) && defined(slug.current)]{ _id, locale, "category": ${ARTICLE_CATEGORY}, "slug": slug.current, "modifiedAt": ${ARTICLE_MODIFIED} },
+    "articles": *[_type == "article" && defined(locale) && defined(slug.current) && defined(${ARTICLE_CATEGORY})]{ _id, locale, "category": ${ARTICLE_CATEGORY}, "slug": slug.current, "modifiedAt": ${ARTICLE_MODIFIED} },
     "translations": *[_type == "translation.metadata"]{ "refs": translations[].value._ref }
   }`)
 }
