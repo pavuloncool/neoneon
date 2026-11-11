@@ -208,6 +208,10 @@
 
 - `SANITY_API_HOST` (tylko lokalnie; na Vercel ignorowane): klient strony czyta treści z innego adresu API. Służy do testów z danymi zmienionymi w pamięci (`higiena/sanity-mock.mjs`, GROQ przez `groq-js`) — bez zapisu do Sanity.
 
+### Porządki techniczne — etap 6a: polski komunikat kolizji sluga kategorii
+
+- Kolizję z obecnym lub poprzednim adresem innej kategorii w tym języku zgłasza walidacja pola: „Ten adres jest już używany przez inną kategorię w tym języku (obecny lub poprzedni adres).” Domyślne sprawdzenie Sanity („Slug is already in use”) wyłączone. Test walidacji 12/12.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów

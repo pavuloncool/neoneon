@@ -4,7 +4,7 @@
 // „Opublikuj (zmiana adresu)” (sanity/actions/categoryPublish.tsx): stary slug trafia do `previousSlugs`,
 // a strona przekierowuje stare adresy (kategorii i jej artykułów) na nowe — 308.
 
-import { defineField, defineType, type SlugValidationContext } from 'sanity'
+import { defineField, defineType } from 'sanity'
 import { DEFAULT_LOCALE } from '../../lib/locales'
 import { APP_RESERVED_SLUGS } from '../../lib/categories'
 import { publishedSlug, slugTaken } from '../slugConflicts'
@@ -13,11 +13,9 @@ import { publishedSlug, slugTaken } from '../slugConflicts'
 // że jedynym błędem jest właśnie zmiana adresu, i wtedy pozwala opublikować (dopisując stary slug).
 export const SLUG_CHANGE_MESSAGE = 'Zmiana adresu opublikowanej kategorii'
 
-// Slug unikalny wśród kategorii w obrębie języka (także wśród ich poprzednich adresów)
-async function isUniqueCategorySlug(slug: string, context: SlugValidationContext) {
-  const { document, getClient } = context
-  return !(await slugTaken(getClient, 'category', slug, String(document?.locale ?? DEFAULT_LOCALE), document?._id))
-}
+// Unikalność sluga sprawdza walidacja pola (z polskim komunikatem, w obrębie języka i z poprzednimi adresami),
+// więc domyślne sprawdzenie Sanity („Slug is already in use”, bez podziału na języki) jest wyłączone.
+const skipDefaultUniqueCheck = () => true
 
 // Pole `categoryRef` (artykuł, link, kafelek): tylko kategorie w języku edytowanego dokumentu
 export const categoryRefField = () =>
@@ -50,7 +48,7 @@ export const category = defineType({
         'Kategoria będzie pod /pl/{slug} lub /en/{slug}. Zmiana sluga zmienia adresy strony kategorii i wszystkich jej artykułów — po publikacji przyciskiem „Opublikuj (zmiana adresu)” stare adresy przekierowują (308) na nowe.',
       type: 'slug',
       group: 'content',
-      options: { source: 'title', maxLength: 64, isUnique: isUniqueCategorySlug },
+      options: { source: 'title', maxLength: 64, isUnique: skipDefaultUniqueCheck },
       validation: (r) =>
         r.required().custom(async (value, ctx) => {
           const slug = value?.current
@@ -66,6 +64,9 @@ export const category = defineType({
             return `${SLUG_CHANGE_MESSAGE} z „${published}” na „${slug}”: użyj przycisku „Opublikuj (zmiana adresu)” — stary adres trafi do poprzednich adresów i będzie przekierowany (308). Bez zmiany adresu: przywróć „${published}”.`
           }
           const locale = String(ctx.document?.locale ?? DEFAULT_LOCALE)
+          if (await slugTaken(ctx.getClient, 'category', slug, locale, ctx.document?._id)) {
+            return 'Ten adres jest już używany przez inną kategorię w tym języku (obecny lub poprzedni adres).'
+          }
           if (await slugTaken(ctx.getClient, 'page', slug, locale, undefined)) return `Adres „${slug}” ma już strona w tym języku`
           return true
         }),
