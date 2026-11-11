@@ -16,7 +16,6 @@
     "@sanity/document-internationalization": "^6.2.46",
     "@sanity/icons": "^5.2.3",
     "@sanity/image-url": "^2.1.1",
-    "@sanity/language-filter": "^5.0.23",
     "@sanity/vision": "^6.20.0",
     "@tailwindcss/typography": "^0.5.19",
     "clsx": "^2.1.1",

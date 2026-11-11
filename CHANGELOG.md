@@ -129,6 +129,11 @@
 - `types/css.d.ts`: deklaracja `*.css` dla importu `@/styles/globals.css`. Przyczyna błędu TS2882: `node_modules/.bin/tsc` (też `npx tsc`) to TypeScript 6.0.3 z CLI Sanity (`@sanity/workflow-cli` → `@typescript/old`), który domyślnie sprawdza importy dla efektu ubocznego. Projektowy TypeScript 5.9 (`npm run typecheck`, build Next) błędu nie zgłaszał.
 - Czysto: `tsc --noEmit` (TS 6), `npm run typecheck` (TS 5.9), lint.
 
+### Porządki techniczne — etap 7, A2: bez bezpośredniej zależności `@sanity/language-filter`
+
+- Nic w kodzie go nie importuje. To peer `sanity-plugin-internationalized-array` (peer `@sanity/document-internationalization`): wpis był potrzebny przy `legacy-peer-deps`; od etapu 1 npm instaluje peery sam, więc pakiet zostaje w `node_modules` jako peer (lockfile: `"peer": true`).
+- Build przechodzi, Studio ładuje się lokalnie do ekranu logowania bez błędów w konsoli.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
