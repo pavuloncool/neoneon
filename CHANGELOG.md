@@ -170,6 +170,12 @@
 - 20 przebiegów `814c4f7` kontra produkcja `176780c` w jednej sesji: 104 / 105 ms, 13/20 i 14/20 wysokich — hipoteza o leniwym `ContactForm` z 4a obalona. Długie zadania identyczne w obu wariantach i w obu trybach: wykonanie React DOM (~150 ms) i modułu GSAP (~65 ms); zadania Turnstile działają w osobnym procesie ramki `challenges.cloudflare.com` i nie wchodzą do TBT strony. Dwumodalność = symulacja Lighthouse (`throttlingMethod: simulate`): przy tych samych zadaniach szacowany TTI raz obejmuje, raz nie obejmuje zadania GSAP; z dławieniem DevTools rozkład jest jednomodalny (~100 ms).
 - Po B8 (kontakt bez kodu HeroNeon, JS 181 → 172 KB brotli): protokół z zasady 6 — mediana **58 ms**, 19/20 przebiegów 54–68 ms (produkcja 107 ms). Dławienie DevTools: 94 / 100,5 ms (gałąź / produkcja) — te same długie zadania.
 
+### Porządki techniczne — etap 7, C11: `npm audit` — Next 16.4.3
+
+- `next` i `eslint-config-next` 16.1.6 → 16.4.3 (najnowsza wersja starsza niż 2 tygodnie, zamyka wszystkie zakresy `<=16.4.0`): usuwa zgłoszenie critical, m.in. RCE w Image Optimization (GHSA-2xp9-vwfh-vxw4, GHSA-2464-fhr4-w9xw) i w `use cache` (GHSA-673q-mjm6-r5xr), obejścia Proxy, SSRF i XSS. W zakresach: `brace-expansion`, `picomatch`, `sharp` 0.35.5, `postcss` w Next 8.5.23. `sanity`, `@sanity/client`, `react` bez zmian. Bez `npm audit fix --force` i bez `overrides`.
+- Audit: 40 (1 critical, 7 high) → 35 (0 critical, 3 high). Pozostałe high tylko w CLI Sanity, bez poprawki u autora, nie ma ich w buildzie strony: `js-yaml` 3.13.1 i `smol-toml` 1.5.2 (przypięte w `@vercel/frameworks`, także w najnowszej 3.35.0), `undici` 7.29.1 (przypięte w `@module-federation/dts-plugin`; strona w runtime używa `undici` 7.30.1 przez `@sanity/client`). Moderate `next-sanity` = ten sam łańcuch przez `sanity` → `@sanity/cli`.
+- Koszt: ok. +6 KB brotli JS frameworka na każdej stronie, TBT +8–10 ms (Lighthouse, 5 przebiegów). Poprawki bezpieczeństwa frameworka mają pierwszeństwo przed progami wydajności dla zmian własnych; nowy punkt odniesienia — pomiar po merge.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
