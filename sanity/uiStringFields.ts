@@ -9,15 +9,6 @@ export const UI_STRING_GROUPS: {
   fields: { key: string; title: string; description?: string }[]
 }[] = [
   {
-    namespace: 'nav',
-    title: 'Nazwy kategorii',
-    fields: [
-      { key: 'contentWriting', title: 'Content Writing', description: 'Nagłówek i tytuł strony kategorii.' },
-      { key: 'uxStrategies', title: 'UX Strategies', description: 'Nagłówek i tytuł strony kategorii.' },
-      { key: 'dataVisualisation', title: 'Data Visualisation', description: 'Nagłówek i tytuł strony kategorii.' },
-    ],
-  },
-  {
     namespace: 'category',
     title: 'Strony kategorii',
     fields: [

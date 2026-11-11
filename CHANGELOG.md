@@ -98,6 +98,11 @@
 - `formatDate()` formatuje w stałej strefie `Europe/Warsaw` (`SITE_TIME_ZONE` w `lib/utils.ts`), w obu językach. Wcześniej strefa serwera (Vercel: UTC), a w karcie artykułu (komponent kliencki) po hydracji — strefa przeglądarki.
 - Zmiana widocznych dat (data publikacji po 22:00/23:00 UTC): `moja-strona-z-ai` 21 → 22 marca 2026, `frictionless-lead-generation` 4 → 5 kwietnia 2026, `free-content-to-frictionless-lead-generation` 4 → 5 April 2026. Daty w metadanych (`article:*_time`, JSON-LD, sitemap) to ISO z godziną — bez zmian.
 
+### Porządki techniczne — etap 5 (kod): bez kluczy `nav.*` z nazwami kategorii
+
+- Usunięte `nav.contentWriting`, `nav.uxStrategies`, `nav.dataVisualisation` z `messages/*.json` i grupa „Nazwy kategorii” z dokumentu „Teksty interfejsu” (`sanity/uiStringFields.ts`). Nazwy kategorii od etapu 4c są tylko w dokumentach `category`.
+- Dane: migracja `migrations/etap5-uistrings-nav` usuwa obiekt `nav` z `uiStrings-pl/en`; wycofanie: `migrations/etap5-uistrings-nav-wycofanie`.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
