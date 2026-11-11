@@ -200,6 +200,10 @@
 - Trasa `[...segments]`, tylko na ścieżce „nie znaleziono” (bez dodatkowych zapytań dla działających adresów): `/{locale}/{dawny-slug}` → 308 na `/{locale}/{slug}` (gdy to nie kategoria ani strona, a slug jest w `previousSlugs` kategorii); `/{locale}/{dawny-slug}/{artykuł}` → 308 na `/{locale}/{slug}/{artykuł}`, tylko gdy artykuł ma tę kategorię (inna kategoria w adresie nadal 404). Parametry adresu (`?tag=`) zachowane. `permanentRedirect()`.
 - Zapytania: `getCategorySlugByPreviousSlug`, w projekcji artykułu `category_previous_slugs`.
 
+### Porządki techniczne — etap 6a: przełącznik języka na stronie kategorii
+
+- Strona kategorii zapisuje adres odpowiednika w drugim języku (`TranslationStore` ze slugiem z powiązania tłumaczeń). Wcześniej przełącznik zostawiał ten sam slug — przy różnych slugach PL/EN prowadziłby do 404.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów

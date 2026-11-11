@@ -7,6 +7,7 @@ import { ArticleCard } from '@/components/blog/ArticleCard'
 import { TagBadge } from '@/components/blog/TagBadge'
 import { FadeUp } from '@/components/ui/Motion'
 import { getTranslations } from 'next-intl/server'
+import { TranslationStore } from '@/components/layout/TranslationStore'
 import type { ResolvedCategory } from '@/lib/categoryRoute'
 import type { Locale } from '@/lib/locales'
 
@@ -27,6 +28,8 @@ export async function CategoryPage({ category, locale, tag }: CategoryPageProps)
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-16">
+      {/* Przełącznik języka: odpowiednik kategorii z powiązania tłumaczeń (slugi PL/EN mogą się różnić) */}
+      {category.altSlug !== null && <TranslationStore path={`/${category.altSlug}`} />}
       <FadeUp lcp="solid">
         <header className="mb-12 pb-12 border-b border-border">
           <p className="text-xs tracking-widest text-muted dark:text-white/60 uppercase mb-3">{tc('label')}</p>
