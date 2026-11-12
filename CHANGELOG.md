@@ -224,6 +224,16 @@
 - Bez webhooków i nowych sekretów. `robots.txt`, `icon.png`, `apple-icon.png` zostają statyczne — nie zależą od Sanity. Obrazów OG generowanych przy buildzie nie ma (OG z Sanity w metadanych stron dynamicznych).
 - Treść sitemapy na dzisiejszych danych bajt w bajt jak na produkcji; zmiana danych (atrapa Sanity) widoczna bez nowego builda.
 
+## 2026-11-12
+
+### Vercel Speed Insights
+
+- Pakiet `@vercel/speed-insights` przypięty dokładnie na `2.0.0` (2026-03-10). Najnowsza `2.1.0` (2026-11-05) jest młodsza niż 2 tygodnie. Zastępuje propozycję agenta Vercel z PR #1 (`^2.1.0`, komponent bez warunków).
+- `components/layout/SpeedInsightsClient.tsx`: komponent kliencki z `beforeSend`. Adres strony wysyłany do Vercel bez parametrów zapytania (`?q=`, `?tag=` …) i bez kotwicy. `route` to szablon trasy (`/[locale]/[...segments]`), też bez zapytania.
+- `app/[locale]/layout.tsx`: `<SpeedInsightsClient />` na końcu `<body>`, tylko gdy `!isDraftMode` (jak Umami). Studio (`/studio`) ma własny layout i skryptu nie dostaje.
+- Skrypt ładowany przez platformę z `/_vercel/speed-insights/script.js` (ścieżka pominięta w matcherze `proxy.ts`), metryki do `/_vercel/speed-insights/vitals`. Bez cookies. Przeglądarki automatyczne (`navigator.webdriver`, „Headless” w user agent) niczego nie wysyłają.
+- Rollback: Production `ed98b3b` (deployment 7722623862), tag `przed-speed-insights`.
+
 ## 2026-10-29
 
 ### Przekierowania dawnych polskich adresów
