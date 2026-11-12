@@ -7,6 +7,7 @@ import { ThemeProvider } from '@/components/layout/ThemeProvider'
 import { cormorant, dmSans, dmMono } from '@/app/fonts'
 import { DraftTools } from '@/components/layout/DraftTools'
 import { HtmlClassGuard } from '@/components/layout/HtmlClassGuard'
+import { SpeedInsightsClient } from '@/components/layout/SpeedInsightsClient'
 import { getSiteSettings } from '@/lib/queries'
 import { IS_PRODUCTION, SITE_NAME, SITE_URL, localeUrl } from '@/lib/site'
 import { OG_LOCALE, isLocale, toLocale } from '@/lib/locales'
@@ -84,6 +85,8 @@ export default async function LocaleLayout({
             strategy="afterInteractive"
           />
         )}
+        {/* Vercel Speed Insights — metryki wydajności bez cookies, adres bez parametrów zapytania */}
+        {!isDraftMode && <SpeedInsightsClient />}
       </body>
     </html>
   )
