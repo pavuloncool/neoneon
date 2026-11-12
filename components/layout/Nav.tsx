@@ -266,7 +266,7 @@ export function Nav({ links, logo, labels }: NavProps) {
                     {/* Aktywny link zachowuje dotychczasowy styl; pozostałe: rolling text + złote podkreślenie */}
                     <NavLink link={link} className={cn(
                       'text-sm tracking-wide px-3 py-1.5 transition-colors',
-                      active ? 'bg-ink text-paper dark:bg-white dark:text-ink' : 'nav-roll-link text-muted hover:text-ink dark:hover:text-white'
+                      active ? 'bg-ink text-paper dark:bg-white dark:text-ink' : 'nav-roll-link text-muted hover:text-ink dark:hover:!text-white'
                     )}>
                       {active ? link.label : <RollingLabel label={link.label} />}
                     </NavLink>
@@ -278,7 +278,7 @@ export function Nav({ links, logo, labels }: NavProps) {
             <Link
               href="/search"
               aria-label={labels.search}
-              className="text-muted hover:text-ink dark:hover:text-white transition-colors p-1"
+              className="text-muted hover:text-ink dark:hover:!text-white transition-colors p-1"
             >
               <Search size={16} strokeWidth={1.5} aria-hidden="true"/>
             </Link>

@@ -39,7 +39,7 @@ export function LanguageSwitcher({
           'px-1.5 py-1 transition-colors duration-200',
           locale === 'pl'
             ? dark ? 'text-white font-medium' : 'text-ink dark:text-white font-medium'
-            : dark ? 'text-white/50 hover:text-white' : 'text-muted hover:text-ink dark:hover:text-white'
+            : dark ? 'text-white/50 hover:text-white' : 'text-muted hover:text-ink dark:hover:!text-white'
         )}
       >
         PL
@@ -53,7 +53,7 @@ export function LanguageSwitcher({
           'px-1.5 py-1 transition-colors duration-200',
           locale === 'en'
             ? dark ? 'text-white font-medium' : 'text-ink dark:text-white font-medium'
-            : dark ? 'text-white/50 hover:text-white' : 'text-muted hover:text-ink dark:hover:text-white'
+            : dark ? 'text-white/50 hover:text-white' : 'text-muted hover:text-ink dark:hover:!text-white'
         )}
       >
         EN

@@ -441,10 +441,12 @@ html.theme-vt *::after {
   color: rgba(255, 255, 255, 0.65) !important;
 }
 
-/* Hover fix: elementy z hover:text-paper lub hover:text-ink nie blokowane przez !important */
+/* Hover fix: elementy z hover:text-paper lub hover:text-ink nie blokowane przez !important.
+   Dotyczy kafelków/kart, które w dark mode na hover dostają białe tło (ArticleCard, CategoryTiles,
+   RecentArticles). Bez `nav a:hover`: linki w navbarze, menu mobilnym i stopce mają ciemne tło,
+   więc przyciemniony tekst był niewidoczny — kolor hover ustawiają same komponenty (dark:hover:!text-white). */
 .dark .group:hover .text-muted,
-.dark a:hover .text-muted,
-.dark nav a:hover {
+.dark a:hover .text-muted {
   color: rgba(15, 15, 15, 0.5) !important;
 }
 

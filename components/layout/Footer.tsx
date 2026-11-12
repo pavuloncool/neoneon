@@ -8,7 +8,7 @@ export interface FooterProps {
 }
 
 export function Footer({ text, links, navLabel }: FooterProps) {
-  const linkClass = 'text-sm text-muted hover:text-ink transition-colors'
+  const linkClass = 'text-sm text-muted hover:text-ink dark:hover:!text-white transition-colors'
   return (
     <footer className="mt-24 border-t border-border">
       <div className="max-w-5xl mx-auto px-6 py-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
