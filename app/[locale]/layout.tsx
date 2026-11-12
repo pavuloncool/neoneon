@@ -3,6 +3,7 @@ import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { draftMode } from 'next/headers'
 import Script from 'next/script'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { ThemeProvider } from '@/components/layout/ThemeProvider'
 import { cormorant, dmSans, dmMono } from '@/app/fonts'
 import { DraftTools } from '@/components/layout/DraftTools'
@@ -84,6 +85,7 @@ export default async function LocaleLayout({
             strategy="afterInteractive"
           />
         )}
+        <SpeedInsights />
       </body>
     </html>
   )
