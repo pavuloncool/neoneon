@@ -233,6 +233,13 @@
 - `app/[locale]/layout.tsx`: `<SpeedInsightsClient />` na końcu `<body>`, tylko gdy `!isDraftMode` (jak Umami). Studio (`/studio`) ma własny layout i skryptu nie dostaje.
 - Skrypt ładowany przez platformę z `/_vercel/speed-insights/script.js` (ścieżka pominięta w matcherze `proxy.ts`), metryki do `/_vercel/speed-insights/vitals`. Bez cookies. Przeglądarki automatyczne (`navigator.webdriver`, „Headless” w user agent) niczego nie wysyłają.
 - Rollback: Production `ed98b3b` (deployment 7722623862), tag `przed-speed-insights`.
+- Wdrożone: merge `90b8713`, Production deployment 7734013719. PR #1 agenta zamknięty bez scalania. Kontrola panelu (12.11): dane z produkcji, desktop RES 100, trasy jako szablony bez parametrów; zużycie 80 / 10 000 zdarzeń w 30 dniach. `sampleRate` niepotrzebny (szacunek ok. 1 700 zdarzeń w 30 dniach).
+
+### Polityka prywatności: Vercel Speed Insights (zmiana w Sanity, 2026-11-12, 09:56)
+
+- Nowa sekcja PL/EN „Pomiar wydajności strony (Vercel Speed Insights)” / „Performance measurement (Vercel Speed Insights)” po sekcji Umami: zbierane wskaźniki wydajności, adres bez parametrów, ogólny wzór adresu, opis elementu, szybkość połączenia, typ urządzenia, system, przeglądarka, kraj; bez cookies, bez identyfikatora, bez powiązania z adresem IP. Podstawa: art. 6 ust. 1 lit. f RODO (utrzymanie wydajności serwisu).
+- Sekcja Umami: usunięte zdanie „Ponieważ Umami nie zapisuje ani nie odczytuje informacji z Twojego urządzenia, nie jest wymagana zgoda na cookies” (EN: „Because Umami neither stores nor reads…”). Informacja, że Umami nie zapisuje danych w przeglądarce, zostaje w pierwszym akapicie.
+- Data aktualizacji: 12 listopada 2026. Zapis skryptem z dry runem i `ifRevisionID`, 0 szkiców.
 
 ## 2026-10-29
 
